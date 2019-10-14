@@ -19,7 +19,10 @@ class Data:
     def download_data(self):
         data = 0
 
-        ftp = ftplib.FTP('xxx', 'xxx', 'xxx')
+        server, username, passwd = self.get_credentials()
+        ftp = FTP(server)
+        ftp.login(user=username, passwd=passwd)
+
         ftp.cwd("/asi16_data/asi_16124") #cam 1
         files  = ftp.nlst()
 
@@ -70,9 +73,19 @@ class Data:
 
         del tmp
 
-    def images_information(self):
+    def get_credentials(self):
+        f = open('cred.txt', 'r')
+        lines = f.read().split(',')
+        f.close()
+        # print(lines)
+        return lines[0], lines[1], lines[2]
 
-        ftp = ftplib.FTP('xxx', 'xxx', 'xxx')
+
+    def images_information(self):
+        server, username, passwd = self.get_credentials()
+        ftp = ftplib.FTP(server)
+        ftp.login(user=username, passwd=passwd)
+
         ftp.cwd("/asi16_data/asi_16124")  # cam 1
         files = ftp.nlst()
         del files[0]
@@ -143,18 +156,19 @@ class Data:
         # cv2.imwrite(name + str('._prep.jpg'), image)
         return cv2.resize(img, (width, height), interpolation=cv2.INTER_LINEAR)
 
-    def build_df(self, size):
+    def build_df(self, queries):
         # size 0 means al images
         index = 0
-        # tmp_img = cv2.imread(path + files[0])  # random image assume here they are all the same
-        # height, width, channels = tmp_img.shape TODO
-        df = np.empty([(size), 7077896])
+        tmp_img = cv2.imread('asi_16124/20191006/20191006060800_11.jpg')  # random image assume here they are all the same
+        height, width, channels = tmp_img.shape
+        size_of_row = 8 + height*width*channels
+        df = np.empty([queries, size_of_row])
 
         folders = listdir('asi_16124')#select cam
         del folders[0:3] #first 3 are bad data
 
         for folder in folders:
-            if index == size:
+            if index == queries:
                 break
 
             path = 'asi_16124/' + str(folder) + '/'
@@ -162,9 +176,9 @@ class Data:
 
             self.process_csv(path + files[-1])  # process csv
             tmp_df = pd.read_csv(path + files[-1], sep=',', header=0, usecols=[2,3,4,5])  #load csv
-            # print(tmp_df)
+            print(tmp_df)
             for file in files:
-                if index == size: #cancel if dataframe is full
+                if index == queries: #cancel if dataframe is full
                     break
 
                 arr = tmp_df[tmp_df['2'] == self.exract_formatted_time(file)] #find image in cvs by time
@@ -178,13 +192,16 @@ class Data:
                 index += 1
                 print(index)
 
+        #YEAR, MONTH, DAY, HOURS, MINUTES, SECONDS, TEMP, IRRADIANCE, IMAGE
         return df.astype(int)
 
 
 #
 d = Data()
-df = d.build_df(2)
-print(df[0][0:12])
+# df = d.build_df(2)
+d.images_information()
+
+# print(df[0][0:12])
 # # d.download_data()
 
 #make df ready for future predictions
