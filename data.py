@@ -2,16 +2,12 @@ import ftplib
 import csv
 import numpy as np
 import pandas as pd
-from tensorflow import name_scope
 from os import listdir
 import numpy as np
 import cv2
-import matplotlib.pyplot as plt
-import matplotlib
 from datetime import time
+from data_visuals import *
 from PIL import Image
-
-
 
 class Data:
 
@@ -82,6 +78,61 @@ class Data:
         # print(lines)
         return lines[0], lines[1], lines[2]
 
+    def extract_time(self, time_str):
+        return(time_str[8:14])
+
+    def exract_formatted_time(self, time_str):
+        s = time_str[8:14]
+        return s[0:2] + ':' + s[2:4] + ':' + s[4:6]
+
+    def extract_time_less_accurate(self, time_str):
+        return(time_str[8:12])
+
+    def pre_process(self):
+        pass
+
+    def sample(self):
+        pass
+
+    def wordListToFreqDict(self, wordlist):
+        wordfreq = [wordlist.count(p) for p in wordlist]
+        return dict(zip(wordlist, wordfreq))
+
+    def resize_image(self,img, height, width):
+        # setting dim of the resize
+        # name = ('image/20190716084100_11.jpg')
+        # img = cv2.imread(name)
+        # image = cv2.resize(np.float32(img), (800, 800), interpolation=cv2.INTER_LINEAR)
+        # cv2.imwrite(name + str('._prep.jpg'), image)
+        return cv2.resize(img, (width, height), interpolation=cv2.INTER_LINEAR)
+
+    def get_avg_var_by_minute(self, df, hour, minute):
+        rows = df[df[:, 3] == hour] # filter on hours
+        rows = rows[rows[:, 4] == minute] # filter on minutes
+        return np.mean(rows[:,6:8], axis=0), np.var(rows[:,6:8], axis=0)
+
+    def plot_avg_per_month(self, month, start, end):
+        df = self.get_df_csv_month(month, start, end)
+        hours = list(range(start, end))
+        minutes = list(range(0, 60, 5))
+        times, avg_temp, var_temp, avg_ghi, var_ghi, var_ghi, tick_times = ([] for i in range(7))
+
+        for h in hours:
+            tick_times.append(time(h, 0, 0)) #round hours
+            tick_times.append(time(h, 30, 0)) # half hours
+            for m in minutes:
+                tmp_avg, tmp_var = self.get_avg_var_by_minute(df, h, m)
+                tmp_time = time(h, m, 0)
+                times.append(tmp_time)
+                avg_temp.append(tmp_avg[0])
+                var_temp.append(tmp_var[0])
+                avg_ghi.append(tmp_avg[1])
+                var_ghi.append(tmp_var[1])
+        #plot data
+        plot_time_avg(tick_times, times, avg_temp, 'time', 'temp. in celsius', 'avg. temp. in month ' + str(month))
+        plot_time_avg(tick_times, times, var_temp, 'time', 'Variance temp.','var. temp. in month ' + str(month))
+        plot_time_avg(tick_times, times, avg_ghi, 'time', 'Global horizon irradiace', 'avg. ghi in month ' + str(month))
+        plot_time_avg(tick_times, times, var_ghi, 'time', 'Variance GHI', 'var. ghi in month ' + str(month))
 
     def images_information(self):
         server, username, passwd = self.get_credentials()
@@ -90,11 +141,9 @@ class Data:
 
         ftp.cwd("/asi16_data/asi_16124")  # cam 1
         files = ftp.nlst()
-        del files[0]
+        del files[0] #data not valid
 
-        start_times = []
-        stop_times = []
-        times = [] # no way
+        start_times, stop_times, times = ([] for i in range(3)) #times not used. too much data. unable to plot..
         todo = len(files)
         done = 0
 
@@ -113,117 +162,11 @@ class Data:
         print(start_dict)
         print(stop_dict)
 
-        self.plot_freq(start_dict, 'Frequency start times')
-        self.plot_freq(stop_dict, 'Frequency stop times')
+        plot_freq(start_dict, 'Frequency start times')
+        plot_freq(stop_dict, 'Frequency stop times')
 
 
-    def extract_time(self, time_str):
-        return(time_str[8:14])
-
-    def exract_formatted_time(self, time_str):
-        s = time_str[8:14]
-        return s[0:2] + ':' + s[2:4] + ':' + s[4:6]
-
-    def extract_time_less_accurate(self, time_str):
-        return(time_str[8:12])
-
-
-    def pre_process(self):
-        pass
-
-    def sample(self):
-        pass
-
-
-
-
-    def wordListToFreqDict(self, wordlist):
-        wordfreq = [wordlist.count(p) for p in wordlist]
-        return dict(zip(wordlist, wordfreq))
-
-    def plot_freq(self, dict, title):
-        ax = plt.axes()
-        plt.setp(ax.get_xticklabels(), rotation=90, horizontalalignment='right', fontsize='x-small')
-        plt.bar(dict.keys(), dict.values(), 0.75, color='b')
-
-        plt.title(title)
-        plt.xlabel('times')
-        plt.ylabel('frequency')
-        plt.tight_layout()
-
-        plt.show()
-
-    def resize_image(self,img, height, width):
-        # setting dim of the resize
-        # name = ('image/20190716084100_11.jpg')
-        # img = cv2.imread(name)
-        # image = cv2.resize(np.float32(img), (800, 800), interpolation=cv2.INTER_LINEAR)
-        # cv2.imwrite(name + str('._prep.jpg'), image)
-        return cv2.resize(img, (width, height), interpolation=cv2.INTER_LINEAR)
-
-    def get_avg_var_by_minute(self, df, hour, minute):
-        # rows = df[(np.where((df[:3] == hour) & (df[:4] == minute)))]
-
-        rows = df[df[:,3] == hour] # first statement
-        # print(rows)
-        rows = rows[rows[:,4] == minute] # second statement
-        # print(rows)
-        means = np.mean(rows[:,6:8], axis=0)
-        var = np.var(rows[:,6:8], axis=0)
-        # print(means)
-        return means, var
-
-
-    def plot_avg_per_month(self, month, start, end):
-        df = self.get_df_csv_month(month, start, end)
-        hours = list(range(start, end))
-        minutes = list(range(0, 60, 5))
-        times = []
-        avg_temp = []
-        var_temp = []
-        avg_ghi = []
-        var_ghi = []
-        tick_times = []
-
-        for h in hours:
-            tick_times.append(time(h, 0, 0))
-            tick_times.append(time(h, 30, 0))
-            for m in minutes:
-                tmp_avg, tmp_var = self.get_avg_var_by_minute(df, h, m)
-                tmp_time = time(h, m, 0)
-                times.append(tmp_time)
-                avg_temp.append(tmp_avg[0])
-                var_temp.append(tmp_var[0])
-                avg_ghi.append(tmp_avg[1])
-                var_ghi.append(tmp_var[1])
-
-        self.plot_time_avg(tick_times, times, avg_temp, 'time', 'temp. in celsius',
-                           'avg. temp. in month ' + str(month))
-
-        self.plot_time_avg(tick_times, times, var_temp, 'time', 'Variance temp.',
-                           'var. temp. in month ' + str(month))
-
-        self.plot_time_avg(tick_times, times, avg_ghi, 'time', 'Global horizon irradiace',
-                           'avg. ghi in month ' + str(month))
-
-        self.plot_time_avg(tick_times, times, var_ghi, 'time', 'Variance GHI',
-                           'var. ghi in month ' + str(month))
-
-
-    def plot_time_avg(self, tick_times, times, values, lx, ly, title):
-        plt.xticks(tick_times)
-        ax = plt.axes()
-        plt.setp(ax.get_xticklabels(), rotation=45, horizontalalignment='right', fontsize='x-small')
-        plt.plot(times, values, linestyle=':')
-
-        plt.title(title)
-        plt.xlabel(lx)
-        plt.ylabel(ly)
-
-        plt.show()
-
-    def get_df_csv_month(self, month, start, end):
-
+    def get_df_csv_month(self, month, start, end): #get data frame for a month with start and end time not inc. image
         folders = listdir('asi_16124')  # select cam
         del folders[0:3]  # first 3 are bad data
         index = 0
@@ -240,7 +183,7 @@ class Data:
                 tmp_df = pd.read_csv(path + files[-1], sep=',', header=0, usecols=[2, 3, 4, 5])  # load csv
 
                 for row in tmp_df.iterrows():
-                    if( int(row[1].values[1][6:8]) == 0 and int(row[1].values[1][3:5])%5 == 0 and int(row[1].values[1][0:2]) > start and int(row[1].values[1][0:2]) < end):
+                    if( int(row[1].values[1][6:8]) == 0 and int(row[1].values[1][3:5])%5 == 0 and int(row[1].values[1][0:2]) >= start and int(row[1].values[1][0:2]) < end):
                         df[index][0:8] = np.array([row[1].values[0][0:2], row[1].values[0][3:5], row[1].values[0][6:8],
                                                    row[1].values[1][0:2], row[1].values[1][3:5], row[1].values[1][6:8],
                                                    row[1].values[2], row[1].values[3]])  # set csv data to df
@@ -248,7 +191,7 @@ class Data:
                         # print(index)
         # # YEAR, MONTH, DAY, HOURS, MINUTES, SECONDS, TEMP, IRRADIANCE, IMAGE
         print('filled queries: ' + str(index) + 'out of: ' + str(queries))
-        return df[0:index].astype(int)
+        return df.astype(int)
 
     def build_df(self, queries):
         # size 0 means al images
@@ -295,7 +238,7 @@ class Data:
 d = Data()
 # df = d.build_df(2)
 # d.images_information()
-d.plot_avg_per_month(9, 3, 22)
+d.plot_avg_per_month(9, 5, 19)
 # print(df[0][0:12])
 # # d.download_data()
 
