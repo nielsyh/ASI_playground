@@ -225,7 +225,9 @@ class Data:
                 data = arr.to_numpy().flatten()
                 #index in csv, seconds, year, month, day, hours, minutes, seconds, temp, irriadiance. then image
                 df[index][0:8] = np.array([data[0][0:2], data[0][3:5], data[0][6:8], data[1][0:2], data[1][3:5], data[1][6:8], data[2], data[3]]) #set csv data to df
-                df[index][8:] = cv2.imread(path + file).flatten() #set img data to df
+                img  = cv2.imread(path + file)
+                df[index][8:] = img.flatten() #set img data to df
+
                 index += 1
                 print(index)
 
