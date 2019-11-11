@@ -22,6 +22,7 @@ class Features:
 
     def number_of_cloud_pixels(self, img, threshold = 0.8):
         img = self.pre_process_img(img, 400)
+        orig =
         img2 = 0
         img2 = cv2.normalize(img,img2,-1,1,cv2.NORM_MINMAX)
         height, width, channels = img2.shape
@@ -33,9 +34,9 @@ class Features:
 
         for h in range(0, height):
             for w in range(0, width):
-                r = img2[h,w,0]
+                b = img2[h,w,0]
                 g = img2[h,w,1]
-                b = img2[h,w,2]
+                r = img2[h,w,2]
 
                 # if b == 0:
                 #     continue
@@ -48,7 +49,7 @@ class Features:
 
                 # if brgb < 500:
                 # if nrbr > 0.15 and nrbr < 1:
-                if rbr > 0.67 :
+                if rbr < 0.67 :
                     amount_of_cloud_pixels += 1
                     img[h, w, 0] = 124
                     img[h, w, 1] = 252
@@ -57,13 +58,14 @@ class Features:
 
         print(amount_of_cloud_pixels)
         cv2.imshow('image', img)
+        cv2.imshow('orig', orig)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
         return amount_of_cloud_pixels
 
-# a = Features()
+a = Features()
 # # url = 'image/20190723152730_11.jpg'
 # url = 'image/20190723151830_11.jpg'
-# # url = 'asi_16124/20190813/20190813153015_11.jpg'
-# img = cv2.imread(url)
-# a.number_of_cloud_pixels(img)
+url = 'asi_16124/20190813/20190813153015_11.jpg'
+img = cv2.imread(url)
+a.number_of_cloud_pixels(img)
