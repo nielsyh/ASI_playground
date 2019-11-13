@@ -117,10 +117,10 @@ class Data:
         return rows
 
 
-    def plot_per_month(self, month, start, end):
-        df = self.get_df_csv_month(month, start, end)
+    def plot_per_month(self, month, start, end, step):
+        df = self.get_df_csv_month(month, start, end, step)
         hours = list(range(start, end))
-        minutes = list(range(0, 60, 5))
+        minutes = list(range(0, 60, step))
         times, avg_temp, var_temp, avg_ghi, var_ghi, var_ghi, tick_times = ([] for i in range(7))
 
         for h in hours:
@@ -137,14 +137,14 @@ class Data:
         #plot data
         plot_time_avg(tick_times, times, avg_temp, 'time', 'temp. in celsius', 'avg. temp. in month ' + str(month))
         plot_time_avg(tick_times, times, var_temp, 'time', 'Variance temp.','var. temp. in month ' + str(month))
-        plot_time_avg(tick_times, times, avg_ghi, 'time', 'Global horizon irradiace', 'avg. ghi in month ' + str(month))
+        plot_time_avg(tick_times, times, avg_ghi, 'time', 'GHI in W/m^2', 'avg. ghi in month ' + str(month))
         plot_time_avg(tick_times, times, var_ghi, 'time', 'Variance GHI', 'var. ghi in month ' + str(month))
 
 
-    def plot_day(self, day, month, start, end):
-        df = self.get_df_csv_day(month,day, start, end)
+    def plot_day(self, day, month, start, end, step):
+        df = self.get_df_csv_day(month,day, start, end, step)
         hours = list(range(start, end))
-        minutes = list(range(0, 60, 5))
+        minutes = list(range(0, 60, step))
         times, temp, ghi, tick_times = ([] for i in range(4))
 
         for h in hours:
@@ -155,6 +155,7 @@ class Data:
                 tmp_time = time(h, m, 0)
                 # print('---------')
                 # print(rows)
+                # print(str(rows) + '' + str(m))
                 tmp_temp = rows[0][6]
                 tmp_ghi = rows[0][7]
                 # print(tmp_temp)
@@ -166,7 +167,7 @@ class Data:
 
         #plot data
         plot_time_avg(tick_times, times, temp, 'time', 'temp. in celsius', 'temp. in day: ' + str(day) + ' month: ' + str(month))
-        plot_time_avg(tick_times, times, ghi, 'time', 'GHI', 'GHI in day: ' + str(day) + ' month: ' + str(month))
+        plot_time_avg(tick_times, times, ghi, 'time', 'GHI in W/m^2', 'GHI in day: ' + str(day) + ' month: ' + str(month))
 
 
 
@@ -202,11 +203,11 @@ class Data:
         plot_freq(stop_dict, 'Frequency stop times')
 
 
-    def get_df_csv_month(self, month, start, end): #get data frame for a month with start and end time not inc. image
+    def get_df_csv_month(self, month, start, end, step): #get data frame for a month with start and end time not inc. image
         folders = listdir('asi_16124')  # select cam
         del folders[0:3]  # first 3 are bad data
         index = 0
-        queries = int(31 * ((end - start)*60/5))
+        queries = int(31 * ((end - start)*60/step))
         df = np.empty([queries, 8]) #create df
 
         for folder in folders: #fill df
@@ -219,7 +220,7 @@ class Data:
                 tmp_df = pd.read_csv(path + files[-1], sep=',', header=0, usecols=[2, 3, 4, 5])  # load csv
 
                 for row in tmp_df.iterrows():
-                    if( int(row[1].values[1][6:8]) == 0 and int(row[1].values[1][3:5])%5 == 0 and int(row[1].values[1][0:2]) >= start and int(row[1].values[1][0:2]) < end):
+                    if( int(row[1].values[1][6:8]) == 0 and int(row[1].values[1][3:5])%step == 0 and int(row[1].values[1][0:2]) >= start and int(row[1].values[1][0:2]) < end):
                         df[index][0:8] = np.array([row[1].values[0][0:2], row[1].values[0][3:5], row[1].values[0][6:8],
                                                    row[1].values[1][0:2], row[1].values[1][3:5], row[1].values[1][6:8],
                                                    row[1].values[2], row[1].values[3]])  # set csv data to df
@@ -229,17 +230,17 @@ class Data:
         print('filled queries: ' + str(index) + 'out of: ' + str(queries))
         return df.astype(int)
 
-    def get_df_csv_day(self, month, day, start, end):
+    def get_df_csv_day(self, month, day, start, end, step):
         path = 'asi_16124/2019' + month + day + '/'
         files = listdir(path)
         index = 0
-        queries = int(((end - start) * 60 / 5))
+        queries = int(((end - start) * 60 / step))
         df = np.empty([queries, 8])  # create df
         self.process_csv(path + files[-1])
         tmp_df = pd.read_csv(path + files[-1], sep=',', header=0, usecols=[2, 3, 4, 5])  # load csv
 
         for row in tmp_df.iterrows():
-            if (int(row[1].values[1][6:8]) == 0 and int(row[1].values[1][3:5]) % 5 == 0 and int(
+            if (int(row[1].values[1][6:8]) == 0 and int(row[1].values[1][3:5]) % step == 0 and int(
                     row[1].values[1][0:2]) >= start and int(row[1].values[1][0:2]) < end):
                 df[index][0:8] = np.array([row[1].values[0][0:2], row[1].values[0][3:5], row[1].values[0][6:8],
                                            row[1].values[1][0:2], row[1].values[1][3:5], row[1].values[1][6:8],
@@ -298,8 +299,11 @@ class Data:
 d = Data()
 # df = d.build_df(2)
 # d.images_information()
-# d.plot_per_month(10, 5, 19)
-d.plot_day('05', '09', 5 , 19)
+# d.plot_per_month(9, 5, 19)
+d.plot_per_month(10, 5, 19)
+# d.plot_day('05', '09', 5 , 19)
+d.plot_day('07', '09', 5, 19, 2)
+# d.plot_day('05', '10', 5 , 19)
 # df = d.get_df_csv_day('10','05',5,19)
 # print(df[0][0:12])
 # print(df[-1][0:12])
