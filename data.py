@@ -135,10 +135,10 @@ class Data:
                 avg_ghi.append(tmp_avg[1])
                 var_ghi.append(tmp_var[1])
         #plot data
-        plot_time_avg(tick_times, times, avg_temp, 'time', 'temp. in celsius', 'avg. temp. in month ' + str(month))
-        plot_time_avg(tick_times, times, var_temp, 'time', 'Variance temp.','var. temp. in month ' + str(month))
-        plot_time_avg(tick_times, times, avg_ghi, 'time', 'GHI in W/m^2', 'avg. ghi in month ' + str(month))
-        plot_time_avg(tick_times, times, var_ghi, 'time', 'Variance GHI', 'var. ghi in month ' + str(month))
+        plot_time_avg(tick_times, times, avg_temp, 'time', 'Temp. in celsius', 'avg. Temp. in month ' + str(month))
+        plot_time_avg(tick_times, times, var_temp, 'time', 'Variance temp.','var. Temp. in month ' + str(month))
+        plot_time_avg(tick_times, times, avg_ghi, 'time', 'GHI in W/m^2', 'avg. GHI in month ' + str(month))
+        plot_time_avg(tick_times, times, var_ghi, 'time', 'Variance GHI', 'var. GHI in month ' + str(month))
 
 
     def plot_day(self, day, month, start, end, step):
@@ -218,12 +218,19 @@ class Data:
 
                 self.process_csv(path + files[-1])  # process csv
                 tmp_df = pd.read_csv(path + files[-1], sep=',', header=0, usecols=[2, 3, 4, 5])  # load csv
+                tmp_temp = None
 
                 for row in tmp_df.iterrows():
                     if( int(row[1].values[1][6:8]) == 0 and int(row[1].values[1][3:5])%step == 0 and int(row[1].values[1][0:2]) >= start and int(row[1].values[1][0:2]) < end):
                         df[index][0:8] = np.array([row[1].values[0][0:2], row[1].values[0][3:5], row[1].values[0][6:8],
                                                    row[1].values[1][0:2], row[1].values[1][3:5], row[1].values[1][6:8],
                                                    row[1].values[2], row[1].values[3]])  # set csv data to df
+
+                        if(df[index][6] == 0):
+                            df[index][6] = tmp_temp
+                        else:
+                            tmp_temp = df[index][6]
+
                         index += 1
                         # print(index)
         # # YEAR, MONTH, DAY, HOURS, MINUTES, SECONDS, TEMP, IRRADIANCE, IMAGE
@@ -300,7 +307,7 @@ d = Data()
 # df = d.build_df(2)
 # d.images_information()
 # d.plot_per_month(9, 5, 19)
-d.plot_per_month(10, 5, 19)
+# d.plot_per_month(9, 5, 19, 5)
 # d.plot_day('05', '09', 5 , 19)
 d.plot_day('07', '09', 5, 19, 2)
 # d.plot_day('05', '10', 5 , 19)
