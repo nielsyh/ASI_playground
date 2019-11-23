@@ -36,7 +36,7 @@ class OpticalFlow:
         frame1_g = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
         frame2_g = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
         flow = self.get_farneback_flow(frame1_g, frame2_g)
-        return self.warp_flow(frame2, flow)
+        return self.warp_flow(frame2, flow), self.draw_hsv(flow)
 
 
 f1 = cv2.imread('asi_16124/20190821/20190821074245_11.jpg')
@@ -48,15 +48,18 @@ opt = OpticalFlow()
 
 frame1 = a.pre_process_img(f1, 400)
 frame2 = a.pre_process_img(f2, 400)
-gen3 = opt.generate_next_img(frame1, frame2)
+gen3, hsv = opt.generate_next_img(frame1, frame2)
 
 cv2.imshow("orig 1", frame1)
 cv2.imshow("orig 2", frame2)
 cv2.imshow("generated 3", gen3)
+cv2.imshow("hsv", hsv)
 
 k = cv2.waitKey(0) & 0xff
 
 cv2.destroyAllWindows()
+
+
 
 
 #

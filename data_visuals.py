@@ -9,8 +9,6 @@ style.use('ggplot')
 def plot_time_avg(tick_times, times, values, lx, ly, title):
 
     plt.xticks(tick_times)
-    # ax = plt.axes()
-    # plt.setp(ax.get_xticklabels(), rotation=45, horizontalalignment='right', fontsize='x-small')
     plt.xticks(rotation=45)
     plt.plot(times, values, linestyle=':')
 
