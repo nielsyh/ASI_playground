@@ -3,6 +3,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.style as style
 
+
 style.use('seaborn-poster') #sets the size of the charts
 style.use('ggplot')
 
@@ -12,6 +13,19 @@ def plot_time_avg(tick_times, times, values, lx, ly, title):
     plt.xticks(rotation=45)
     plt.plot(times, values, linestyle=':')
 
+    plt.title(title)
+    plt.xlabel(lx)
+    plt.ylabel(ly)
+
+    plt.show()
+
+def plot_2_models(tick_times, times, values_m1, values_m2, lx, ly, title):
+
+    plt.xticks(tick_times)
+    plt.xticks(rotation=45)
+    plt.plot(times, values_m1 ,linestyle='-', label = 'Observed')
+    plt.plot(times, values_m2, linestyle='-', label = 'Predicted')
+    plt.legend()
     plt.title(title)
     plt.xlabel(lx)
     plt.ylabel(ly)

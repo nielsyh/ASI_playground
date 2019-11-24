@@ -8,6 +8,7 @@ import cv2
 from datetime import time
 from data_visuals import *
 from PIL import Image
+from metrics import *
 
 class Data:
 
@@ -153,13 +154,8 @@ class Data:
             for m in minutes:
                 rows = self.get_ghi_temp_by_minute(df, h, m)
                 tmp_time = time(h, m, 0)
-                # print('---------')
-                # print(rows)
-                # print(str(rows) + '' + str(m))
                 tmp_temp = rows[0][6]
                 tmp_ghi = rows[0][7]
-                # print(tmp_temp)
-                # print(tmp_ghi)
 
                 times.append(tmp_time)
                 temp.append(tmp_temp)
@@ -169,7 +165,93 @@ class Data:
         plot_time_avg(tick_times, times, temp, 'time', 'temp. in celsius', 'temp. in day: ' + str(day) + ' month: ' + str(month))
         plot_time_avg(tick_times, times, ghi, 'time', 'GHI in W/m^2', 'GHI in day: ' + str(day) + ' month: ' + str(month))
 
+    def plot_persistence_day(self, day, month, start, end, step):
 
+        df_truth = self.get_df_csv_day(month, day, start, end, step)
+        previous_day = '0' + str(int(day) - 1) #cao ni mam fix this
+        df_pred = self.get_df_csv_day(month, previous_day, start, end, step)
+
+        hours = list(range(start, end))
+        minutes = list(range(0, 60, step))
+        times, ghi_pred, ghi_truth, tick_times = ([] for i in range(4))
+
+        for h in hours:
+            tick_times.append(time(h, 0, 0))  # round hours
+            tick_times.append(time(h, 30, 0))  # half hours
+            for m in minutes:
+                rows_truth = self.get_ghi_temp_by_minute(df_truth, h, m)
+                rows_pred = self.get_ghi_temp_by_minute(df_pred, h, m)
+                tmp_time = time(h, m, 0)
+
+                #sometimes data is missing then skip.
+                if( len(rows_truth) > 0 and len(rows_pred) > 0):
+                    ghi_truth_tmp = rows_truth[0][7]
+                    ghi_pred_tmp = rows_pred[0][7]
+                    times.append(tmp_time)
+                    ghi_truth.append(ghi_truth_tmp)
+                    ghi_pred.append(ghi_pred_tmp)
+
+        # plot data
+        plot_2_models(tick_times, times,ghi_truth, ghi_pred, 'time', 'GHI in W/m^2',
+                      'GHI at day: ' + str(day) + ' month: ' + str(month))
+
+    def get_error_month(self, month, start, end, step):
+        y_observed = []
+        y_predicted = []
+
+        for i in range(2,4):
+
+            day = str(i)
+            if len(day) == 1:
+                day = '0' + day
+
+            print(day)
+            df_truth = self.get_df_csv_day(month, day, start, end, step)
+            previous_day =  str(int(day) - 1)  # cao ni mam fix this
+
+
+            if len(previous_day) == 1:
+                previous_day = '0' + previous_day
+
+            df_pred = self.get_df_csv_day(month, previous_day, start, end, step)
+
+            hours = list(range(start, end))
+            minutes = list(range(0, 60, step))
+            times, ghi_pred, ghi_truth, tick_times = ([] for i in range(4))
+
+            for h in hours:
+                tick_times.append(time(h, 0, 0))  # round hours
+                tick_times.append(time(h, 30, 0))  # half hours
+                for m in minutes:
+                    rows_truth = self.get_ghi_temp_by_minute(df_truth, h, m)
+                    rows_pred = self.get_ghi_temp_by_minute(df_pred, h, m)
+                    tmp_time = time(h, m, 0)
+
+                    # sometimes data is missing then skip.
+                    if (len(rows_truth) > 0 and len(rows_pred) > 0):
+                        ghi_truth_tmp = rows_truth[0][7]
+                        ghi_pred_tmp = rows_pred[0][7]
+                        times.append(tmp_time)
+                        ghi_truth.append(ghi_truth_tmp)
+                        ghi_pred.append(ghi_pred_tmp)
+
+            y_observed.append(ghi_truth)
+            y_predicted.append(ghi_pred)
+
+        y_observed = self.flatten(y_observed)
+        y_predicted = self.flatten(y_predicted)
+
+        print('RMSE')
+        print(Metrics.rmse(y_observed, y_predicted))
+        print('MAE')
+        print(Metrics.mae(y_observed, y_predicted))
+        print('MAPE')
+        print(Metrics.mape(y_observed, y_predicted))
+
+
+    def flatten(self,l):
+        f = [item for sublist in l for item in sublist]
+        return f
 
     def images_information(self):
         server, username, passwd = self.get_credentials()
@@ -309,7 +391,13 @@ d = Data()
 # d.plot_per_month(9, 5, 19)
 # d.plot_per_month(9, 5, 19, 5)
 # d.plot_day('05', '09', 5 , 19)
-d.plot_day('04', '09', 14, 15, 1)
+# d.plot_day('04', '09', 14, 15, 1)
+# d.plot_persistence_day('02', '09', 6, 19, 1)
+# d.plot_persistence_day('03', '09', 6, 19, 1)
+# d.plot_persistence_day('04', '09', 6, 19, 1)
+# d.plot_persistence_day('05', '09', 6, 19, 1)
+d.get_error_month('09', 6, 19, 10)
+
 # d.plot_day('05', '10', 5 , 19)
 # df = d.get_df_csv_day('10','05',5,19)
 # print(df[0][0:12])
