@@ -19,6 +19,7 @@ class Data:
     def download_data(self, cam = 1, overwrite = False):
         data = 0
         cam_url = 0
+        file_url = 0
 
         if(cam  == 1):
             cam_url = "/asi16_data/asi_16124/"
@@ -46,7 +47,6 @@ class Data:
                 if not path.isfile(tmp_name) or overwrite:
                 #if image
                     if('.jpg' in i):
-                        continue
                         image = open(tmp_name, 'wb')
                         ftp.retrbinary('RETR ' + file_name, image.write, 1024)
                         image.close()
@@ -55,6 +55,7 @@ class Data:
                         csv = open(tmp_name, 'wb')
                         ftp.retrbinary('RETR ' + file_name, csv.write, 1024)
                         csv.close()
+                        #some have wrong encoding..
                         try:
                             self.process_csv(tmp_name)
                         except:
@@ -79,11 +80,8 @@ class Data:
             c = [1, 2, 4, 7, 15]
             for index, row in arr.iterrows():
                 for i in c:
-                    # try:
                     vals = row[i].split('=')
                     row[i] = vals[1]
-                    # except:
-                        # print("row: " + str(row[i]))
 
             arr[c].to_csv(csv_name, index=False)
         del tmp
@@ -92,7 +90,6 @@ class Data:
         f = open('cred.txt', 'r')
         lines = f.read().split(',')
         f.close()
-        # print(lines)
         return lines[0], lines[1], lines[2]
 
     def extract_time(self, time_str):
@@ -105,22 +102,11 @@ class Data:
     def extract_time_less_accurate(self, time_str):
         return(time_str[8:12])
 
-    def pre_process(self):
-        pass
-
-    def sample(self):
-        pass
-
     def wordListToFreqDict(self, wordlist):
         wordfreq = [wordlist.count(p) for p in wordlist]
         return dict(zip(wordlist, wordfreq))
 
     def resize_image(self,img, height, width):
-        # setting dim of the resize
-        # name = ('image/20190716084100_11.jpg')
-        # img = cv2.imread(name)
-        # image = cv2.resize(np.float32(img), (800, 800), interpolation=cv2.INTER_LINEAR)
-        # cv2.imwrite(name + str('._prep.jpg'), image)
         return cv2.resize(img, (width, height), interpolation=cv2.INTER_LINEAR)
 
     def get_avg_var_by_minute(self, df, hour, minute):
@@ -187,7 +173,7 @@ class Data:
 
         df_truth = self.get_df_csv_day(month, day, start, end, step)
         previous_day = '0' + str(int(day) - 1) #cao ni mam fix this
-        df_pred = self.get_df_csv_day(month, previous_day, start, end, step)
+        df_pred = self.get_df_csv_day(month, self.get_prev_day(day), start, end, step)
 
         hours = list(range(start, end))
         minutes = list(range(0, 60, step))
@@ -203,7 +189,6 @@ class Data:
 
                 #sometimes data is missing then skip.
                 if( len(rows_truth) > 0 and len(rows_pred) > 0):
-                    # print(rows_truth[0])
                     ghi_truth_tmp = rows_truth[0][8]
                     ghi_pred_tmp = rows_pred[0][8]
                     times.append(tmp_time)
@@ -213,6 +198,12 @@ class Data:
         # plot data
         plot_2_models(tick_times, times,ghi_truth, ghi_pred, 'time', 'GHI in W/m^2',
                       'GHI at day: ' + str(day) + ' month: ' + str(month))
+
+    def get_prev_day(self, day):
+        previous_day = str(int(day) - 1)  # cao ni mam fix this
+        if len(previous_day) == 1:
+            previous_day = '0' + previous_day
+        return previous_day
 
     def get_error_month(self, month, start, end, step):
         y_observed = []
@@ -224,15 +215,8 @@ class Data:
             if len(day) == 1:
                 day = '0' + day
 
-            print(day)
             df_truth = self.get_df_csv_day(month, day, start, end, step)
-            previous_day =  str(int(day) - 1)  # cao ni mam fix this
-
-
-            if len(previous_day) == 1:
-                previous_day = '0' + previous_day
-
-            df_pred = self.get_df_csv_day(month, previous_day, start, end, step)
+            df_pred = self.get_df_csv_day(month, self.get_prev_day(day), start, end, step) #todo include prev month
 
             hours = list(range(start, end))
             minutes = list(range(0, 60, step))
