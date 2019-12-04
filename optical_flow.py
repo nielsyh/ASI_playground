@@ -39,20 +39,30 @@ class OpticalFlow:
         return self.warp_flow(frame2, flow), self.draw_hsv(flow)
 
 
-f1 = cv2.imread('asi_16124/20190821/20190821074245_11.jpg')
-f2 = cv2.imread('asi_16124/20190821/20190821074330_11.jpg')
+f1 = cv2.imread('asi_16124/20190821/20190821120115_11.jpg')
+f2 = cv2.imread('asi_16124/20190821/20190821120130_11.jpg')
+f3 = cv2.imread('asi_16124/20190821/20190821120145_11.jpg')
 
 #preprocess
 a = Features()
 opt = OpticalFlow()
 
-frame1 = a.pre_process_img(f1, 400)
-frame2 = a.pre_process_img(f2, 400)
+frame1 = f1#a.pre_process_img(f1, 400)
+frame2 = f2#a.pre_process_img(f2, 400)
+frame3 = f3#a.pre_process_img(f3, 400)
 gen3, hsv = opt.generate_next_img(frame1, frame2)
+
+
+frame1 = a.pre_process_img(frame1,400)
+frame2 = a.pre_process_img(frame2,400)
+frame3 = a.pre_process_img(frame3,400)
+gen3 = a.pre_process_img(gen3,400)
+hsv = a.pre_process_img(hsv,400)
 
 cv2.imshow("orig 1", frame1)
 cv2.imshow("orig 2", frame2)
 cv2.imshow("generated 3", gen3)
+cv2.imshow("orig 3", frame3)
 cv2.imshow("hsv", hsv)
 
 k = cv2.waitKey(0) & 0xff

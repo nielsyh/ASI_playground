@@ -18,6 +18,7 @@ class Metrics:
 
     @staticmethod
     def mape(y_observed, y_predicted):
-        # y_observed, y_predicted = check_arrays(y_observed, y_predicted)
-        return np.mean(np.abs((y_observed - y_predicted) / y_observed)) * 100
+        y_observed, y_pred = np.array(y_observed), np.array(y_predicted)
+        return np.mean(np.abs((y_observed - y_predicted) / (y_observed +1) )) * 100
+
 
