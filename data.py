@@ -47,9 +47,9 @@ class Data:
                 #if image
                     if('.jpg' in i):
                         continue
-                        # image = open(tmp_name, 'wb')
-                        # ftp.retrbinary('RETR ' + file_name, image.write, 1024)
-                        # image.close()
+                        image = open(tmp_name, 'wb')
+                        ftp.retrbinary('RETR ' + file_name, image.write, 1024)
+                        image.close()
                         # #TODO now you can do pre_processing
                     elif('.csv' in i):
                         csv = open(tmp_name, 'wb')
@@ -354,7 +354,7 @@ class Data:
         df = np.empty([queries, 9])  # create df
 
         self.process_csv(path + files[-1])
-        tmp_df = pd.read_csv(path + files[-1], sep=',', header=0, usecols=[0, 1 ,2, 3, 4])  # load csv
+        tmp_df = pd.read_csv(path + files[-1], sep=',', header=0, usecols=[0, 1, 2, 3, 4])  # load csv
 
         for row in tmp_df.iterrows():
             #check seconds 0, check step
