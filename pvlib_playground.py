@@ -7,7 +7,6 @@ from pvlib import clearsky, atmosphere, solarposition
 from pvlib.location import Location
 from pvlib.iotools import read_tmy3
 
-
 class PvLibPlayground:
 
     def __init__(self):
@@ -22,8 +21,13 @@ class PvLibPlayground:
         return -2.363556
 
     @staticmethod
+    def get_altitude():
+        return 545.9
+
+    @staticmethod
+    #todo get real attitude on
     def get_location_almeria():
-        return Location(37.091549, -2.363556, tz='UTC', altitude=0)
+        return Location(37.091549, -2.363556, tz='UTC', altitude=PvLibPlayground.get_altitude())
 
     @staticmethod
     def get_df_times(start, end):
@@ -53,9 +57,8 @@ class PvLibPlayground:
                                               PvLibPlayground.get_longitude(),
                                               pvlib.solarposition.equation_of_time_spencer71(day_of_year))
 
-
     @staticmethod
-    def get_declation_angle(self, month, day):
+    def get_declation_angle(month, day):
         return pvlib.solarposition.declination_cooper69(PvLibPlayground.get_day_of_year(month, day))
 
     def get_solar_attitude_angle(self, month, day, time):
@@ -68,7 +71,7 @@ class PvLibPlayground:
         pass
 
     @staticmethod
-    def get_solar_zenith_angle(self, month, day, times):
+    def get_solar_zenith_angle(month, day, times):
         doy = PvLibPlayground.get_day_of_year(month, day)
         return pvlib.solarposition.solar_zenith_analytical(PvLibPlayground.get_latitude(),
                                                     PvLibPlayground.get_hour_angle(doy, times),

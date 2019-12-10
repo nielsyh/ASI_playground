@@ -7,6 +7,7 @@ import matplotlib.style as style
 style.use('seaborn-poster') #sets the size of the charts
 style.use('ggplot')
 
+
 def plot_time_avg(tick_times, times, values, values_label, lx, ly, title, values_2 = [], values_2_label = ''):
 
     plt.xticks(tick_times)
@@ -23,6 +24,7 @@ def plot_time_avg(tick_times, times, values, values_label, lx, ly, title, values
 
     plt.show()
 
+
 def plot_2_models(tick_times, times, values_m1, values_m2, lx, ly, title):
 
     plt.xticks(tick_times)
@@ -35,6 +37,7 @@ def plot_2_models(tick_times, times, values_m1, values_m2, lx, ly, title):
     plt.ylabel(ly)
 
     plt.show()
+
 
 def plot_freq(dict, title):
     ax = plt.axes()

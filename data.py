@@ -11,6 +11,7 @@ from PIL import Image
 from metrics import *
 from pvlib_playground import *
 
+
 class Data:
 
     def __init__(self):
@@ -44,10 +45,8 @@ class Data:
             for i in f_:
                 file_name = (str(i))
                 tmp_name = (tmp_path + str(i))
-                #check if file exists
-                if not path.isfile(tmp_name) or overwrite:
-                #if image
-                    if('.jpg' in i):
+                if not path.isfile(tmp_name) or overwrite:  # check if file exists
+                    if('.jpg' in i): # if image
                         image = open(tmp_name, 'wb')
                         ftp.retrbinary('RETR ' + file_name, image.write, 1024)
                         image.close()
@@ -56,8 +55,7 @@ class Data:
                         csv = open(tmp_name, 'wb')
                         ftp.retrbinary('RETR ' + file_name, csv.write, 1024)
                         csv.close()
-                        #some have wrong encoding..
-                        try:
+                        try:  #some have wrong encoding..
                             self.process_csv(tmp_name)
                         except:
                             print('Error processing: ' + file_name)
@@ -67,17 +65,16 @@ class Data:
         return data
 
     def process_csv(self, csv_name):
-        # colums = ["DATE", "TIME", "RHUA", "TMPA", "PIRA"]
         tmp = pd.read_csv(csv_name, sep=';', header=None)
         if(len(tmp.columns) > 1):
-            arr = pd.read_csv(csv_name, sep=';', header=None, usecols=[0, 1, 2, 4, 7, 15])
+            arr = pd.read_csv(csv_name, sep=';', header=None, usecols=[0, 1, 2, 4, 7, 15])  # colums = ["DATE", "TIME", "RHUA", "TMPA", "PIRA"]
 
-            #remove rows containing c,v,r not sure what it means..
+            # remove rows containing c,v,r not sure what it means..
             arr = arr[arr[0] != 'V-----']
             arr = arr[arr[0] != 'C-----']
             arr = arr[arr[0] != 'R-----']
 
-            #date, time, humidity, tempertature, ghi
+            # date, time, humidity, tempertature, ghi
             c = [1, 2, 4, 7, 15]
             for index, row in arr.iterrows():
                 for i in c:
@@ -111,8 +108,8 @@ class Data:
         return cv2.resize(img, (width, height), interpolation=cv2.INTER_LINEAR)
 
     def get_avg_var_by_minute(self, df, hour, minute):
-        rows = df[df[:, 3] == hour] # filter on hours
-        rows = rows[rows[:, 4] == minute] # filter on minutes
+        rows = df[df[:, 3] == hour]  # filter on hours
+        rows = rows[rows[:, 4] == minute]  # filter on minutes
         return np.mean(rows[:,6:9], axis=0), np.var(rows[:,6:9], axis=0)
 
     def get_ghi_temp_by_minute(self,df, hour, minute):
@@ -127,8 +124,8 @@ class Data:
         times, avg_temp, var_temp, avg_ghi, var_ghi, var_ghi, tick_times = ([] for i in range(7))
 
         for h in hours:
-            tick_times.append(time(h, 0, 0)) #round hours
-            tick_times.append(time(h, 30, 0)) # half hours
+            tick_times.append(time(h, 0, 0))  #round hours
+            tick_times.append(time(h, 30, 0))  # half hours
             for m in minutes:
                 tmp_avg, tmp_var = self.get_avg_var_by_minute(df, h, m)
                 tmp_time = time(h, m, 0)
@@ -144,7 +141,6 @@ class Data:
         plot_time_avg(tick_times, times, avg_ghi, 'time', 'GHI in W/m^2', 'avg. GHI in month ' + str(month))
         plot_time_avg(tick_times, times, var_ghi, 'time', 'Variance GHI', 'var. GHI in month ' + str(month))
 
-
     def plot_day(self, day, month, start, end, step):
         df = self.get_df_csv_day(month,day, start, end, step)
         hours = list(range(start, end))
@@ -154,8 +150,8 @@ class Data:
         ghi_clear_sky = PvLibPlayground.get_clear_sky_irradiance(int(month), int(day), start, end)
 
         for h in hours:
-            tick_times.append(time(h, 0, 0)) #round hours
-            tick_times.append(time(h, 30, 0)) # half hours
+            tick_times.append(time(h, 0, 0))  # round hours
+            tick_times.append(time(h, 30, 0))  # half hours
             for m in minutes:
                 rows = self.get_ghi_temp_by_minute(df, h, m)
                 tmp_time = time(h, m, 0)
@@ -373,8 +369,8 @@ class Data:
         size_of_row = 9 + height*width*channels
         df = np.empty([queries, size_of_row])
 
-        folders = listdir('asi_16124')#select cam
-        del folders[0:3] #first 3 are bad data
+        folders = listdir('asi_16124')  # select cam
+        del folders[0:3]  # first 3 are bad data
 
         for folder in folders:
             if index == queries:
@@ -385,7 +381,6 @@ class Data:
 
             self.process_csv(path + files[-1])  # process csv
             tmp_df = pd.read_csv(path + files[-1], sep=',', header=0, usecols=[0, 1, 2, 3, 4])  #load csv
-            # print(tmp_df)
             for file in files:
                 if index == queries: #cancel if dataframe is full
                     break
@@ -394,8 +389,10 @@ class Data:
                 if(arr.empty): #means if image is not in csv file
                     continue
 
+                # todo add external data
+
                 data = arr.to_numpy().flatten()
-                #index in csv, seconds, year, month, day, hours, minutes, seconds, temp, irriadiance. then image
+                # index in csv, seconds, year, month, day, hours, minutes, seconds, temp, irriadiance. then image
                 df[index][0:8] = np.array([data[0][0:2], data[0][3:5], data[0][6:8], data[1][0:2], data[1][3:5], data[1][6:8], data[2], data[3], data[4]]) #set csv data to df
                 img  = cv2.imread(path + file)
                 df[index][8:] = img.flatten() #set img data to df
