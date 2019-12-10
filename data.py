@@ -9,6 +9,7 @@ from datetime import time
 from data_visuals import *
 from PIL import Image
 from metrics import *
+from pvlib_playground import *
 
 class Data:
 
@@ -150,6 +151,8 @@ class Data:
         minutes = list(range(0, 60, step))
         times, temp, ghi, tick_times = ([] for i in range(4))
 
+        ghi_clear_sky = PvLibPlayground.get_clear_sky_irradiance(int(month), int(day), start, end)
+
         for h in hours:
             tick_times.append(time(h, 0, 0)) #round hours
             tick_times.append(time(h, 30, 0)) # half hours
@@ -157,17 +160,23 @@ class Data:
                 rows = self.get_ghi_temp_by_minute(df, h, m)
                 tmp_time = time(h, m, 0)
 
+                old_ghi, old_temp = 0, 0
+
                 if (len(rows) > 0):
-                    tmp_temp = rows[0][6]
-                    tmp_ghi = rows[0][7]
+                    tmp_temp, old_temp = rows[0][6], rows[0][6]
+                    tmp_ghi, old_ghi = rows[0][8], rows[0][8]
 
                     times.append(tmp_time)
                     temp.append(tmp_temp)
                     ghi.append(tmp_ghi)
+                else:
+                    times.append(tmp_time)
+                    temp.append(old_temp)
+                    ghi.append(old_ghi)
 
         #plot data
-        plot_time_avg(tick_times, times, temp, 'time', 'temp. in celsius', 'temp. in day: ' + str(day) + ' month: ' + str(month))
-        plot_time_avg(tick_times, times, ghi, 'time', 'GHI in W/m^2', 'GHI in day: ' + str(day) + ' month: ' + str(month))
+        plot_time_avg(tick_times, times, temp, '', 'time', 'temp. in celsius', 'temp. in day: ' + str(day) + ' month: ' + str(month))
+        plot_time_avg(tick_times, times, ghi, 'GHI measured', 'time', 'GHI in W/m^2', 'GHI in day: ' + str(day) + ' month: ' + str(month), ghi_clear_sky, 'Clear sky GHI')
 
     def plot_persistence_day(self, day, month, start, end, step):
 
@@ -356,13 +365,12 @@ class Data:
         return df.astype(int)
 
 
-
     def build_df(self, queries):
         # size 0 means al images
         index = 0
         tmp_img = cv2.imread('asi_16124/20191006/20191006060800_11.jpg')  # random image assume here they are all the same
         height, width, channels = tmp_img.shape
-        size_of_row = 8 + height*width*channels
+        size_of_row = 9 + height*width*channels
         df = np.empty([queries, size_of_row])
 
         folders = listdir('asi_16124')#select cam
@@ -376,7 +384,7 @@ class Data:
             files = listdir(path)
 
             self.process_csv(path + files[-1])  # process csv
-            tmp_df = pd.read_csv(path + files[-1], sep=',', header=0, usecols=[2,3,4,5])  #load csv
+            tmp_df = pd.read_csv(path + files[-1], sep=',', header=0, usecols=[0, 1, 2, 3, 4])  #load csv
             # print(tmp_df)
             for file in files:
                 if index == queries: #cancel if dataframe is full
@@ -388,7 +396,7 @@ class Data:
 
                 data = arr.to_numpy().flatten()
                 #index in csv, seconds, year, month, day, hours, minutes, seconds, temp, irriadiance. then image
-                df[index][0:8] = np.array([data[0][0:2], data[0][3:5], data[0][6:8], data[1][0:2], data[1][3:5], data[1][6:8], data[2], data[3]]) #set csv data to df
+                df[index][0:8] = np.array([data[0][0:2], data[0][3:5], data[0][6:8], data[1][0:2], data[1][3:5], data[1][6:8], data[2], data[3], data[4]]) #set csv data to df
                 img  = cv2.imread(path + file)
                 df[index][8:] = img.flatten() #set img data to df
 
@@ -407,8 +415,8 @@ d = Data()
 # df = d.build_df(2)
 # d.images_information()
 # d.plot_per_month(9, 5, 19)
-d.plot_per_month(9, 5, 19, 5)
-# d.plot_day('12', '07', 5 , 19, 1)
+# d.plot_per_month(9, 5, 19, 5)
+d.plot_day('28', '08', 5 , 19, 1)
 # d.plot_day('04', '09', 14, 15, 1)
 # d.plot_persistence_day('02', '09', 6, 19, 1)
 # d.plot_persistence_day('03', '09', 6, 19, 1)

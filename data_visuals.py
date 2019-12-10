@@ -7,12 +7,16 @@ import matplotlib.style as style
 style.use('seaborn-poster') #sets the size of the charts
 style.use('ggplot')
 
-def plot_time_avg(tick_times, times, values, lx, ly, title):
+def plot_time_avg(tick_times, times, values, values_label, lx, ly, title, values_2 = [], values_2_label = ''):
 
     plt.xticks(tick_times)
     plt.xticks(rotation=45)
-    plt.plot(times, values, linestyle=':')
+    plt.plot(times, values, linestyle='-', label=values_label)
 
+    if(len(values_2) > 1):
+        plt.plot(times, values_2, linestyle='-', label = values_2_label)
+
+    plt.legend()
     plt.title(title)
     plt.xlabel(lx)
     plt.ylabel(ly)
