@@ -96,15 +96,15 @@ class PvLibPlayground:
 
 
 # p = PvLibPlayground()
-month = 10
-day = 15
-start_time = 6
-end_time = 18
-start = pd.Timestamp(year=2019, month=month, day=day, hour=start_time)
-end = pd.Timestamp(year=2019, month=month, day=day, hour=(end_time-1), minute = 59)
-
-t = PvLibPlayground.get_df_times(start, end)
-
-print(PvLibPlayground.get_azimuth(10, 15, t))
+# month = 10
+# day = 15
+# start_time = 6
+# end_time = 18
+# start = pd.Timestamp(year=2019, month=month, day=day, hour=start_time)
+# end = pd.Timestamp(year=2019, month=month, day=day, hour=(end_time-1), minute = 59)
+#
+# t = PvLibPlayground.get_df_times(start, end)
+#
+# print(PvLibPlayground.get_azimuth(10, 15, t))
 # PvLibPlayground.get_azimuth(10,15, PvLibPlayground.get_pd_time(10, 15, 12, 00))
 # p.get_clear_sky_irradiance(10,1)

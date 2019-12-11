@@ -3,13 +3,48 @@ import csv
 import numpy as np
 import pandas as pd
 from os import listdir, path
-import numpy as np
 import cv2
 from datetime import time
 from data_visuals import *
 from PIL import Image
-from metrics import *
-from pvlib_playground import *
+from metrics import Metrics
+from pvlib_playground import PvLibPlayground
+
+
+def int_to_str(i):
+    s = str(i)
+    if(len(s)) == 2:
+        return s
+    else:
+        return '0' + s
+
+
+def process_csv(csv_name):
+    tmp = pd.read_csv(csv_name, sep=';', header=None)
+    if(len(tmp.columns) > 1):
+        arr = pd.read_csv(csv_name, sep=';', header=None, usecols=[0, 1, 2, 4, 7, 15])  # colums = ["DATE", "TIME", "RHUA", "TMPA", "PIRA"]
+
+        # remove rows containing c,v,r not sure what it means..
+        arr = arr[arr[0] != 'V-----']
+        arr = arr[arr[0] != 'C-----']
+        arr = arr[arr[0] != 'R-----']
+
+        # date, time, humidity, tempertature, ghi
+        c = [1, 2, 4, 7, 15]
+        for index, row in arr.iterrows():
+            for i in c:
+                vals = row[i].split('=')
+                row[i] = vals[1]
+
+        arr[c].to_csv(csv_name, index=False)
+    del tmp
+
+
+def get_credentials():
+    f = open('cred.txt', 'r')
+    lines = f.read().split(',')
+    f.close()
+    return lines[0], lines[1], lines[2]
 
 
 class Data:
@@ -17,8 +52,7 @@ class Data:
     def __init__(self):
         pass
 
-    #download data
-    def download_data(self, cam = 1, overwrite = False):
+    def download_data(self, cam = 1, overwrite = False):  # download data
         data = 0
         cam_url = 0
         file_url = 0
@@ -28,7 +62,7 @@ class Data:
             file_url = "asi_16124/"
             #todo add second
 
-        server, username, passwd = self.get_credentials()
+        server, username, passwd = get_credentials()
         ftp = ftplib.FTP(server)
         ftp.login(user=username, passwd=passwd)
 
@@ -55,40 +89,14 @@ class Data:
                         csv = open(tmp_name, 'wb')
                         ftp.retrbinary('RETR ' + file_name, csv.write, 1024)
                         csv.close()
-                        try:  #some have wrong encoding..
-                            self.process_csv(tmp_name)
+                        try:  # some have wrong encoding..
+                            process_csv(tmp_name)
                         except:
                             print('Error processing: ' + file_name)
                 else:
                     print('file ' + file_name + " exists.. no overwrite")
 
         return data
-
-    def process_csv(self, csv_name):
-        tmp = pd.read_csv(csv_name, sep=';', header=None)
-        if(len(tmp.columns) > 1):
-            arr = pd.read_csv(csv_name, sep=';', header=None, usecols=[0, 1, 2, 4, 7, 15])  # colums = ["DATE", "TIME", "RHUA", "TMPA", "PIRA"]
-
-            # remove rows containing c,v,r not sure what it means..
-            arr = arr[arr[0] != 'V-----']
-            arr = arr[arr[0] != 'C-----']
-            arr = arr[arr[0] != 'R-----']
-
-            # date, time, humidity, tempertature, ghi
-            c = [1, 2, 4, 7, 15]
-            for index, row in arr.iterrows():
-                for i in c:
-                    vals = row[i].split('=')
-                    row[i] = vals[1]
-
-            arr[c].to_csv(csv_name, index=False)
-        del tmp
-
-    def get_credentials(self):
-        f = open('cred.txt', 'r')
-        lines = f.read().split(',')
-        f.close()
-        return lines[0], lines[1], lines[2]
 
     def extract_time(self, time_str):
         return(time_str[8:14])
@@ -113,7 +121,11 @@ class Data:
         return np.mean(rows[:,6:9], axis=0), np.var(rows[:,6:9], axis=0)
 
     def get_ghi_temp_by_minute(self,df, hour, minute):
+
+        print(df)
         rows = df[df[:, 3] == hour]  # filter on hours
+        rows = df[np.where(df[:, 3] == hour)]
+        print(rows)
         rows = rows[rows[:, 4] == minute]  # filter on minutes
         return rows
 
@@ -135,7 +147,7 @@ class Data:
                 #todo tmp[1] = humidity
                 avg_ghi.append(tmp_avg[2])
                 var_ghi.append(tmp_var[2])
-        #plot data
+        # plot data
         plot_time_avg(tick_times, times, avg_temp, 'time', 'Temp. in celsius', 'avg. Temp. in month ' + str(month))
         plot_time_avg(tick_times, times, var_temp, 'time', 'Variance temp.','var. Temp. in month ' + str(month))
         plot_time_avg(tick_times, times, avg_ghi, 'time', 'GHI in W/m^2', 'avg. GHI in month ' + str(month))
@@ -262,7 +274,7 @@ class Data:
         return f
 
     def images_information(self):
-        server, username, passwd = self.get_credentials()
+        server, username, passwd = get_credentials()
         ftp = ftplib.FTP(server)
         ftp.login(user=username, passwd=passwd)
 
@@ -306,7 +318,7 @@ class Data:
                 path = 'asi_16124/' + str(folder) + '/'
                 files = listdir(path)
 
-                self.process_csv(path + files[-1])  # process csv
+                process_csv(path + files[-1])  # process csv
                 tmp_df = pd.read_csv(path + files[-1], sep=',', header=0, usecols=[0, 1, 2, 3, 4])  # load csv
                 tmp_temp = None
 
@@ -334,7 +346,39 @@ class Data:
         return df.astype(int)
 
     def get_df_csv_day(self, month, day, start, end, step):
-        path = 'asi_16124/2019' + month + day + '/'
+
+        path = 'asi_16124/2019' + int_to_str(month) + int_to_str(day) + '/'
+        files = listdir(path)
+        index = 0
+
+        #data frame
+        queries = int(((end - start) * 60 / step))
+        df = np.empty([queries, 9])
+        print(df.shape)
+
+        #               dtype=[('a', 'i4'), ('b', 'i4'), ('c', 'i4'), ('d', 'i4'), ('e', 'i4'), ('f', 'i4'), ('g', 'i4'), ('h', 'i4'), ('i', 'i4')] )  # create df
+        process_csv(path + files[-1])
+        tmp_df = pd.read_csv(path + files[-1], sep=',', header=0, usecols=[0, 1, 2, 3, 4])  # load csv
+
+        for row in tmp_df.iterrows():
+            # check seconds 0, check step
+            # todo add more data from solar pos
+
+            if (int(row[1].values[1][6:8]) == 0 and int(row[1].values[1][3:5]) % step == 0 and int(
+                    row[1].values[1][0:2]) >= start and int(row[1].values[1][0:2]) < end):
+                df[index][0:9] = np.array([row[1].values[0][0:2], row[1].values[0][3:5], row[1].values[0][6:8],  # date
+                                           row[1].values[1][0:2], row[1].values[1][3:5], row[1].values[1][6:8],  # time
+                                           row[1].values[2],  # temp
+                                           row[1].values[3],  # humidity
+                                           row[1].values[4]])  # ghi  # set csv data to df
+                index += 1
+
+        print('filled queries: ' + str(index) + 'out of: ' + str(queries))
+        print(df.dtype)
+        return df[0:index]
+
+    def get_df_csv_day_RP(self, month, day, start, end, step): #  replaces missing values with value of 15 seconds later.
+        path = 'asi_16124/2019' + int_to_str(month) + int_to_str(day) + '/'
         files = listdir(path)
         index = 0
 
@@ -342,78 +386,70 @@ class Data:
         queries = int(((end - start) * 60 / step))
         df = np.empty([queries, 9])  # create df
 
-        self.process_csv(path + files[-1])
+        process_csv(path + files[-1])
         tmp_df = pd.read_csv(path + files[-1], sep=',', header=0, usecols=[0, 1, 2, 3, 4])  # load csv
 
-        for row in tmp_df.iterrows():
-            #check seconds 0, check step
+        min_idx = 0
 
-            if (int(row[1].values[1][6:8]) == 0 and int(row[1].values[1][3:5]) % step == 0 and int(
-                    row[1].values[1][0:2]) >= start and int(row[1].values[1][0:2]) < end):
-                df[index][0:9] = np.array([row[1].values[0][0:2], row[1].values[0][3:5], row[1].values[0][6:8], #date
-                                           row[1].values[1][0:2], row[1].values[1][3:5], row[1].values[1][6:8], #time
-                                           row[1].values[2], #temp
-                                           row[1].values[3], #humidity
-                                           row[1].values[4]]) #ghi  # set csv data to df
+        for i, row in tmp_df.iterrows():
+            # todo add more data from solar pos
+            if(index <= (i - min_idx) / 4 and int(row[1][3:5]) % step == 0 and int(   # some magic for missing values.
+                    row[1][0:2]) >= start and int(row[1][0:2]) < end):
+                df[index][0:9] = np.array([row[0][0:2], row[0][3:5], row[0][6:8],  # date
+                                           row[1][0:2], row[1][3:5], row[1][6:8],  # time
+                                           row[2],  # temp
+                                           row[3],  # humidity
+                                           row[4]])  # ghi  # set csv data to df
                 index += 1
+                if index == 1:  # some magic for missing values.
+                    min_idx = i
 
-        print('filled queries: ' + str(index) + 'out of: ' + str(queries))
-        return df.astype(int)
+        print('filled queries: ' + str(index) + ' out of: ' + str(queries))
+        return df
 
+    def sample_from_df(self, df, sample_size):  # sample random rows. returns new df with indexes.
+        random_idx = np.random.randint(df.shape[0], size=sample_size)
+        return df[random_idx, :], random_idx
 
-    def build_df(self, queries):
-        # size 0 means al images
+    def build_df(self, days, start, end, step, images=False):
+        # size 0 means all images
         index = 0
-        tmp_img = cv2.imread('asi_16124/20191006/20191006060800_11.jpg')  # random image assume here they are all the same
-        height, width, channels = tmp_img.shape
-        size_of_row = 9 + height*width*channels
-        df = np.empty([queries, size_of_row])
 
-        folders = listdir('asi_16124')  # select cam
-        del folders[0:3]  # first 3 are bad data
+        if images:
+            tmp_img = cv2.imread('asi_16124/20191006/20191006060800_11.jpg')  # random image assume here they are all the same.
+            height, width, channels = tmp_img.shape
+            size_of_row = 9 + height*width*channels
+        else:
+            size_of_row = 9
 
-        for folder in folders:
-            if index == queries:
-                break
+        queries_per_day = int(((end - start) * 60 / step))
+        mega_df = np.empty((days, queries_per_day, size_of_row))
 
-            path = 'asi_16124/' + str(folder) + '/'
-            files = listdir(path)
+        months = [8]
+        days = [1]
 
-            self.process_csv(path + files[-1])  # process csv
-            tmp_df = pd.read_csv(path + files[-1], sep=',', header=0, usecols=[0, 1, 2, 3, 4])  #load csv
-            for file in files:
-                if index == queries: #cancel if dataframe is full
-                    break
-
-                arr = tmp_df[tmp_df['2'] == self.exract_formatted_time(file)] #find image in cvs by time
-                if(arr.empty): #means if image is not in csv file
-                    continue
-
-                # todo add external data
-
-                data = arr.to_numpy().flatten()
-                # index in csv, seconds, year, month, day, hours, minutes, seconds, temp, irriadiance. then image
-                df[index][0:8] = np.array([data[0][0:2], data[0][3:5], data[0][6:8], data[1][0:2], data[1][3:5], data[1][6:8], data[2], data[3], data[4]]) #set csv data to df
-                img  = cv2.imread(path + file)
-                df[index][8:] = img.flatten() #set img data to df
-
+        for m in months:
+            for d in days:
+                mega_df[index] = self.get_df_csv_day_RP(m, d, start, end, step)
                 index += 1
-                print(index)
+
 
         #YEAR, MONTH, DAY, HOURS, MINUTES, SECONDS, TEMP, IRRADIANCE, IMAGE
-        print('filled queries: ' + str(index) + 'out of: ' + str(queries))
-        return df.astype(int)
+        # print('filled queries: ' + str(index) + 'out of: ' + str(queries))
+        return mega_df
 
 
 #
 d = Data()
+# arr = d.build_df(1, 5, 19, 1)
+# print(arr[0])
 # d.download_data(1, True)
 # d.process_csv("asi_16124/20190712/peridata_16124_20190712.csv")
 # df = d.build_df(2)
 # d.images_information()
 # d.plot_per_month(9, 5, 19)
 # d.plot_per_month(9, 5, 19, 5)
-d.plot_day('28', '08', 5 , 19, 1)
+# d.plot_day('28', '08', 5 , 19, 1)
 # d.plot_day('04', '09', 14, 15, 1)
 # d.plot_persistence_day('02', '09', 6, 19, 1)
 # d.plot_persistence_day('03', '09', 6, 19, 1)
@@ -421,7 +457,7 @@ d.plot_day('28', '08', 5 , 19, 1)
 # d.plot_persistence_day('05', '09', 6, 19, 1)
 # d.get_error_month('09', 6, 19, 1)
 
-# d.plot_day('05', '10', 5 , 19)
+d.plot_day('05', '10', 5, 19, 1)
 # df = d.get_df_csv_day('10','05',5,19)
 # print(df[0][0:12])
 # print(df[-1][0:12])
