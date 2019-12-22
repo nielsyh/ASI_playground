@@ -2,26 +2,53 @@ import cv2
 import numpy as np
 from PIL import Image
 
+
+def int_to_str(i):
+    s = str(i)
+    if(len(s)) == 2:
+        return s
+    else:
+        return '0' + s
+
+
+def get_image_by_date_time(year, month, day, hour, minute, seconds):
+    if (year == 19):
+        year = '2019'
+    elif (year == 20):
+        year = '2020'
+
+    base_url = 'asi_16124/'
+    tmp_url = year + int_to_str(month) + int_to_str(day)
+    folder_url = tmp_url + '/'
+    img_url = tmp_url + int_to_str(hour) + int_to_str(minute) + int_to_str(seconds) + '_11.jpg'
+    total_url = base_url + folder_url + img_url
+    # print(total_url)
+    image = cv2.imread(total_url)
+    return pre_process_img(image, 400)
+
+
+def resize_image(img, dim):
+    # setting dim of the resize
+    return cv2.resize(img, (dim, dim), interpolation=cv2.INTER_LINEAR)
+
+
+def pre_process_img(img, dim):
+    y = 26
+    x = 26
+    h = 1486
+    w = 1486
+    img = img[y:y + h, x:x + w]
+    img = resize_image(img, dim)
+
+    return img
+
+
 class Features:
     def __init__(self):
         pass
 
-    def pre_process_img(self,img, dim):
-        y  = 26
-        x = 26
-        h = 1486
-        w = 1486
-        img = img[y:y + h, x:x + w]
-        img = self.resize_image(img, dim)
-
-        return img
-
-    def resize_image(self,img, dim):
-        # setting dim of the resize
-        return cv2.resize(img, (dim, dim), interpolation=cv2.INTER_LINEAR)
-
     def number_of_cloud_pixels(self, img, threshold = 0.8):
-        img = self.pre_process_img(img, 400)
+        img = pre_process_img(img, 400)
         # orig =
         img2 = 0
         img2 = cv2.normalize(img,img2,-1,1,cv2.NORM_MINMAX)

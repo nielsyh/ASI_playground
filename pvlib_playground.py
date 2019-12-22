@@ -82,26 +82,34 @@ class PvLibPlayground:
         return pd.Timestamp(year=2019, month=month, day=day, hour=hour, minute=minute)
 
     @staticmethod
-    def get_clear_sky_irradiance(month, day, start_time, end_time):
-        loc = PvLibPlayground.get_location_almeria()
+    def get_times(year, month, day, start_time, end_time):
+        s = pd.Timestamp(year=year, month=month, day=day, hour=start_time)
+        e = pd.Timestamp(year=year, month=month, day=day, hour=(end_time - 1), minute=59)
+        return PvLibPlayground.get_df_times(s, e)
 
-        start = pd.Timestamp(year=2019, month=month, day=day, hour=start_time)
-        end = pd.Timestamp(year=2019, month=month, day=day, hour=(end_time-1), minute = 59)
-        times = PvLibPlayground.get_df_times(start, end)
+
+    @staticmethod
+    def get_clear_sky_irradiance(times):
+        loc = PvLibPlayground.get_location_almeria()
         ghic = loc.get_clearsky(times, model='ineichen', linke_turbidity=3)
         return ghic['ghi'].values.tolist()
 
-    def get_all_external_data(self, month, day, time):
-        pass
-
+    @staticmethod
+    def get_meteor_data(month, day, times):  # todo add more
+        csi = PvLibPlayground.get_clear_sky_irradiance(times)
+        azimuth = PvLibPlayground.get_azimuth(month, day, times)
+        zenith = PvLibPlayground.get_solar_zenith_angle(month, day, times)
+        return csi, azimuth, zenith
 
 # p = PvLibPlayground()
+# year = 2019
 # month = 10
 # day = 15
-# start_time = 6
-# end_time = 18
-# start = pd.Timestamp(year=2019, month=month, day=day, hour=start_time)
-# end = pd.Timestamp(year=2019, month=month, day=day, hour=(end_time-1), minute = 59)
+# start_time = 7
+# end_time = 19
+# times = PvLibPlayground.get_times(year, month, day, start_time, end_time)
+# t = p.get_clear_sky_irradiance(times)
+# print(t)
 #
 # t = PvLibPlayground.get_df_times(start, end)
 #

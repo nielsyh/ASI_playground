@@ -9,14 +9,7 @@ from data_visuals import *
 from PIL import Image
 from metrics import Metrics
 from pvlib_playground import PvLibPlayground
-
-
-def int_to_str(i):
-    s = str(i)
-    if(len(s)) == 2:
-        return s
-    else:
-        return '0' + s
+from features import get_image_by_date_time, int_to_str
 
 
 def process_csv(csv_name):
@@ -122,10 +115,10 @@ class Data:
 
     def get_ghi_temp_by_minute(self,df, hour, minute):
 
-        print(df)
-        rows = df[df[:, 3] == hour]  # filter on hours
+        # print(df)
+        # rows = df[df[:, 3] == hour]  # filter on hours
         rows = df[np.where(df[:, 3] == hour)]
-        print(rows)
+        # print(rows)
         rows = rows[rows[:, 4] == minute]  # filter on minutes
         return rows
 
@@ -154,12 +147,17 @@ class Data:
         plot_time_avg(tick_times, times, var_ghi, 'time', 'Variance GHI', 'var. GHI in month ' + str(month))
 
     def plot_day(self, day, month, start, end, step):
-        df = self.get_df_csv_day(month,day, start, end, step)
+        # df = self.get_df_csv_day(month, day, start, end, step)
+        df = self.get_df_csv_day_RP(month, day, start, end, step)
         hours = list(range(start, end))
         minutes = list(range(0, 60, step))
         times, temp, ghi, tick_times = ([] for i in range(4))
 
-        ghi_clear_sky = PvLibPlayground.get_clear_sky_irradiance(int(month), int(day), start, end)
+        ghi_clear_sky = PvLibPlayground.get_clear_sky_irradiance(PvLibPlayground.get_times(2019,
+                                                                                           int(month),
+                                                                                           int(day),
+                                                                                           start,
+                                                                                           end))
 
         for h in hours:
             tick_times.append(time(h, 0, 0))  # round hours
@@ -167,7 +165,6 @@ class Data:
             for m in minutes:
                 rows = self.get_ghi_temp_by_minute(df, h, m)
                 tmp_time = time(h, m, 0)
-
                 old_ghi, old_temp = 0, 0
 
                 if (len(rows) > 0):
@@ -356,7 +353,7 @@ class Data:
         df = np.empty([queries, 9])
         print(df.shape)
 
-        #               dtype=[('a', 'i4'), ('b', 'i4'), ('c', 'i4'), ('d', 'i4'), ('e', 'i4'), ('f', 'i4'), ('g', 'i4'), ('h', 'i4'), ('i', 'i4')] )  # create df
+        dt= [('a', 'i4'), ('b', 'i4'), ('c', 'i4'), ('d', 'i4'), ('e', 'i4'), ('f', 'i4'), ('g', 'i4'), ('h', 'i4'), ('i', 'i4')]   # create df
         process_csv(path + files[-1])
         tmp_df = pd.read_csv(path + files[-1], sep=',', header=0, usecols=[0, 1, 2, 3, 4])  # load csv
 
@@ -405,51 +402,77 @@ class Data:
                     min_idx = i
 
         print('filled queries: ' + str(index) + ' out of: ' + str(queries))
+        # print(df)
         return df
 
     def sample_from_df(self, df, sample_size):  # sample random rows. returns new df with indexes.
         random_idx = np.random.randint(df.shape[0], size=sample_size)
         return df[random_idx, :], random_idx
 
-    def build_df(self, days, start, end, step, images=False):
-        # size 0 means all images
-        index = 0
+    def build_df(self, days, start, end, step, meteor_data=False, images=False):
+        day_index = -1
+        size_of_row = 9       # row default size
+        size_meteor_data = 3  # amount of columns from meteor data
+        img_idx = 9           # index of column were image data starts
 
+        if meteor_data:  # adjusting df row length according to amount of data
+            size_of_row += size_meteor_data
         if images:
-            tmp_img = cv2.imread('asi_16124/20191006/20191006060800_11.jpg')  # random image assume here they are all the same.
-            height, width, channels = tmp_img.shape
-            size_of_row = 9 + height*width*channels
-        else:
-            size_of_row = 9
+            size_of_row += 400*400*3
+            if(meteor_data):
+                img_idx += size_meteor_data
+
+        print('Building Df with meteor data: ' + str(meteor_data) + ', image data: ' + str(images) + '..')
+        print('size of a row: ' + str(size_of_row))
 
         queries_per_day = int(((end - start) * 60 / step))
         mega_df = np.empty((days, queries_per_day, size_of_row))
 
+        # todo add real months and days
         months = [8]
         days = [1]
 
+        # todo add images & external data
         for m in months:
             for d in days:
-                mega_df[index] = self.get_df_csv_day_RP(m, d, start, end, step)
-                index += 1
+                day_data = self.get_df_csv_day_RP(m, d, start, end, step)
+                day_index += 1
 
+                csi, azimuth, zenith = PvLibPlayground.get_meteor_data(m,
+                                                                       d,
+                                                                       PvLibPlayground.get_times(2019,# year todo make this 2020 ready
+                                                                                                 m,  # month
+                                                                                                 d,  # day
+                                                                                                 start,  # start time
+                                                                                                 end))  # end time
+
+                for idx, object in enumerate(day_data):
+                    mega_df[day_index][idx][0:9] = object  # adding data from csv
+                    if(meteor_data):
+                        mega_df[day_index][idx][9] = csi[idx]
+                        mega_df[day_index][idx][10] = azimuth[idx]
+                        mega_df[day_index][idx][11] = zenith[idx]
+                    if(images):
+                        year, month, day, hour, minute, seconds = int(object[0]), int(object[1]), int(object[2]), int(object[3]), int(object[4]), int(object[5])
+                        mega_df[day_index][idx][img_idx:size_of_row] = get_image_by_date_time(year, month, day, hour, minute, seconds).flatten()
 
         #YEAR, MONTH, DAY, HOURS, MINUTES, SECONDS, TEMP, IRRADIANCE, IMAGE
-        # print('filled queries: ' + str(index) + 'out of: ' + str(queries))
         return mega_df
 
 
 #
 d = Data()
-# arr = d.build_df(1, 5, 19, 1)
-# print(arr[0])
+arr = d.build_df(1, 7, 19, 1, meteor_data=True)
+print(arr)
+# img = get_image_by_date_time(19,9,1,12,0,0).flatten()
+# print(img.shape)
 # d.download_data(1, True)
 # d.process_csv("asi_16124/20190712/peridata_16124_20190712.csv")
 # df = d.build_df(2)
 # d.images_information()
 # d.plot_per_month(9, 5, 19)
 # d.plot_per_month(9, 5, 19, 5)
-# d.plot_day('28', '08', 5 , 19, 1)
+# d.plot_day('01','08', 7, 19, 1)
 # d.plot_day('04', '09', 14, 15, 1)
 # d.plot_persistence_day('02', '09', 6, 19, 1)
 # d.plot_persistence_day('03', '09', 6, 19, 1)
@@ -457,7 +480,7 @@ d = Data()
 # d.plot_persistence_day('05', '09', 6, 19, 1)
 # d.get_error_month('09', 6, 19, 1)
 
-d.plot_day('05', '10', 5, 19, 1)
+# d.plot_day('05', '10', 5, 19, 1)
 # df = d.get_df_csv_day('10','05',5,19)
 # print(df[0][0:12])
 # print(df[-1][0:12])
