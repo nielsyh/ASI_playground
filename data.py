@@ -55,9 +55,10 @@ class Data:
     queries_per_day = 0
     pred_horizon = 30
 
-    def __init__(self, meteor_data=False, images=False):
+    def __init__(self, pred_horzion=30, meteor_data=False, images=False):
         self.meteor_data = meteor_data
         self.images = images
+        self.pred_horizon = pred_horzion
 
         if self.meteor_data:  # adjusting df row length according to amount of data
             self.size_of_row += self.size_meteor_data
@@ -406,11 +407,10 @@ class Data:
 
         process_csv(path + files[-1])
         tmp_df = pd.read_csv(path + files[-1], sep=',', header=0, usecols=[0, 1, 2, 3, 4])  # load csv
-
-        min_idx = 0
+        todo = 0
 
         for i, row in tmp_df.iterrows():
-            if (index <= (i - min_idx) / 4 and int(row[1][3:5]) % step == 0 and int(  # some magic for missing values.
+            if (int(row[1][3:5]) == todo and int(  # some magic for missing values.
                     row[1][0:2]) >= start and int(row[1][0:2]) < end):
                 df[index][0:9] = np.array([row[0][0:2], row[0][3:5], row[0][6:8],  # date
                                            row[1][0:2], row[1][3:5], row[1][6:8],  # time
@@ -418,15 +418,16 @@ class Data:
                                            row[3],  # humidity
                                            row[4]])  # ghi  # set csv data to df
                 index += 1
-                if index == 1:  # some magic for missing values.
-                    min_idx = i
+                todo += step
+                if(todo == 60):
+                    todo = 0
 
         print('filled queries: ' + str(index) + ' out of: ' + str(queries))
         return df.astype(int)
 
-    def sample_from_df(self, df, sample_size):  # sample random rows. returns new df with indexes.
-        random_idx = np.random.randint(df.shape[0], size=sample_size)
-        return df[random_idx, :], random_idx
+    def sample_from_df(self, sample_size):  # sample random rows. returns new df with indexes.
+        random_idx = np.random.randint(self.mega_df.shape[0], size=sample_size)
+        return self.mega_df[random_idx, :, :], random_idx
 
     def build_df(self, start, end, step, months):
         print('Building Df with meteor data: ' + str(self.meteor_data) + ', image data: ' + str(self.images) + '..')
@@ -438,14 +439,14 @@ class Data:
             days += calendar.monthrange(2019, m)[1]
 
         #debug
-        # days = 3
+        # days = 2
 
         self.mega_df = np.zeros((days, self.queries_per_day, self.size_of_row), dtype=np.uint16)
         self.extra_df = np.zeros((days, 30, 1), dtype=np.uint16)
 
         for m in months:
             days = range(1, calendar.monthrange(2019, m)[1])  # create an array with days for that month
-            # days = [1,2,3]
+            # days = [3]
 
             for d in days:
                 day_data = self.get_df_csv_day_RP(m, d, start, end, step).astype(int)
@@ -482,20 +483,21 @@ class Data:
         # YEAR, MONTH, DAY, HOURS, MINUTES, SECONDS, TEMP, IRRADIANCE, IMAGE
         print('Building done')
 
-    def label_df(self, minutes_a_head):
+    def label_df(self):
         for idx_day, day in enumerate(self.mega_df):
             tmp_cnt = 0
             for idx_timeslot, time_slot in enumerate(day):
-                if (self.queries_per_day - minutes_a_head) > idx_timeslot:
-                    self.mega_df[idx_day][idx_timeslot][self.size_of_row-1] = self.mega_df[idx_day][idx_timeslot + minutes_a_head][8]
+                if (self.queries_per_day - self.pred_horizon) > idx_timeslot:
+                    self.mega_df[idx_day][idx_timeslot][self.size_of_row-1] = self.mega_df[idx_day][idx_timeslot + self.pred_horizon][8]
                     tmp_cnt +=1
                 else:
                     self.mega_df[idx_day][idx_timeslot][self.size_of_row - 1] = self.extra_df[idx_day][idx_timeslot-tmp_cnt][0]
 
-d = Data(meteor_data=False)
+d = Data(pred_horzion=10, meteor_data=False)
 d.build_df(7, 19, 1, months=[9])
-d.label_df(30)
-print(d.mega_df[0][0:10])
+d.label_df()
+# sample = d.sample_from_df(15)
+# print(sample[0][0:10])
 
 # img = get_image_by_date_time(19,9,1,12,0,0).flatten()
 # print(img.shape)
