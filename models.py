@@ -3,27 +3,44 @@ import matplotlib.pyplot as plt
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, confusion_matrix
 from data import Data
+from metrics import Metrics
 
-# class Models:
-#
-#     def __init__(self):
-#         pass
+class SVM_predictor:
 
-def svm_model(x_train, y_train):
-    svclassifier = SVC(kernel='linear')
-    svclassifier.fit(x_train, y_train)
+    def __init__(self, pred_horzion=10, meteor_data=False):
+        self.data = Data(pred_horzion=pred_horzion, meteor_data=meteor_data)
 
-def print_res(y_test, y_pred):
-    print(confusion_matrix(y_test, y_pred))
-    print(classification_report(y_test, y_pred))
+        self.data.build_df(7, 19, 1, months=[9])
+        self.data.label_df()
+        self.data.split_data_set()
+        self.data.flatten_data_set()
 
-d = Data(pred_horzion=10, meteor_data=False)
-d.build_df(7, 19, 1, months=[9])
-d.label_df()
-d.mega_df = d.mega_df.reshape(d.mega_df.shape[0]*d.mega_df.shape[1], -1)
+        self.x_train = self.data.train_df[:, 0: self.data.train_df.shape[1] - 1]
+        self.y_train = self.data.train_df[:, -1]
 
-# svclassifier = SVC(kernel='linear')
-svclassifier = SVC(kernel='rbf')
-x_train = d.mega_df[:,0:d.mega_df.shape[1]-1]
-y_train = d.mega_df[:,-1]
-svclassifier.fit(x_train, y_train)
+        self.x_test = self.data.test_df[:, 0:self.data.test_df.shape[1] - 1]
+        self.y_test = self.data.test_df[:, -1]
+
+
+    def train_svm(self):
+        self.svclassifier = SVC(kernel='rbf', gamma='auto')
+        self.svclassifier.fit(self.x_train, self.y_train)
+
+    def predict_svm(self):
+        y_pred = self.svclassifier.predict(self.x_train)
+        self.print_error(self.y_test, y_pred)
+
+    def print_error(self, y_observed, y_predicted):
+        print('RMSE')
+        print(Metrics.rmse(y_observed, y_predicted))
+        print('MAE')
+        print(Metrics.mae(y_observed, y_predicted))
+        print('MAPE')
+        print(Metrics.mape(y_observed, y_predicted))
+
+a = SVM_predictor()
+a.train_svm()
+a.predict_svm()
+
+
+

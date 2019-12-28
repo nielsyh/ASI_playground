@@ -48,6 +48,10 @@ class Data:
 
     mega_df = []
     extra_df = []
+
+    train_df = []
+    test_df = []
+
     day_index = -1
     size_of_row = 10  # row default size 9 + 1 for label
     size_meteor_data = 3  # amount of columns from meteor data
@@ -363,37 +367,8 @@ class Data:
                         index += 1
                         # print(index)
         # # YEAR, MONTH, DAY, HOURS, MINUTES, SECONDS, TEMP, IRRADIANCE, IMAGE
-        print('filled queries: ' + str(index) + 'out of: ' + str(queries))
+        # print('filled queries: ' + str(index) + 'out of: ' + str(queries))
         return df.astype(int)
-
-    def get_df_csv_day(self, month, day, start, end, step):
-        path = 'asi_16124/2019' + int_to_str(month) + int_to_str(day) + '/'
-        files = listdir(path)
-        index = 0
-
-        # data frame
-        queries = int(((end - start) * 60 / step))
-        df = np.empty([queries, 9])
-        dt = [('a', 'i4'), ('b', 'i4'), ('c', 'i4'), ('d', 'i4'), ('e', 'i4'), ('f', 'i4'), ('g', 'i4'), ('h', 'i4'),
-              ('i', 'i4')]  # create df
-        process_csv(path + files[-1])
-        tmp_df = pd.read_csv(path + files[-1], sep=',', header=0, usecols=[0, 1, 2, 3, 4])  # load csv
-
-        for row in tmp_df.iterrows():
-            # check seconds 0, check step
-            # todo add more data from solar pos
-
-            if (int(row[1].values[1][6:8]) == 0 and int(row[1].values[1][3:5]) % step == 0 and int(
-                    row[1].values[1][0:2]) >= start and int(row[1].values[1][0:2]) < end):
-                df[index][0:9] = np.array([row[1].values[0][0:2], row[1].values[0][3:5], row[1].values[0][6:8],  # date
-                                           row[1].values[1][0:2], row[1].values[1][3:5], row[1].values[1][6:8],  # time
-                                           row[1].values[2],  # temp
-                                           row[1].values[3],  # humidity
-                                           row[1].values[4]])  # ghi  # set csv data to df
-                index += 1
-
-        print('filled queries: ' + str(index) + 'out of: ' + str(queries))
-        return df[0:index]
 
     def get_df_csv_day_RP(self, month, day, start, end,
                           step):  # replaces missing values with value of 15 seconds later.
@@ -422,12 +397,27 @@ class Data:
                 if(todo == 60):
                     todo = 0
 
-        print('filled queries: ' + str(index) + ' out of: ' + str(queries))
+        # print('filled queries: ' + str(index) + ' out of: ' + str(queries))
         return df.astype(int)
 
     def sample_from_df(self, sample_size):  # sample random rows. returns new df with indexes.
         random_idx = np.random.randint(self.mega_df.shape[0], size=sample_size)
         return self.mega_df[random_idx, :, :], random_idx
+
+    def split_data_set(self, train_percentage=0.8):  # todo validation set and in/ex clusions for training set.
+        print('Splitting with train: ' + str(train_percentage) + '...')
+        np.random.shuffle(self.mega_df)
+        tmp_size = int(train_percentage * self.mega_df.shape[0])
+        self.train_df = self.mega_df[0:tmp_size]
+        self.test_df = self.mega_df[tmp_size:self.mega_df.shape[0]]
+        print('done')
+
+    def flatten_data_set(self):  # this is needed to use it as input for models
+        print('Flattening..')
+        self.mega_df =  self.mega_df.reshape((self.mega_df.shape[0] * self.mega_df.shape[1], -1))
+        self.train_df = self.train_df.reshape((self.train_df.shape[0] * self.train_df.shape[1], -1))
+        self.test_df = self.test_df.reshape((self.test_df.shape[0] * self.test_df.shape[1], -1))
+        print('done')
 
     def build_df(self, start, end, step, months):
         print('Building Df with meteor data: ' + str(self.meteor_data) + ', image data: ' + str(self.images) + '..')
@@ -442,11 +432,12 @@ class Data:
         # days = 2
 
         self.mega_df = np.zeros((days, self.queries_per_day, self.size_of_row), dtype=np.uint16)
-        self.extra_df = np.zeros((days, 30, 1), dtype=np.uint16)
+        self.extra_df = np.zeros((days, self.pred_horizon, 1), dtype=np.uint16)
 
         for m in months:
             days = range(1, calendar.monthrange(2019, m)[1])  # create an array with days for that month
-            # days = [3]
+            # debug
+            # days = [1,2]
 
             for d in days:
                 day_data = self.get_df_csv_day_RP(m, d, start, end, step).astype(int)
@@ -493,9 +484,14 @@ class Data:
                 else:
                     self.mega_df[idx_day][idx_timeslot][self.size_of_row - 1] = self.extra_df[idx_day][idx_timeslot-tmp_cnt][0]
 
-d = Data(pred_horzion=10, meteor_data=False)
-d.build_df(7, 19, 1, months=[9])
-d.label_df()
+# d = Data(pred_horzion=10, meteor_data=False)
+# d.build_df(7, 19, 1, months=[9])
+# d.label_df()
+# print(len(d.mega_df), len(d.train_df), len(d.test_df))
+# d.split_data_set()
+# print(len(d.mega_df), len(d.train_df), len(d.test_df))
+# d.flatten_data_set()
+# print(len(d.mega_df), len(d.train_df), len(d.test_df))
 # sample = d.sample_from_df(15)
 # print(sample[0][0:10])
 
