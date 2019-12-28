@@ -428,16 +428,17 @@ class Data:
         for m in months:
             days += calendar.monthrange(2019, m)[1]
 
-        #debug
-        days = 2
+        # debug
+        # days = 2
 
         self.mega_df = np.zeros((days, self.queries_per_day, self.size_of_row), dtype=np.uint16)
         self.extra_df = np.zeros((days, self.pred_horizon, 1), dtype=np.uint16)
 
         for m in months:
             days = range(1, calendar.monthrange(2019, m)[1])  # create an array with days for that month
+
             # debug
-            days = [1,2]
+            # days = [1,2]
 
             for d in days:
                 day_data = self.get_df_csv_day_RP(m, d, start, end, step).astype(int)
