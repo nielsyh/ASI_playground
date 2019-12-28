@@ -13,7 +13,7 @@ from metrics import Metrics
 from pvlib_playground import PvLibPlayground
 from features import get_image_by_date_time, int_to_str
 import calendar
-
+from datetime import date
 
 def process_csv(csv_name):
     tmp = pd.read_csv(csv_name, sep=';', header=None)
@@ -485,6 +485,14 @@ class Data:
                 else:
                     self.mega_df[idx_day][idx_timeslot][self.size_of_row - 1] = self.extra_df[idx_day][idx_timeslot-tmp_cnt][0]
 
+    def save_dataset(self):
+        today = str(date.today())
+        np.savez_compressed('train_' + today, self.train_df)
+        np.savez_compressed('test_' + today, self.test_df)
+
+    def load_dataset(self, name):
+        self.train_df = np.load('train_' + name)
+        self.test_df = np.load('test_' + name)
 # d = Data(pred_horzion=10, meteor_data=False)
 # d.build_df(7, 19, 1, months=[9])
 # d.label_df()
