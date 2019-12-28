@@ -1,12 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.svm import SVC
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.linear_model import LogisticRegression
 from data import Data
 from metrics import Metrics
+from models.model_template import Predictor_template
 
 
-class SVM_predictor:
+class Regression_predictor(Predictor_template):
 
     def __init__(self, data):
         self.data = data
@@ -18,17 +18,19 @@ class SVM_predictor:
         self.y_test = self.data.test_df[:, -1]
 
     def train(self):
-        print('SVM: Training..')
-        self.svclassifier = SVC(kernel='rbf', gamma='auto')
-        self.svclassifier.fit(self.x_train, self.y_train)
+        print('REG: Training..')
+        self.logisticRegr = LogisticRegression()
+        self.logisticRegr.fit(self.x_train, self.y_train)
         print('done..')
 
     def predict(self):
-        print('SVM: Predicting..')
-        y_pred = self.svclassifier.predict(self.x_train)
+        print('REG: Predicting..')
+        y_pred = self.logisticRegr.predict(self.x_train)
         Metrics.print_error(self.y_test, y_pred)
 
-
-# a = SVM_predictor()
+# a = Regression_predictor()
 # a.train()
 # a.predict()
+
+
+

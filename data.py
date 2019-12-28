@@ -372,7 +372,7 @@ class Data:
 
     def get_df_csv_day_RP(self, month, day, start, end,
                           step):  # replaces missing values with value of 15 seconds later.
-        path = '../asi_16124/2019' + int_to_str(month) + int_to_str(day) + '/'
+        path = 'asi_16124/2019' + int_to_str(month) + int_to_str(day) + '/'
         files = listdir(path)
         index = 0
 
@@ -429,7 +429,7 @@ class Data:
             days += calendar.monthrange(2019, m)[1]
 
         # debug
-        # days = 2
+        days = 2
 
         self.mega_df = np.zeros((days, self.queries_per_day, self.size_of_row), dtype=np.uint16)
         self.extra_df = np.zeros((days, self.pred_horizon, 1), dtype=np.uint16)
@@ -438,7 +438,7 @@ class Data:
             days = range(1, calendar.monthrange(2019, m)[1])  # create an array with days for that month
 
             # debug
-            # days = [1,2]
+            days = [1,2]
 
             for d in days:
                 day_data = self.get_df_csv_day_RP(m, d, start, end, step).astype(int)
@@ -493,6 +493,7 @@ class Data:
     def load_dataset(self, name):
         self.train_df = np.load('train_' + name)
         self.test_df = np.load('test_' + name)
+
 # d = Data(pred_horzion=10, meteor_data=False)
 # d.build_df(7, 19, 1, months=[9])
 # d.label_df()
