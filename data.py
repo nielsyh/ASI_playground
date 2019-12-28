@@ -59,10 +59,11 @@ class Data:
     queries_per_day = 0
     pred_horizon = 30
 
-    def __init__(self, pred_horzion=30, meteor_data=False, images=False):
+    def __init__(self, pred_horzion=30, meteor_data=False, images=False, debug=False):
         self.meteor_data = meteor_data
         self.images = images
         self.pred_horizon = pred_horzion
+        self.debug = debug
 
         if self.meteor_data:  # adjusting df row length according to amount of data
             self.size_of_row += self.size_meteor_data
@@ -70,6 +71,12 @@ class Data:
             self.size_of_row += 400 * 400 * 3
             if self.meteor_data:
                 self.img_idx += self.size_meteor_data
+
+        print('Building Df with meteor data: ' + str(self.meteor_data) + ', image data: ' + str(
+            self.images) + ', debug: ' + str(self.debug) + '..')
+        print('Prediction horizon: ' + str(self.pred_horizon))
+        print('size of a row: ' + str(self.size_of_row))
+
 
     def download_data(self, cam=1, overwrite=False):  # download data
         data = 0
@@ -420,16 +427,14 @@ class Data:
         print('done')
 
     def build_df(self, start, end, step, months):
-        print('Building Df with meteor data: ' + str(self.meteor_data) + ', image data: ' + str(self.images) + '..')
-        print('size of a row: ' + str(self.size_of_row))
-
         self.queries_per_day = int(((end - start) * 60 / step))  # amount of data in one day
         days = 0
         for m in months:
             days += calendar.monthrange(2019, m)[1]
 
         # debug
-        days = 2
+        if(self.debug):
+            days = 2
 
         self.mega_df = np.zeros((days, self.queries_per_day, self.size_of_row), dtype=np.uint16)
         self.extra_df = np.zeros((days, self.pred_horizon, 1), dtype=np.uint16)
@@ -438,7 +443,8 @@ class Data:
             days = range(1, calendar.monthrange(2019, m)[1])  # create an array with days for that month
 
             # debug
-            days = [1,2]
+            if(self.debug):
+                days = [1,2]
 
             for d in days:
                 day_data = self.get_df_csv_day_RP(m, d, start, end, step).astype(int)
