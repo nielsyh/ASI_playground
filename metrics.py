@@ -21,6 +21,20 @@ class Metrics:
         y_observed, y_pred = np.array(y_observed), np.array(y_predicted)
         return np.mean(np.abs((y_observed - y_predicted) / (y_observed +1) )) * 100
 
+
+    @staticmethod
+    def get_error(y_observed, y_predicted):
+        print('RMSE')
+        rmse = Metrics.rmse(y_observed, y_predicted)
+        print(rmse)
+        print('MAE')
+        mae = Metrics.mae(y_observed, y_predicted)
+        print(mae)
+        print('MAPE')
+        mape = Metrics.mape(y_observed, y_predicted)
+        print(mape)
+        return rmse, mae, mape
+
     @staticmethod
     def print_error(y_observed, y_predicted):
         print('RMSE')
@@ -29,4 +43,5 @@ class Metrics:
         print(Metrics.mae(y_observed, y_predicted))
         print('MAPE')
         print(Metrics.mape(y_observed, y_predicted))
+
 
