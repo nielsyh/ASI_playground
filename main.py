@@ -9,6 +9,7 @@ print(prediction_horizons)
 errors_svm = []
 errors_log_reg = []
 
+
 for i in prediction_horizons:
     data = Data(pred_horzion=i, meteor_data=False, debug=True)
     data.build_df(7, 19, 1, months=[9])

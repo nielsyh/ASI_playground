@@ -11,9 +11,12 @@ from data_visuals import *
 from PIL import Image
 from metrics import Metrics
 from pvlib_playground import PvLibPlayground
-from features import get_image_by_date_time, int_to_str
+from features import get_image_by_date_time, int_to_str, extract_features
 import calendar
 from datetime import date
+# from debug import printProgressBar
+from tqdm import tqdm
+
 
 def process_csv(csv_name):
     tmp = pd.read_csv(csv_name, sep=';', header=None)
@@ -68,7 +71,7 @@ class Data:
         if self.meteor_data:  # adjusting df row length according to amount of data
             self.size_of_row += self.size_meteor_data
         if self.images:
-            self.size_of_row += 400 * 400 * 3
+            self.size_of_row += 4  # change if it gets bigger
             if self.meteor_data:
                 self.img_idx += self.size_meteor_data
 
@@ -430,7 +433,11 @@ class Data:
         self.queries_per_day = int(((end - start) * 60 / step))  # amount of data in one day
         days = 0
         for m in months:
-            days += calendar.monthrange(2019, m)[1]
+            if m < 4:
+                year = 2020
+            else:
+                year = 2019
+            days += calendar.monthrange(year, m)[1]
 
         # debug
         if(self.debug):
@@ -440,13 +447,18 @@ class Data:
         self.extra_df = np.zeros((days, self.pred_horizon, 1), dtype=np.uint16)
 
         for m in months:
-            days = range(1, calendar.monthrange(2019, m)[1])  # create an array with days for that month
+            if m < 4:
+                year = 2020
+            else:
+                year = 2019
+
+            days = range(1, calendar.monthrange(year, m)[1])  # create an array with days for that month
 
             # debug
             if(self.debug):
                 days = [1,2]
 
-            for d in days:
+            for d in tqdm(days, total=len(days), unit='progess days for month ' + str(m)):
                 day_data = self.get_df_csv_day_RP(m, d, start, end, step).astype(int)
                 extra = self.get_df_csv_day_RP(m, d, end, end+1, step).astype(int)
                 self.day_index += 1
@@ -455,7 +467,7 @@ class Data:
                 if self.meteor_data:
                     csi, azimuth, zenith = PvLibPlayground.get_meteor_data(m,
                                                                            d,
-                                                                           PvLibPlayground.get_times(2019,  # year, todo make this 2020 ready
+                                                                           PvLibPlayground.get_times(year,  # year, todo make this 2020 ready
                                                                                                      m,  # month
                                                                                                      d,  # day
                                                                                                      start,  # start time
@@ -466,7 +478,7 @@ class Data:
                     else:
                         continue
 
-                for idx, data in enumerate(day_data):
+                for idx, data in tqdm(enumerate(day_data), total=len(day_data), unit='progess day ' + str(d)):
                     self.mega_df[self.day_index][idx][0:9] = data  # adding data from csv
                     if self.meteor_data:
                         self.mega_df[self.day_index][idx][9] = csi[idx]
@@ -475,8 +487,8 @@ class Data:
                     if self.images:
                         year, month, day, hour, minute, seconds = int(data[0]), int(data[1]), int(data[2]), int(
                             data[3]), int(data[4]), int(data[5])
-                        self.mega_df[self.day_index][idx][self.img_idx:(self.size_of_row-1)] = get_image_by_date_time(year, month, day, hour,
-                                                                                              minute, seconds).flatten()
+                        img = get_image_by_date_time(year, month, day, hour,minute, seconds)
+                        self.mega_df[self.day_index][idx][self.img_idx:(self.size_of_row-1)] = extract_features(img)
 
         # YEAR, MONTH, DAY, HOURS, MINUTES, SECONDS, TEMP, IRRADIANCE, IMAGE
         print('Building done')
@@ -500,8 +512,14 @@ class Data:
         self.train_df = np.load('train_' + name)
         self.test_df = np.load('test_' + name)
 
-# d = Data(pred_horzion=10, meteor_data=False)
-# d.build_df(7, 19, 1, months=[9])
+d = Data(pred_horzion=10, meteor_data=False, images=True, debug=True)
+d.build_df(7, 19, 1, months=[9])
+d.label_df()
+d.split_data_set()
+d.flatten_data_set()
+
+print(d.mega_df)
+
 # d.label_df()
 # print(len(d.mega_df), len(d.train_df), len(d.test_df))
 # d.split_data_set()
