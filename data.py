@@ -82,7 +82,6 @@ class Data:
 
 
     def download_data(self, cam=1, overwrite=False):  # download data
-        data = 0
         cam_url = 0
         file_url = 0
 
@@ -98,7 +97,7 @@ class Data:
         ftp.cwd(cam_url)
         files = ftp.nlst()
 
-        for f in files:
+        for f in tqdm(files, total=len(files)):
             print("f:" + f)
             ftp.cwd((cam_url + str(f)))
             tmp_path = file_url + f + "/"
@@ -124,8 +123,6 @@ class Data:
                             print('Error processing: ' + file_name)
                 else:
                     print('file ' + file_name + " exists.. no overwrite")
-
-        return data
 
     def extract_time(self, time_str):
         return (time_str[8:14])
@@ -512,13 +509,13 @@ class Data:
         self.train_df = np.load('train_' + name)
         self.test_df = np.load('test_' + name)
 
-d = Data(pred_horzion=10, meteor_data=False, images=True, debug=True)
-d.build_df(7, 19, 1, months=[9])
-d.label_df()
-d.split_data_set()
-d.flatten_data_set()
-
-print(d.mega_df)
+# d = Data(pred_horzion=10, meteor_data=False, images=True, debug=True)
+# d.build_df(7, 19, 1, months=[9])
+# d.label_df()
+# d.split_data_set()
+# d.flatten_data_set()
+#
+# print(d.mega_df)
 
 # d.label_df()
 # print(len(d.mega_df), len(d.train_df), len(d.test_df))
