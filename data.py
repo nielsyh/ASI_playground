@@ -92,6 +92,7 @@ class Data:
 
         server, username, passwd = get_credentials()
         ftp = ftplib.FTP(server)
+        print(username, passwd)
         ftp.login(user=username, passwd=passwd)
 
         ftp.cwd(cam_url)

@@ -11,7 +11,7 @@ errors_log_reg = []
 
 for i in prediction_horizons:
     data = Data(pred_horzion=i, meteor_data=False, images=False, debug=True)
-    # data.download_data()
+    data.download_data()
     data.build_df(7, 19, 1, months=[9])
     data.label_df()
     data.split_data_set()
