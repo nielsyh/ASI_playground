@@ -4,6 +4,7 @@ from sklearn.linear_model import LogisticRegression
 from data import Data
 from metrics import Metrics
 from models.model_template import Predictor_template
+import pickle
 
 
 class Regression_predictor(Predictor_template):
@@ -28,6 +29,14 @@ class Regression_predictor(Predictor_template):
         y_pred = self.logisticRegr.predict(self.x_train)
         rmse, mae, mape = Metrics.get_error(self.y_test, y_pred)
         return rmse, mae, mape
+
+    def save(self, name):
+        with open(name, 'wb') as file:
+            pickle.dump(self.model, file)
+
+    def load(self, name):
+        with open(name, 'rb') as file:
+            self.model = pickle.load(file)
 
 # a = Regression_predictor()
 # a.train()

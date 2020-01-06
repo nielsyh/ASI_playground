@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from data import Data
 from metrics import Metrics
+import pickle
 
 
 class Predictor_template(ABC):
@@ -13,3 +14,10 @@ class Predictor_template(ABC):
 
     def predict(self):
         pass
+
+    def save(self, name):
+        pass
+
+    def load(self, name):
+        pass
+
