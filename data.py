@@ -1,6 +1,7 @@
 import ftplib
 import csv
 from builtins import enumerate
+import os
 
 import numpy as np
 import pandas as pd
@@ -109,6 +110,8 @@ class Data:
                 file_name = (str(i))
                 tmp_name = (tmp_path + str(i))
                 if not path.isfile(tmp_name) or overwrite:  # check if file exists
+                    if not os.path.exists(tmp_path):
+                        os.mkdir(tmp_path)
                     if '.jpg' in i:  # if image
                         image = open(tmp_name, 'wb')
                         ftp.retrbinary('RETR ' + file_name, image.write, 1024)
