@@ -1,5 +1,4 @@
 import ftplib
-import csv
 from builtins import enumerate
 import os
 
@@ -9,14 +8,13 @@ from os import listdir, path
 import cv2
 from datetime import time
 from data_visuals import *
-from PIL import Image
 from metrics import Metrics
 from pvlib_playground import PvLibPlayground
 from features import get_image_by_date_time, int_to_str, extract_features
 import calendar
 from datetime import date
-# from debug import printProgressBar
 from tqdm import tqdm
+from sklearn.preprocessing import *
 
 
 def process_csv(csv_name):
