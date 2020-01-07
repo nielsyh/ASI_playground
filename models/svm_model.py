@@ -11,25 +11,18 @@ class SVM_predictor:
 
     def __init__(self, data):
         self.data = data
-
-        self.x_train = self.data.train_df[:, 0: self.data.train_df.shape[1] - 1]
-        self.y_train = self.data.train_df[:, -1]
-
-        self.x_test = self.data.test_df[:, 0:self.data.test_df.shape[1] - 1]
-        self.y_test = self.data.test_df[:, -1]
-
         self.model = 0
 
     def train(self):
         print('SVM: Training..')
         self.svclassifier = SVC(kernel='rbf', gamma='auto')
-        self.model = self.svclassifier.fit(self.x_train, self.y_train)
+        self.model = self.svclassifier.fit(self.data.x_train, self.data.y_train)
         print('done..')
 
     def predict(self):
         print('SVM: Predicting..')
-        y_pred = self.model.predict(self.x_test)
-        rmse, mae, mape = Metrics.get_error(self.y_test, y_pred)
+        y_pred = self.model.predict(self.data.x_test)
+        rmse, mae, mape = Metrics.get_error(self.data.y_test, y_pred)
         return rmse, mae, mape
 
     def save(self, name):

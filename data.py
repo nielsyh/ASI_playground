@@ -67,6 +67,11 @@ class Data:
         self.pred_horizon = pred_horzion
         self.debug = debug
 
+        self.x_train = 0
+        self.y_train = 0
+        self.x_test = 0
+        self.y_test = 0
+
         if self.meteor_data:  # adjusting df row length according to amount of data
             self.size_of_row += self.size_meteor_data
         if self.images:
@@ -424,7 +429,29 @@ class Data:
         self.mega_df =  self.mega_df.reshape((self.mega_df.shape[0] * self.mega_df.shape[1], -1))
         self.train_df = self.train_df.reshape((self.train_df.shape[0] * self.train_df.shape[1], -1))
         self.test_df = self.test_df.reshape((self.test_df.shape[0] * self.test_df.shape[1], -1))
+
+        self.x_train = self.train_df[:, 0: self.train_df.shape[1] - 1]
+        self.y_train = self.train_df[:, -1]
+
+        self.x_test = self.test_df[:, 0:self.test_df.shape[1] - 1]
+        self.y_test = self.test_df[:, -1]
+
         print('done')
+
+    def normalize_data_sets(self):
+
+        colums_to_normalize = [3, 4, 5, 6, 7, 8]
+        if(self.meteor_data):
+            colums_to_normalize.extend([9])
+        if(self.images):
+            colums_to_normalize.extend([13, 14, 15, 16])
+
+        print('normalzing for: ' + str(colums_to_normalize))
+
+        self.x_train[:, colums_to_normalize] = normalize(self.x_train[:, colums_to_normalize], axis=0, norm='l2')
+        self.x_test[:, colums_to_normalize] = normalize(self.x_test[:, colums_to_normalize], axis=0, norm='l2')
+        print('done')
+
 
     def build_df(self, start, end, step, months):
         self.queries_per_day = int(((end - start) * 60 / step))  # amount of data in one day
@@ -440,8 +467,8 @@ class Data:
         if(self.debug):
             days = 2
 
-        self.mega_df = np.zeros((days, self.queries_per_day, self.size_of_row), dtype=np.uint16)
-        self.extra_df = np.zeros((days, self.pred_horizon, 1), dtype=np.uint16)
+        self.mega_df = np.zeros((days, self.queries_per_day, self.size_of_row), dtype=np.float)
+        self.extra_df = np.zeros((days, self.pred_horizon, 1), dtype=np.float)
 
         for m in months:
             if m < 4:
@@ -509,13 +536,14 @@ class Data:
         self.train_df = np.load('train_' + name)
         self.test_df = np.load('test_' + name)
 
-# d = Data(pred_horzion=10, meteor_data=False, images=True, debug=True)
-# d.build_df(7, 19, 1, months=[9])
-# d.label_df()
-# d.split_data_set()
-# d.flatten_data_set()
-#
-# print(d.mega_df)
+d = Data(pred_horzion=10, meteor_data=False, images=False, debug=True)
+d.build_df(7, 19, 1, months=[9])
+d.label_df()
+d.split_data_set()
+d.flatten_data_set()
+d.normalize_data_sets()
+np.set_printoptions(precision=3)
+print(d.x_test[500:505])
 
 # d.label_df()
 # print(len(d.mega_df), len(d.train_df), len(d.test_df))
