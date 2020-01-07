@@ -18,7 +18,6 @@ from sklearn.preprocessing import *
 
 
 def process_csv(csv_name):
-    print(csv_name)
     tmp = pd.read_csv(csv_name, sep=';', header=None)
     if (len(tmp.columns) > 1):
         arr = pd.read_csv(csv_name, sep=';', header=None,
@@ -379,15 +378,14 @@ class Data:
 
     def get_df_csv_day_RP(self, month, day, start, end,
                           step):  # replaces missing values with value of 15 seconds later.
+
         path = 'asi_16124/2019' + int_to_str(month) + int_to_str(day) + '/'
-        # files = listdir(path)
-        file_name = 'peridata_16124_2019' + int_to_str(month) + int_to_str(day) + '.csv'
+        file_name = 'peridata_16124_2019' + int_to_str(month) + int_to_str(day) + '.csv'  # todo make 2020 ready
         index = 0
 
         # data frame
         queries = int(((end - start) * 60 / step))
         df = np.empty([queries, 9])  # create df
-
 
         process_csv(path + file_name)
         tmp_df = pd.read_csv(path + file_name, sep=',', header=0, usecols=[0, 1, 2, 3, 4, ],  encoding='cp1252')  # load csv

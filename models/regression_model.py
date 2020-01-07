@@ -26,7 +26,7 @@ class Regression_predictor(Predictor_template):
 
     def predict(self):
         print('REG: Predicting..')
-        y_pred = self.logisticRegr.predict(self.x_train)
+        y_pred = self.logisticRegr.predict(self.x_test)
         rmse, mae, mape = Metrics.get_error(self.y_test, y_pred)
         return rmse, mae, mape
 
