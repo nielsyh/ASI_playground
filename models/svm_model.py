@@ -28,7 +28,7 @@ class SVM_predictor:
 
     def predict(self):
         print('SVM: Predicting..')
-        y_pred = self.model.predict(self.x_train)
+        y_pred = self.model.predict(self.x_test)
         rmse, mae, mape = Metrics.get_error(self.y_test, y_pred)
         return rmse, mae, mape
 
