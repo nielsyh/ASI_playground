@@ -68,6 +68,10 @@ class Data:
     pred_horizon = 30
 
     def __init__(self, pred_horzion=30, meteor_data=False, images=False, debug=False):
+        self.start = 0
+        self.end = 0
+        self.step = 0
+
         self.meteor_data = meteor_data
         self.images = images
         self.pred_horizon = pred_horzion
@@ -446,7 +450,7 @@ class Data:
 
     def normalize_data_sets(self):
 
-        colums_to_normalize = [3, 4, 5, 6, 7, 8]
+        colums_to_normalize = [6, 7, 8]
         if(self.meteor_data):
             colums_to_normalize.extend([9])
         if(self.images):
@@ -458,8 +462,12 @@ class Data:
         self.x_test[:, colums_to_normalize] = normalize(self.x_test[:, colums_to_normalize], axis=0, norm='l2')
         print('done')
 
-
     def build_df(self, start, end, step, months):
+
+        self.start = start
+        self.end = end
+        self.step = step
+
         self.queries_per_day = int(((end - start) * 60 / step))  # amount of data in one day
         days = 0
         for m in months:

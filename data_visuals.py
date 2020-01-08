@@ -8,10 +8,11 @@ style.use('seaborn-poster') #sets the size of the charts
 style.use('ggplot')
 
 
-def plot_error(model_a, model_b, title, xl, yl, prediction_horizons, option):
+def plot_error(model_a, model_b, model_c, title, xl, yl, prediction_horizons, option):
 
-    plt.plot(prediction_horizons, [i[option] for i in model_a], linestyle='-', label='values model a')
-    plt.plot(prediction_horizons, [i[option] for i in model_b], linestyle='-', label='values model b')
+    plt.plot(prediction_horizons, [i[option] for i in model_a], linestyle='-', label='SVM')
+    plt.plot(prediction_horizons, [i[option] for i in model_b], linestyle='-', label='Log. res.')
+    plt.plot(prediction_horizons, [i[option] for i in model_c], linestyle='-', label='Persistence')
 
     plt.legend()
     plt.title(title)
@@ -20,6 +21,7 @@ def plot_error(model_a, model_b, title, xl, yl, prediction_horizons, option):
 
     plt.show()
     plt.savefig('plot_' + str(title) +'.png')
+    plt.close()
 
 
 def plot_time_avg(tick_times, times, values, values_label, lx, ly, title, values_2 = [], values_2_label = ''):
