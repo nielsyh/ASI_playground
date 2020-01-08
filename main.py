@@ -16,9 +16,9 @@ errors_persistence = []
 for i in tqdm(prediction_horizons, total=len(prediction_horizons)):
 
     # SETUP
-    data = Data(pred_horzion=i, meteor_data=True, images=False, debug=True)
+    data = Data(pred_horzion=i, meteor_data=True, images=False, debug=False)
     # data.download_data()
-    data.build_df(10, 17, 1, months=[9,10,11,12])
+    data.build_df(10, 17, 1, months=[9])
     data.label_df()
     data.split_data_set()
     data.flatten_data_set()

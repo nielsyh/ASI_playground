@@ -23,7 +23,8 @@ def month_to_year(month):
         return '2019'
 
 def process_csv(csv_name):
-    # print(csv_name)
+    print(csv_name)
+
     tmp = pd.read_csv(csv_name, sep=';', header=None)
     if (len(tmp.columns) > 1):
         arr = pd.read_csv(csv_name, sep=';', header=None,
