@@ -14,7 +14,7 @@ class Regression_predictor(Predictor_template):
 
     def train(self):
         print('REG: Training..')
-        self.logisticRegr = LogisticRegression(max_iter=1000)
+        self.logisticRegr = LogisticRegression()
         self.logisticRegr.fit(self.data.x_train, self.data.y_train)
         print('done..')
 

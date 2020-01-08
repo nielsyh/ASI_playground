@@ -16,8 +16,14 @@ from datetime import date
 from tqdm import tqdm
 from sklearn.preprocessing import *
 
+def month_to_year(month):
+    if month < 4:
+        return '2020'
+    else:
+        return '2019'
 
 def process_csv(csv_name):
+    # print(csv_name)
     tmp = pd.read_csv(csv_name, sep=';', header=None)
     if (len(tmp.columns) > 1):
         arr = pd.read_csv(csv_name, sep=';', header=None,
@@ -125,8 +131,8 @@ class Data:
                             process_csv(tmp_name)
                         except:
                             print('Error processing: ' + file_name)
-                else:
-                    print('file ' + file_name + " exists.. no overwrite")
+                # else:
+                #     print('file ' + file_name + " exists.. no overwrite")
 
     def extract_time(self, time_str):
         return (time_str[8:14])
@@ -385,7 +391,7 @@ class Data:
                           step):  # replaces missing values with value of 15 seconds later.
 
         path = 'asi_16124/2019' + int_to_str(month) + int_to_str(day) + '/'
-        file_name = 'peridata_16124_2019' + int_to_str(month) + int_to_str(day) + '.csv'  # todo make 2020 ready
+        file_name = 'peridata_16124_' + month_to_year(month) + int_to_str(month) + int_to_str(day) + '.csv'  # todo make 2020 ready
         index = 0
 
         # data frame
@@ -457,10 +463,7 @@ class Data:
         self.queries_per_day = int(((end - start) * 60 / step))  # amount of data in one day
         days = 0
         for m in months:
-            if m < 4:
-                year = 2020
-            else:
-                year = 2019
+            year = int(month_to_year(m))
             days += calendar.monthrange(year, m)[1]
 
         # debug
@@ -535,6 +538,7 @@ class Data:
     def load_dataset(self, name):
         self.train_df = np.load('train_' + name)
         self.test_df = np.load('test_' + name)
+
 
 # d = Data(pred_horzion=10, meteor_data=True, images=False, debug=True)
 # d.build_df(7, 19, 1, months=[9])

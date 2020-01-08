@@ -8,18 +8,18 @@ style.use('seaborn-poster') #sets the size of the charts
 style.use('ggplot')
 
 
-def plot_rmse(model_a, model_b):
-    prediction_horizons = [1, 5, 10, 20]
-    plt.plot(prediction_horizons, [i[0] for i in model_a], linestyle='-', label='values model a')
-    plt.plot(prediction_horizons, [i[0] for i in model_b], linestyle='-', label='values model b')
+def plot_error(model_a, model_b, title, xl, yl, prediction_horizons, option):
+
+    plt.plot(prediction_horizons, [i[option] for i in model_a], linestyle='-', label='values model a')
+    plt.plot(prediction_horizons, [i[option] for i in model_b], linestyle='-', label='values model b')
 
     plt.legend()
-    plt.title('Title')
-    plt.xlabel('Prediction horizon in minutes')
-    plt.ylabel('Error in RMSE')
+    plt.title(title)
+    plt.xlabel(xl)
+    plt.ylabel(yl)
 
-    # plt.show()
-    plt.savefig('plot_RMSE.png')
+    plt.show()
+    plt.savefig('plot_' + str(title) +'.png')
 
 
 def plot_time_avg(tick_times, times, values, values_label, lx, ly, title, values_2 = [], values_2_label = ''):
