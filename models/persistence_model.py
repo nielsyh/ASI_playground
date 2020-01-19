@@ -9,7 +9,7 @@ import calendar
 import pandas as pd
 
 
-class Persistence_predictor:
+class Persistence_predictor_a:  # predict value as day before
 
     def __init__(self, data):
         self.data = data
@@ -21,7 +21,7 @@ class Persistence_predictor:
 
 
     def predict(self):
-        print('Persistence: Predicting..')
+        print('Persistence a: Predicting..')
         day_data = 0
         last_day = 0
         y_pred = []
@@ -29,6 +29,10 @@ class Persistence_predictor:
             month, day, hour, minute, second = int(x[1]), int(x[2]), int(x[3]), int(x[4]), int(x[5])
             year = int(month_to_year(month))
             minute += self.data.pred_horizon
+
+            if month > 12 or month < 1:
+                print('cao ni ma')
+                continue
 
             current = pd.Timestamp(year=year, month=month, day=day, hour=hour, second=second)
             horizon = current + pd.Timedelta(minutes=self.data.pred_horizon)
@@ -46,13 +50,24 @@ class Persistence_predictor:
         rmse, mae, mape = Metrics.get_error(self.data.y_test, y_pred)
         return rmse, mae, mape
 
-    def save(self, name):
-        with open(name, 'wb') as file:
-            pickle.dump(self.model, file)
+class Persistence_predictor_b:  # predict value as minute before
 
-    def load(self, name):
-        with open(name, 'rb') as file:
-            self.model = pickle.load(file)
+    def __init__(self, data):
+        self.data = data
+        self.model = 0
+
+
+    def train(self):
+        print('No training involved..')
+
+    def predict(self):
+        print('Persistence b: Predicting..')
+        y_pred = []
+        for x in self.data.x_test:
+            y_pred.append(int(x[8]))
+
+        rmse, mae, mape = Metrics.get_error(self.data.y_test, y_pred)
+        return rmse, mae, mape
 
 
 

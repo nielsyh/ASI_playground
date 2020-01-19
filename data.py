@@ -23,7 +23,7 @@ def month_to_year(month):
         return '2019'
 
 def process_csv(csv_name):
-    print(csv_name)
+    # print(csv_name)
 
     tmp = pd.read_csv(csv_name, sep=';', header=None)
     if (len(tmp.columns) > 1):
@@ -96,7 +96,7 @@ class Data:
         print('size of a row: ' + str(self.size_of_row))
 
 
-    def download_data(self, cam=1, overwrite=False):  # download data
+    def download_data(self, cam=1, overwrite=False, process=True):  # download data
         cam_url = 0
         file_url = 0
 
@@ -138,6 +138,44 @@ class Data:
                             print('Error processing: ' + file_name)
                 # else:
                 #     print('file ' + file_name + " exists.. no overwrite")
+
+    def process_all_csv(self, cam = 1):
+        cam_url = 0
+        file_url = 0
+
+        if (cam == 1):
+            cam_url = "/asi16_data/asi_16124/"
+            file_url = "asi_16124/"
+            # todo add second
+
+        server, username, passwd = get_credentials()
+        ftp = ftplib.FTP(server)
+        ftp.login(user=username.strip(), passwd=passwd.strip())
+
+        ftp.cwd(cam_url)
+        files = ftp.nlst()
+
+        for f in tqdm(files, total=len(files)):
+            ftp.cwd((cam_url + str(f)))
+            tmp_path = file_url + f + "/"
+
+            f_ = ftp.nlst()
+            for i in f_:
+                file_name = (str(i))
+                tmp_name = (tmp_path + str(i))
+                if not os.path.exists(tmp_path):
+                    os.mkdir(tmp_path)
+                if '.jpg' in i:  # if image
+                    pass
+                elif '.csv' in i:
+                    csv = open(tmp_name, 'wb')
+                    ftp.retrbinary('RETR ' + file_name, csv.write, 1024)
+                    csv.close()
+                    try:  # some have wrong encoding..
+                        process_csv(tmp_name)
+                    except:
+                        print('Error processing: ' + file_name)
+
 
     def extract_time(self, time_str):
         return (time_str[8:14])
@@ -427,7 +465,7 @@ class Data:
         random_idx = np.random.randint(self.mega_df.shape[0], size=sample_size)
         return self.mega_df[random_idx, :, :], random_idx
 
-    def split_data_set(self, train_percentage=0.8):  # todo validation set and in/ex clusions for training set.
+    def split_data_set_OUTDATED(self, train_percentage=0.8):  # todo validation set and in/ex clusions for training set.
         print('Splitting with train: ' + str(train_percentage) + '...')
         np.random.shuffle(self.mega_df)
         tmp_size = int(train_percentage * self.mega_df.shape[0])
@@ -435,11 +473,33 @@ class Data:
         self.test_df = self.mega_df[tmp_size:self.mega_df.shape[0]]
         print('done')
 
+    def split_data_set(self, m, d):
+        print('Splitting with train until month: ' + str(m) + ', day: ' + str(d) + '...')
+
+        day_idx = 0
+        #find index month
+        for idx, day in enumerate(self.mega_df):
+            print(day)
+            if int(day[0][1]) == m and int(day[0][2]) == d and day_idx == 0:
+                day_idx = idx
+                break
+
+        self.train_df = self.mega_df[0:day_idx]
+        self.test_df = self.mega_df[day_idx]
+
+        # print(self.train_df)
+        # print(self.test_df)
+
+        # self.train_df = self.mega_df[0:tmp_size]
+        # self.test_df = self.mega_df[tmp_size:self.mega_df.shape[0]]
+        # print('done')
+
     def flatten_data_set(self):  # this is needed to use it as input for models
         print('Flattening..')
-        self.mega_df =  self.mega_df.reshape((self.mega_df.shape[0] * self.mega_df.shape[1], -1))
+        # self.mega_df =  self.mega_df.reshape((self.mega_df.shape[0] * self.mega_df.shape[1], -1))
+
         self.train_df = self.train_df.reshape((self.train_df.shape[0] * self.train_df.shape[1], -1))
-        self.test_df = self.test_df.reshape((self.test_df.shape[0] * self.test_df.shape[1], -1))
+        # self.test_df = self.test_df.reshape((self.test_df.shape[0] * self.test_df.shape[1], -1))
 
         self.x_train = self.train_df[:, 0: self.train_df.shape[1] - 1]
         self.y_train = self.train_df[:, -1]
@@ -472,12 +532,15 @@ class Data:
         self.queries_per_day = int(((end - start) * 60 / step))  # amount of data in one day
         days = 0
         for m in months:
-            year = int(month_to_year(m))
-            days += calendar.monthrange(year, m)[1]
+            if m == 7:
+                days += 8
+            else:
+                year = int(month_to_year(m))
+                days += calendar.monthrange(year, m)[1]
 
         # debug
         if(self.debug):
-            days = 2
+            days = 3
 
         self.mega_df = np.zeros((days, self.queries_per_day, self.size_of_row), dtype=np.float)
         self.extra_df = np.zeros((days, self.pred_horizon, 1), dtype=np.float)
@@ -488,13 +551,18 @@ class Data:
             else:
                 year = 2019
 
-            days = range(1, calendar.monthrange(year, m)[1])  # create an array with days for that month
+            if m == 7: #different for july..
+                days = [24, 25, 26, 27, 28, 29, 30, 31]
+                print('set for july')
+            else:
+                days = range(1, calendar.monthrange(year, m)[1])  # create an array with days for that month
 
             # debug
             if(self.debug):
-                days = [1,2]
+                days = [25,26,27]
 
             for d in tqdm(days, total=len(days), unit='progess days for month ' + str(m)):
+                # todo add sunrise/sundown for start end
                 day_data = self.get_df_csv_day_RP(m, d, start, end, step).astype(int)
                 extra = self.get_df_csv_day_RP(m, d, end, end+1, step).astype(int)
                 self.day_index += 1
@@ -529,7 +597,7 @@ class Data:
         # YEAR, MONTH, DAY, HOURS, MINUTES, SECONDS, TEMP, IRRADIANCE, IMAGE
         print('Building done')
 
-    def label_df(self):
+    def label_df(self):  # todo no new data instance for new pred horizon.. just label again..
         for idx_day, day in enumerate(self.mega_df):
             tmp_cnt = 0
             for idx_timeslot, time_slot in enumerate(day):
@@ -548,13 +616,21 @@ class Data:
         self.train_df = np.load('train_' + name)
         self.test_df = np.load('test_' + name)
 
+    # def scan_for_unvalid(self):
+    #     for x in self.x_test:
+    #         last_x = x
+    #         if x[0] == 0 or x[1] == 0 or x[2] == 0:
 
-# d = Data(pred_horzion=10, meteor_data=True, images=False, debug=True)
-# d.build_df(7, 19, 1, months=[9])
+
+# d = Data(pred_horzion=10, meteor_data=False, images=False, debug=False)
+# # d.process_all_csv()
+# d.build_df(7, 19, 1, months=[7, 8, 9])
 # d.label_df()
-# d.split_data_set()
+# d.split_data_set(9, 26) #month, day, hour, minute
 # d.flatten_data_set()
 # d.normalize_data_sets()
+
+
 # np.set_printoptions(precision=3)
 # print(d.x_test[500:505])
 
@@ -570,7 +646,7 @@ class Data:
 # img = get_image_by_date_time(19,9,1,12,0,0).flatten()
 # print(img.shape)
 # d.download_data(1, True)
-# d.process_csv("asi_16124/20190712/peridata_16124_20190712.csv")
+# process_csv("peridata_16124_20190723.csv")
 # df = d.build_df(2)
 # d.images_information()
 # d.plot_per_month(9, 5, 19)
@@ -587,7 +663,7 @@ class Data:
 # df = d.get_df_csv_day('10','05',5,19)
 # print(df[0][0:12])
 # print(df[-1][0:12])
-# # d.download_data()
+
 
 # make df ready for future predictions
 # filter unnesacasru dtuff out

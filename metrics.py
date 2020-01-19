@@ -44,4 +44,14 @@ class Metrics:
         print('MAPE')
         print(Metrics.mape(y_observed, y_predicted))
 
+    @staticmethod
+    def write_results(model, x_test, y_actual, y_pred, horizon):
+        for idx, value in x_test:
+            Metrics.write_to_file(model, x_test[1], x_test[2], x_test[3], x_test[4], horizon, y_actual[idx], y_pred[idx])
+
+    @staticmethod
+    def write_to_file(model, month, hour, day, minute, horizon, actual, predicted):
+        f = open(str(model) + ".txt", "w+")
+        f.write(str(month) + " " + str(day) + " " + str(minute) + " " + str(horizon) + " " + str(actual) + " " + str(predicted))
+        f.close()
 
