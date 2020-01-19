@@ -5,8 +5,8 @@ from data_visuals import plot_error
 from tqdm import tqdm
 import numpy as np
 
-# prediction_horizons = list(range(1, 31))
-prediction_horizons = [1,5,10]
+prediction_horizons = list(range(1, 21))
+# prediction_horizons = [1,5,10]
 print(prediction_horizons)
 
 errors_svm = []
@@ -17,9 +17,9 @@ errors_persistence_b = []
 for i in tqdm(prediction_horizons, total=len(prediction_horizons)):
 
     # SETUP
-    data = Data(pred_horzion=i, meteor_data=False, images=False, debug=False)
+    data = Data(pred_horzion=i, meteor_data=True, images=False, debug=False)
     # data.download_data()
-    data.build_df(10, 17, 1, months=[7,8,9])
+    data.build_df(10, 17, 1, months=[7,8,9,10,11,12])
     data.label_df()
     # data.split_data_set()
     # data.flatten_data_set()
@@ -58,8 +58,8 @@ for i in tqdm(prediction_horizons, total=len(prediction_horizons)):
 # np.savetxt('errors_log_reg', errors_log_reg, delimiter=',')
 # np.savetxt('errors_persistence', errors_persistence, delimiter=',')
 
-plot_error(errors_svm, errors_persistence_b, errors_persistence_a, 'Error RMSE', 'Prediction horizon in minutes', 'Error in RMSE', prediction_horizons, 0) #rmse
-plot_error(errors_svm, errors_persistence_b, errors_persistence_a, 'Error MAE', 'Prediction horizon in minutes', 'Error in MAE', prediction_horizons, 1) #mae
-plot_error(errors_svm, errors_persistence_b, errors_persistence_a, 'Error MAPE', 'Prediction horizon in minutes', 'Error in MAPE', prediction_horizons, 2) #mape
-#
+# plot_error(errors_svm, errors_persistence_b, errors_persistence_a, 'Error RMSE', 'Prediction horizon in minutes', 'Error in RMSE', prediction_horizons, 0) #rmse
+# plot_error(errors_svm, errors_persistence_b, errors_persistence_a, 'Error MAE', 'Prediction horizon in minutes', 'Error in MAE', prediction_horizons, 1) #mae
+# plot_error(errors_svm, errors_persistence_b, errors_persistence_a, 'Error MAPE', 'Prediction horizon in minutes', 'Error in MAPE', prediction_horizons, 2) #mape
+# #
 
