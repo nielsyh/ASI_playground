@@ -61,21 +61,22 @@ class Data:
     train_df = []
     test_df = []
 
-    day_index = -1
+    months = []
+
+    # day_index = -1
     size_of_row = 10  # row default size 9 + 1 for label
     size_meteor_data = 3  # amount of columns from meteor data
     img_idx = 9  # index of column were image data starts
     queries_per_day = 0
-    pred_horizon = 30
+    pred_horizon = 0
 
-    def __init__(self, pred_horzion=30, meteor_data=False, images=False, debug=False):
+    def __init__(self, meteor_data=False, images=False, debug=False):
         self.start = 0
         self.end = 0
         self.step = 0
 
         self.meteor_data = meteor_data
         self.images = images
-        self.pred_horizon = pred_horzion
         self.debug = debug
 
         self.x_train = 0
@@ -92,7 +93,6 @@ class Data:
 
         print('Building Df with meteor data: ' + str(self.meteor_data) + ', image data: ' + str(
             self.images) + ', debug: ' + str(self.debug) + '..')
-        print('Prediction horizon: ' + str(self.pred_horizon))
         print('size of a row: ' + str(self.size_of_row))
 
 
@@ -201,10 +201,7 @@ class Data:
 
     def get_ghi_temp_by_minute(self, df, hour, minute):
 
-        # print(df)
-        # rows = df[df[:, 3] == hour]  # filter on hours
         rows = df[np.where(df[:, 3] == hour)]
-        # print(rows)
         rows = rows[rows[:, 4] == minute]  # filter on minutes
         return rows
 
@@ -465,7 +462,7 @@ class Data:
         random_idx = np.random.randint(self.mega_df.shape[0], size=sample_size)
         return self.mega_df[random_idx, :, :], random_idx
 
-    def split_data_set_OUTDATED(self, train_percentage=0.8):  # todo validation set and in/ex clusions for training set.
+    def split_data_set_DEPRICATED(self, train_percentage=0.8):  # todo validation set and in/ex clusions for training set.
         print('Splitting with train: ' + str(train_percentage) + '...')
         np.random.shuffle(self.mega_df)
         tmp_size = int(train_percentage * self.mega_df.shape[0])
@@ -479,20 +476,16 @@ class Data:
         day_idx = 0
         #find index month
         for idx, day in enumerate(self.mega_df):
-            print(day)
             if int(day[0][1]) == m and int(day[0][2]) == d and day_idx == 0:
                 day_idx = idx
+                print('found: ' + str(day_idx))
                 break
 
         self.train_df = self.mega_df[0:day_idx]
         self.test_df = self.mega_df[day_idx]
 
-        # print(self.train_df)
-        # print(self.test_df)
+        print('done')
 
-        # self.train_df = self.mega_df[0:tmp_size]
-        # self.test_df = self.mega_df[tmp_size:self.mega_df.shape[0]]
-        # print('done')
 
     def flatten_data_set(self):  # this is needed to use it as input for models
         print('Flattening..')
@@ -528,9 +521,12 @@ class Data:
         self.start = start
         self.end = end
         self.step = step
-
+        self.months = months
         self.queries_per_day = int(((end - start) * 60 / step))  # amount of data in one day
+
         days = 0
+        day_index = -1
+
         for m in months:
             if m == 7:
                 days += 8
@@ -543,59 +539,87 @@ class Data:
             days = 3
 
         self.mega_df = np.zeros((days, self.queries_per_day, self.size_of_row), dtype=np.float)
-        self.extra_df = np.zeros((days, self.pred_horizon, 1), dtype=np.float)
 
-        for m in months:
-            if m < 4:
-                year = 2020
-            else:
-                year = 2019
+        if m == 7: #different for july..
+            days = [24, 25, 26, 27, 28, 29, 30, 31]
+            print('set for july')
+        else:
+            days = range(1, calendar.monthrange(2019, m)[1] + 1)  # create an array with days for that month
 
-            if m == 7: #different for july..
-                days = [24, 25, 26, 27, 28, 29, 30, 31]
-                print('set for july')
-            else:
-                days = range(1, calendar.monthrange(year, m)[1])  # create an array with days for that month
+        # debug
+        if(self.debug):
+            days = [25,26,27]
 
-            # debug
-            if(self.debug):
-                days = [25,26,27]
+        for d in tqdm(days, total=len(days), unit='progess days for month ' + str(m)):
+            # todo add sunrise/sundown for start end
+            day_data = self.get_df_csv_day_RP(m, d, start, end, step).astype(int)
+            day_index += 1
 
-            for d in tqdm(days, total=len(days), unit='progess days for month ' + str(m)):
-                # todo add sunrise/sundown for start end
-                day_data = self.get_df_csv_day_RP(m, d, start, end, step).astype(int)
-                extra = self.get_df_csv_day_RP(m, d, end, end+1, step).astype(int)
-                self.day_index += 1
+            csi, azimuth, zenith = [], [], []
+            if self.meteor_data:
+                csi, azimuth, zenith = PvLibPlayground.get_meteor_data(m,
+                                                                       d,
+                                                                       PvLibPlayground.get_times(2019,  # year, todo make this 2020 ready
+                                                                                                 m,  # month
+                                                                                                 d,  # day
+                                                                                                 start,  # start time
+                                                                                                 end))  # end time
 
-                csi, azimuth, zenith = [], [], []
+            for idx, data in tqdm(enumerate(day_data), total=len(day_data), unit='progess day ' + str(d)):
+                self.mega_df[day_index][idx][0:9] = data  # adding data from csv
                 if self.meteor_data:
-                    csi, azimuth, zenith = PvLibPlayground.get_meteor_data(m,
-                                                                           d,
-                                                                           PvLibPlayground.get_times(year,  # year, todo make this 2020 ready
-                                                                                                     m,  # month
-                                                                                                     d,  # day
-                                                                                                     start,  # start time
-                                                                                                     end))  # end time
-                for idx, data in enumerate(extra):  # getting label data for predictions
-                    if(idx < self.pred_horizon):
-                        self.extra_df[self.day_index][idx][0] = data[8]
-                    else:
-                        continue
-
-                for idx, data in tqdm(enumerate(day_data), total=len(day_data), unit='progess day ' + str(d)):
-                    self.mega_df[self.day_index][idx][0:9] = data  # adding data from csv
-                    if self.meteor_data:
-                        self.mega_df[self.day_index][idx][9] = csi[idx]
-                        self.mega_df[self.day_index][idx][10] = azimuth[idx]
-                        self.mega_df[self.day_index][idx][11] = zenith[idx]
-                    if self.images:
-                        year, month, day, hour, minute, seconds = int(data[0]), int(data[1]), int(data[2]), int(
-                            data[3]), int(data[4]), int(data[5])
-                        img = get_image_by_date_time(year, month, day, hour,minute, seconds)
-                        self.mega_df[self.day_index][idx][self.img_idx:(self.size_of_row-1)] = extract_features(img)
+                    self.mega_df[day_index][idx][9] = csi[idx]
+                    self.mega_df[day_index][idx][10] = azimuth[idx]
+                    self.mega_df[day_index][idx][11] = zenith[idx]
+                if self.images:
+                    year, month, day, hour, minute, seconds = int(data[0]), int(data[1]), int(data[2]), int(
+                        data[3]), int(data[4]), int(data[5])
+                    img = get_image_by_date_time(year, month, day, hour,minute, seconds)
+                    self.mega_df[day_index][idx][self.img_idx:(self.size_of_row-1)] = extract_features(img)
 
         # YEAR, MONTH, DAY, HOURS, MINUTES, SECONDS, TEMP, IRRADIANCE, IMAGE
         print('Building done')
+
+    def set_prediction_horizon(self, prediction_horizon):
+        print('Setting prediction horizon to: ' + str(prediction_horizon) + '...')
+        self.pred_horizon = prediction_horizon  # set prediction horizon
+
+        days = 0
+        day_index = -1
+
+        for m in self.months:
+            if m == 7:
+                days += 8
+            else:
+                year = int(month_to_year(m))
+                days += calendar.monthrange(year, m)[1]
+
+        self.extra_df = np.zeros((days, self.pred_horizon, 1), dtype=np.float)  # make space for labels
+
+        for m in self.months:
+
+            if m == 7:  # different for july..
+                days = [24, 25, 26, 27, 28, 29, 30, 31]
+            else:
+                days = range(1, calendar.monthrange(2019, m)[1])  # create an array with days for that month
+
+            if(self.debug):  # debug
+                days = [25, 26, 27]
+
+            for d in tqdm(days, total=len(days), unit='Progress labeling days for month ' + str(m)):
+                # todo add sunrise/sundown for start end
+                extra = self.get_df_csv_day_RP(m, d, self.end, self.end+1, self.step).astype(int)
+                day_index += 1
+
+                for idx, data in enumerate(extra):  # getting label data for predictions
+                    if idx < self.pred_horizon:
+                        self.extra_df[day_index][idx][0] = data[8]
+                    else:
+                        continue
+
+        self.label_df()
+        print('done')
+
 
     def label_df(self):  # todo no new data instance for new pred horizon.. just label again..
         for idx_day, day in enumerate(self.mega_df):
@@ -616,57 +640,27 @@ class Data:
         self.train_df = np.load('train_' + name)
         self.test_df = np.load('test_' + name)
 
-    # def scan_for_unvalid(self):
+    # def scan_for_unvalid(self): todo?
     #     for x in self.x_test:
     #         last_x = x
     #         if x[0] == 0 or x[1] == 0 or x[2] == 0:
 
 
-# d = Data(pred_horzion=10, meteor_data=False, images=False, debug=False)
-# # d.process_all_csv()
-# d.build_df(7, 19, 1, months=[7, 8, 9])
-# d.label_df()
-# d.split_data_set(9, 26) #month, day, hour, minute
-# d.flatten_data_set()
-# d.normalize_data_sets()
+data = Data(meteor_data=False, images=False, debug=False)
+data.build_df(10, 17, 1, months=[9])
+data.set_prediction_horizon(5)
+data.split_data_set(9, 30)
+data.flatten_data_set()
+data.normalize_data_sets()
 
 
 # np.set_printoptions(precision=3)
-# print(d.x_test[500:505])
-
-# d.label_df()
-# print(len(d.mega_df), len(d.train_df), len(d.test_df))
-# d.split_data_set()
-# print(len(d.mega_df), len(d.train_df), len(d.test_df))
-# d.flatten_data_set()
-# print(len(d.mega_df), len(d.train_df), len(d.test_df))
-# sample = d.sample_from_df(15)
-# print(sample[0][0:10])
-
-# img = get_image_by_date_time(19,9,1,12,0,0).flatten()
-# print(img.shape)
 # d.download_data(1, True)
 # process_csv("peridata_16124_20190723.csv")
-# df = d.build_df(2)
 # d.images_information()
 # d.plot_per_month(9, 5, 19)
-# d.plot_per_month(9, 5, 19, 5)
 # d.plot_day('01','08', 7, 19, 1)
-# d.plot_day('04', '09', 14, 15, 1)
 # d.plot_persistence_day('02', '09', 6, 19, 1)
-# d.plot_persistence_day('03', '09', 6, 19, 1)
-# d.plot_persistence_day('04', '09', 6, 19, 1)
-# d.plot_persistence_day('05', '09', 6, 19, 1)
-# d.get_error_month('09', 6, 19, 1)
-
-# d.plot_day('05', '10', 5, 19, 1)
-# df = d.get_df_csv_day('10','05',5,19)
-# print(df[0][0:12])
-# print(df[-1][0:12])
 
 
-# make df ready for future predictions
-# filter unnesacasru dtuff out
-# normalization
-# simple features?
-# save df
+

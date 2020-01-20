@@ -46,12 +46,13 @@ class Metrics:
 
     @staticmethod
     def write_results(model, x_test, y_actual, y_pred, horizon):
-        for idx, value in x_test:
-            Metrics.write_to_file(model, x_test[1], x_test[2], x_test[3], x_test[4], horizon, y_actual[idx], y_pred[idx])
+        for idx, value in enumerate(x_test):
+            Metrics.write_to_file(model, value[1], value[2], value[3], value[4], horizon, y_actual[idx], y_pred[idx])
 
     @staticmethod
-    def write_to_file(model, month, hour, day, minute, horizon, actual, predicted):
-        f = open(str(model) + ".txt", "w+")
-        f.write(str(month) + " " + str(day) + " " + str(minute) + " " + str(horizon) + " " + str(actual) + " " + str(predicted))
+    def write_to_file(model, month, day, hour, minute, horizon, actual, predicted):
+        f = open(str(model) + ".txt", "a")
+        f.write(str(month) + "," + str(day) + "," + str(hour) + "," + str(minute) + "," + str(horizon) + "," + str(actual) + "," + str(predicted))
+        f.write('\n')
         f.close()
 

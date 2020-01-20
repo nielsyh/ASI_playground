@@ -17,12 +17,13 @@ class SVM_predictor:
 
     def run_experiment(self):
         self.day_month_to_predict = []
-        months = [9, 10, 11, 12]
 
-        for m in months:
+        for m in self.data.months:
             last_day = calendar.monthrange(2019, m)[1]
-            if m == 9:
-                days = list(range(11, last_day + 1))
+            if m < 9:
+                continue
+            elif m == 9:
+                days = list(range(11, last_day + 1)) #  Predict from 11 september
             else:
                 days = list(range(1, last_day + 1))
 
@@ -37,10 +38,16 @@ class SVM_predictor:
 
             self.train()
             y_pred, rmse, mae, mape = self.predict()
-            # todo save this according to standard
-            print(rmse, mae, mape)
 
+            name = 0
+            if self.data.debug:
+                name = name + '_debug'
+            if self.data.images:
+                name = name + '_images'
+            if self.data.meteor_data:
+                name = name + '_meteor'
 
+            Metrics.write_results('SWM predictor' + str(name), self.data.x_test, self.data.y_test, y_pred, self.data.pred_horizon)
 
     def train(self):
         print('SVM: Training..')

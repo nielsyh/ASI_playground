@@ -15,6 +15,40 @@ class Persistence_predictor_a:  # predict value as day before
         self.data = data
         self.model = 0
 
+    def run_experiment(self):
+        self.day_month_to_predict = []
+
+        for m in self.data.months:
+            last_day = calendar.monthrange(2019, m)[1]
+            if m < 9:
+                continue
+            elif m == 9:
+                days = list(range(11, last_day + 1))  # Predict from 11 september
+            else:
+                days = list(range(1, last_day + 1))
+
+            for d in days:
+                self.day_month_to_predict.append((m, d))
+
+        for exp in self.day_month_to_predict:
+            print('Persistence a: ' + str(exp))
+            self.data.split_data_set(exp[0], exp[1])
+            self.data.flatten_data_set()
+            # self.data.normalize_data_sets()
+
+            y_pred, rmse, mae, mape = self.predict()
+
+            name = 0
+            if self.data.debug:
+                name = name + '_debug'
+            if self.data.images:
+                name = name + '_images'
+            if self.data.meteor_data:
+                name = name + '_meteor'
+
+            Metrics.write_results('Persistence_a' + str(name), self.data.x_test, self.data.y_test, y_pred,
+                                  self.data.pred_horizon)
+
 
     def train(self):
         print('No training involved..')
@@ -48,13 +82,46 @@ class Persistence_predictor_a:  # predict value as day before
             y_pred.append(rows[0][8])
 
         rmse, mae, mape = Metrics.get_error(self.data.y_test, y_pred)
-        return rmse, mae, mape
+        return y_pred, rmse, mae, mape
 
 class Persistence_predictor_b:  # predict value as minute before
 
     def __init__(self, data):
         self.data = data
         self.model = 0
+
+    def run_experiment(self):
+        self.day_month_to_predict = []
+
+        for m in self.data.months:
+            last_day = calendar.monthrange(2019, m)[1]
+            if m < 9:
+                continue
+            elif m == 9:
+                days = list(range(11, last_day + 1))  # Predict from 11 september
+            else:
+                days = list(range(1, last_day + 1))
+
+            for d in days:
+                self.day_month_to_predict.append((m, d))
+
+        for exp in self.day_month_to_predict:
+            print('persistence b: ' + str(exp))
+            self.data.split_data_set(exp[0], exp[1])
+            self.data.flatten_data_set()
+
+            y_pred, rmse, mae, mape = self.predict()
+
+            name = 0
+            if self.data.debug:
+                name = name + '_debug'
+            if self.data.images:
+                name = name + '_images'
+            if self.data.meteor_data:
+                name = name + '_meteor'
+
+            Metrics.write_results('Persistence_b' + str(name), self.data.x_test, self.data.y_test, y_pred,
+                                  self.data.pred_horizon)
 
 
     def train(self):
@@ -67,7 +134,7 @@ class Persistence_predictor_b:  # predict value as minute before
             y_pred.append(int(x[8]))
 
         rmse, mae, mape = Metrics.get_error(self.data.y_test, y_pred)
-        return rmse, mae, mape
+        return y_pred, rmse, mae, mape
 
 
 
