@@ -39,7 +39,7 @@ class SVM_predictor:
             self.train()
             y_pred, rmse, mae, mape = self.predict()
 
-            name = 0
+            name = '_horizon_' + str(self.data.pred_horizon)
             if self.data.debug:
                 name = name + '_debug'
             if self.data.images:
