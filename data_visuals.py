@@ -2,7 +2,7 @@
 
 import matplotlib.pyplot as plt
 import matplotlib.style as style
-
+from metrics import *
 
 style.use('seaborn-poster') #sets the size of the charts
 style.use('ggplot')
@@ -66,3 +66,17 @@ def plot_freq(dict, title):
     plt.tight_layout()
 
     plt.show()
+
+def read_plot_file(file_name, model_name):
+    with open(file_name) as fp:
+        y_true = []
+        y_pred = []
+        for line in fp:
+            l = line.split(',')
+            y_true.append(float(l[5]))
+            y_pred.append(float(l[6]))
+
+    rmse, mae, mape = Metrics.get_error(y_true,y_pred)
+    print(rmse, mae, mape)
+
+# read_plot_file('SWM predictor_horizon_1.txt', 'SVM')

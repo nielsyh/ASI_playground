@@ -10,12 +10,12 @@ prediction_horizons = list(range(1, 21))
 print(prediction_horizons)
 
 
-data = Data(meteor_data=True, images=False, debug=False)
+data = Data(meteor_data=False, images=False, debug=False)
 for i in tqdm(prediction_horizons, total=len(prediction_horizons)):
 
     # SETUP
-    # data.download_data()
-    data.build_df(10, 17, 1, months=[7, 8, 9, 10, 11, 12])
+    # data.process_all_csv()
+    data.build_df(10, 17, 1, months=[7, 9])
     data.set_prediction_horizon(i)
 
     # MODELS

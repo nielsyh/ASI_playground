@@ -140,6 +140,7 @@ class Data:
                 #     print('file ' + file_name + " exists.. no overwrite")
 
     def process_all_csv(self, cam = 1):
+        print("downloading all csv files")
         cam_url = 0
         file_url = 0
 
@@ -163,18 +164,19 @@ class Data:
             for i in f_:
                 file_name = (str(i))
                 tmp_name = (tmp_path + str(i))
-                if not os.path.exists(tmp_path):
-                    os.mkdir(tmp_path)
-                if '.jpg' in i:  # if image
-                    pass
-                elif '.csv' in i:
-                    csv = open(tmp_name, 'wb')
-                    ftp.retrbinary('RETR ' + file_name, csv.write, 1024)
-                    csv.close()
-                    try:  # some have wrong encoding..
-                        process_csv(tmp_name)
-                    except:
-                        print('Error processing: ' + file_name)
+                if not path.isfile(tmp_name):
+                    if not os.path.exists(tmp_path):
+                        os.mkdir(tmp_path)
+                    if '.jpg' in i:  # if image
+                        pass
+                    elif '.csv' in i:
+                        csv = open(tmp_name, 'wb')
+                        ftp.retrbinary('RETR ' + file_name, csv.write, 1024)
+                        csv.close()
+                        try:  # some have wrong encoding..
+                            process_csv(tmp_name)
+                        except:
+                            print('Error processing: ' + file_name)
 
 
     def extract_time(self, time_str):
@@ -527,6 +529,8 @@ class Data:
         days = 0
         day_index = -1
 
+        print('Processing months: ' + str(months))
+
         for m in months:
             if m == 7:
                 days += 8
@@ -540,42 +544,46 @@ class Data:
 
         self.mega_df = np.zeros((days, self.queries_per_day, self.size_of_row), dtype=np.float)
 
-        if m == 7: #different for july..
-            days = [24, 25, 26, 27, 28, 29, 30, 31]
-            print('set for july')
-        else:
-            days = range(1, calendar.monthrange(2019, m)[1] + 1)  # create an array with days for that month
+
 
         # debug
         if(self.debug):
             days = [25,26,27]
 
-        for d in tqdm(days, total=len(days), unit='progess days for month ' + str(m)):
-            # todo add sunrise/sundown for start end
-            day_data = self.get_df_csv_day_RP(m, d, start, end, step).astype(int)
-            day_index += 1
+        for m in months:
 
-            csi, azimuth, zenith = [], [], []
-            if self.meteor_data:
-                csi, azimuth, zenith = PvLibPlayground.get_meteor_data(m,
-                                                                       d,
-                                                                       PvLibPlayground.get_times(2019,  # year, todo make this 2020 ready
-                                                                                                 m,  # month
-                                                                                                 d,  # day
-                                                                                                 start,  # start time
-                                                                                                 end))  # end time
+            if m == 7:  # different for july..
+                days = [24, 25, 26, 27, 28, 29, 30, 31]
+                # print('set for july')
+            else:
+                days = list(range(1, calendar.monthrange(2019, m)[1] + 1) ) # create an array with days for that month
 
-            for idx, data in tqdm(enumerate(day_data), total=len(day_data), unit='progess day ' + str(d)):
-                self.mega_df[day_index][idx][0:9] = data  # adding data from csv
+            for d in tqdm(days, total=len(days), unit='progess days for month ' + str(m)):
+                # todo add sunrise/sundown for start end
+                day_data = self.get_df_csv_day_RP(m, d, start, end, step).astype(int)
+                day_index += 1
+
+                csi, azimuth, zenith = [], [], []
                 if self.meteor_data:
-                    self.mega_df[day_index][idx][9] = csi[idx]
-                    self.mega_df[day_index][idx][10] = azimuth[idx]
-                    self.mega_df[day_index][idx][11] = zenith[idx]
-                if self.images:
-                    year, month, day, hour, minute, seconds = int(data[0]), int(data[1]), int(data[2]), int(
-                        data[3]), int(data[4]), int(data[5])
-                    img = get_image_by_date_time(year, month, day, hour,minute, seconds)
-                    self.mega_df[day_index][idx][self.img_idx:(self.size_of_row-1)] = extract_features(img)
+                    csi, azimuth, zenith = PvLibPlayground.get_meteor_data(m,
+                                                                           d,
+                                                                           PvLibPlayground.get_times(2019,  # year, todo make this 2020 ready
+                                                                                                     m,  # month
+                                                                                                     d,  # day
+                                                                                                     start,  # start time
+                                                                                                     end))  # end time
+
+                for idx, data in tqdm(enumerate(day_data), total=len(day_data), unit='progess day ' + str(d)):
+                    self.mega_df[day_index][idx][0:9] = data  # adding data from csv
+                    if self.meteor_data:
+                        self.mega_df[day_index][idx][9] = csi[idx]
+                        self.mega_df[day_index][idx][10] = azimuth[idx]
+                        self.mega_df[day_index][idx][11] = zenith[idx]
+                    if self.images:
+                        year, month, day, hour, minute, seconds = int(data[0]), int(data[1]), int(data[2]), int(
+                            data[3]), int(data[4]), int(data[5])
+                        img = get_image_by_date_time(year, month, day, hour,minute, seconds)
+                        self.mega_df[day_index][idx][self.img_idx:(self.size_of_row-1)] = extract_features(img)
 
         # YEAR, MONTH, DAY, HOURS, MINUTES, SECONDS, TEMP, IRRADIANCE, IMAGE
         print('Building done')
