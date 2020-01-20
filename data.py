@@ -646,12 +646,12 @@ class Data:
     #         if x[0] == 0 or x[1] == 0 or x[2] == 0:
 
 
-data = Data(meteor_data=False, images=False, debug=False)
-data.build_df(10, 17, 1, months=[9])
-data.set_prediction_horizon(5)
-data.split_data_set(9, 30)
-data.flatten_data_set()
-data.normalize_data_sets()
+# data = Data(meteor_data=False, images=False, debug=False)
+# data.build_df(10, 17, 1, months=[9])
+# data.set_prediction_horizon(5)
+# data.split_data_set(9, 30)
+# data.flatten_data_set()
+# data.normalize_data_sets()
 
 
 # np.set_printoptions(precision=3)
