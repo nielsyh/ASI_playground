@@ -480,7 +480,7 @@ class Data:
         for idx, day in enumerate(self.mega_df):
             if int(day[0][1]) == m and int(day[0][2]) == d and day_idx == 0:
                 day_idx = idx
-                print('found: ' + str(day_idx))
+                # print('found: ' + str(day_idx))
                 break
 
         self.train_df = self.mega_df[0:day_idx]
@@ -507,8 +507,8 @@ class Data:
     def normalize_data_sets(self):
 
         colums_to_normalize = [6, 7, 8]
-        if(self.meteor_data):
-            colums_to_normalize.extend([9])
+        # if(self.meteor_data):
+        #     colums_to_normalize.extend([9])
         if(self.images):
             colums_to_normalize.extend([13, 14, 15, 16])
 
@@ -563,22 +563,22 @@ class Data:
                 day_data = self.get_df_csv_day_RP(m, d, start, end, step).astype(int)
                 day_index += 1
 
-                csi, azimuth, zenith = [], [], []
-                if self.meteor_data:
-                    csi, azimuth, zenith = PvLibPlayground.get_meteor_data(m,
-                                                                           d,
-                                                                           PvLibPlayground.get_times(2019,  # year, todo make this 2020 ready
-                                                                                                     m,  # month
-                                                                                                     d,  # day
-                                                                                                     start,  # start time
-                                                                                                     end))  # end time
+                # csi, azimuth, zenith = [], [], []
+                # if self.meteor_data:
+                #     csi, azimuth, zenith = PvLibPlayground.get_meteor_data(m,
+                #                                                            d,
+                #                                                            PvLibPlayground.get_times(2019,  # year, todo make this 2020 ready
+                #                                                                                      m,  # month
+                #                                                                                      d,  # day
+                #                                                                                      start,  # start time
+                #                                                                                      end))  # end time
 
                 for idx, data in tqdm(enumerate(day_data), total=len(day_data), unit='progess day ' + str(d)):
                     self.mega_df[day_index][idx][0:9] = data  # adding data from csv
-                    if self.meteor_data:
-                        self.mega_df[day_index][idx][9] = csi[idx]
-                        self.mega_df[day_index][idx][10] = azimuth[idx]
-                        self.mega_df[day_index][idx][11] = zenith[idx]
+                    # if self.meteor_data:
+                    #     self.mega_df[day_index][idx][9] = csi[idx]
+                    #     self.mega_df[day_index][idx][10] = azimuth[idx]
+                    #     self.mega_df[day_index][idx][11] = zenith[idx]
                     if self.images:
                         year, month, day, hour, minute, seconds = int(data[0]), int(data[1]), int(data[2]), int(
                             data[3]), int(data[4]), int(data[5])
@@ -632,7 +632,30 @@ class Data:
     def label_df(self):  # todo no new data instance for new pred horizon.. just label again..
         for idx_day, day in enumerate(self.mega_df):
             tmp_cnt = 0
+            m = int(day[0][1])
+            d = int(day[0][2])
+            start = self.start
+            end = self.end
+
+            csi, azimuth, zenith = [], [], []
+
+            if self.meteor_data:
+                csi, azimuth, zenith = PvLibPlayground.get_meteor_data(m,
+                                                                       d,
+                                                                       PvLibPlayground.get_times(2019,
+                                                                                                 # year, todo make this 2020 ready
+                                                                                                 m,  # month
+                                                                                                 d,  # day
+                                                                                                 start,  # start time
+                                                                                                 end,
+                                                                                                 offset=int(self.pred_horizon)))  # end time
+
             for idx_timeslot, time_slot in enumerate(day):
+                if self.meteor_data:
+                    self.mega_df[idx_day][idx_timeslot][9] = csi[idx_timeslot]
+                    self.mega_df[idx_day][idx_timeslot][10] = azimuth[idx_timeslot]
+                    self.mega_df[idx_day][idx_timeslot][11] = zenith[idx_timeslot]
+
                 if (self.queries_per_day - self.pred_horizon) > idx_timeslot:
                     self.mega_df[idx_day][idx_timeslot][self.size_of_row-1] = self.mega_df[idx_day][idx_timeslot + self.pred_horizon][8]
                     tmp_cnt +=1
@@ -654,15 +677,15 @@ class Data:
     #         if x[0] == 0 or x[1] == 0 or x[2] == 0:
 
 
-# data = Data(meteor_data=False, images=False, debug=False)
-# data.build_df(10, 17, 1, months=[9])
+# data = Data(meteor_data=True, images=False, debug=False)
+# data.build_df(10, 17, 1, months=[7])
 # data.set_prediction_horizon(5)
-# data.split_data_set(9, 30)
+# data.split_data_set(7, 30)
 # data.flatten_data_set()
 # data.normalize_data_sets()
-
-
 # np.set_printoptions(precision=3)
+# print(data.mega_df)
+
 # d.download_data(1, True)
 # process_csv("peridata_16124_20190723.csv")
 # d.images_information()

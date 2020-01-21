@@ -82,9 +82,12 @@ class PvLibPlayground:
         return pd.Timestamp(year=2019, month=month, day=day, hour=hour, minute=minute)
 
     @staticmethod
-    def get_times(year, month, day, start_time, end_time):
-        s = pd.Timestamp(year=year, month=month, day=day, hour=start_time)
-        e = pd.Timestamp(year=year, month=month, day=day, hour=(end_time - 1), minute=59)
+    def get_times(year, month, day, start_time, end_time, offset=0):
+        s = pd.Timestamp(year=year, month=month, day=day, hour=start_time, minute=offset)
+        if offset > 0:
+            e = pd.Timestamp(year=year, month=month, day=day, hour=end_time, minute=offset-1)
+        else:
+            e = pd.Timestamp(year=year, month=month, day=day, hour=(end_time - 1), minute=59)
         return PvLibPlayground.get_df_times(s, e)
 
 
@@ -102,9 +105,9 @@ class PvLibPlayground:
         return csi, azimuth, zenith
 
 # p = PvLibPlayground()
-# year = 2019
-# month = 10
-# day = 15
+# year = 2020
+# month = 1
+# day = 22
 # start_time = 7
 # end_time = 19
 # times = PvLibPlayground.get_times(year, month, day, start_time, end_time)
