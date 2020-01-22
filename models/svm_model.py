@@ -31,7 +31,7 @@ class SVM_predictor:
                 self.day_month_to_predict.append((m, d))
 
         for exp in self.day_month_to_predict:
-            print('SVM: ' + str(exp))
+            print('SVM: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
             self.data.split_data_set(exp[0], exp[1])
             self.data.flatten_data_set()
             self.data.normalize_data_sets()
@@ -50,13 +50,13 @@ class SVM_predictor:
             Metrics.write_results('SVM predictor' + str(name), self.data.x_test, self.data.y_test, y_pred, self.data.pred_horizon)
 
     def train(self):
-        print('SVM: Training..')
+        # print('SVM: Training..')
         self.svclassifier = SVC(kernel='rbf', gamma='auto')
         self.model = self.svclassifier.fit(self.data.x_train, self.data.y_train)
-        print('done..')
+        # print('done..')
 
     def predict(self):
-        print('SVM: Predicting..')
+        # print('SVM: Predicting..')
         y_pred = self.model.predict(self.data.x_test)
         rmse, mae, mape = Metrics.get_error(self.data.y_test, y_pred)
         return y_pred, rmse, mae, mape

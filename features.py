@@ -28,7 +28,10 @@ def get_image_by_date_time(year, month, day, hour, minute, seconds):
         total_url = base_url + folder_url + img_url
         if os.path.isfile(total_url):
             image = cv2.imread(total_url)
-            image_not_found=False
+            if(image is None):
+                seconds += 15
+            else:
+                image_not_found=False
         else:
             seconds += 15
 
