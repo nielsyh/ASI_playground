@@ -6,6 +6,7 @@ import pvlib
 from pvlib import clearsky, atmosphere, solarposition
 from pvlib.location import Location
 from pvlib.iotools import read_tmy3
+from pvlib.forecast import GFS
 
 class PvLibPlayground:
 
@@ -104,16 +105,22 @@ class PvLibPlayground:
         zenith = PvLibPlayground.get_solar_zenith_angle(month, day, times)
         return csi, azimuth, zenith
 
+    @staticmethod
+    # expirimental
+    def get_cloud_coverage(start, end):
+        model = GFS()
+        raw_data = model.get_data(PvLibPlayground.get_latitude(), PvLibPlayground.get_longitude(), start, end)
+        data = model.process_data(raw_data)
+        # data = model.get_processed_data(PvLibPlayground.get_latitude(), PvLibPlayground.get_longitude(), start, end)
+        return data
+
 # p = PvLibPlayground()
-# year = 2020
-# month = 1
-# day = 22
-# start_time = 7
-# end_time = 19
-# times = PvLibPlayground.get_times(year, month, day, start_time, end_time)
-# t = p.get_clear_sky_irradiance(times)
-# print(t)
-#
+# start = pd.Timestamp(year=2020, month=1, day=23, hour=9, minute=0)
+# end = pd.Timestamp(year=2020, month=1, day=23, hour=17, minute=58)
+# t = p.get_cloud_coverage(start, end)
+# with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
+#     print(t)
+# #
 # t = PvLibPlayground.get_df_times(start, end)
 #
 # print(PvLibPlayground.get_azimuth(10, 15, t))

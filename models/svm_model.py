@@ -47,7 +47,7 @@ class SVM_predictor:
             if self.data.meteor_data:
                 name = name + '_meteor'
 
-            Metrics.write_results('SWM predictor' + str(name), self.data.x_test, self.data.y_test, y_pred, self.data.pred_horizon)
+            Metrics.write_results('SVM predictor' + str(name), self.data.x_test, self.data.y_test, y_pred, self.data.pred_horizon)
 
     def train(self):
         print('SVM: Training..')
