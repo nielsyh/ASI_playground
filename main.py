@@ -12,7 +12,7 @@ import time
 prediction_horizons = list(range(1, 21))
 print(prediction_horizons)
 
-def run_experiment_thread(prediction_horizon):
+def SVM_experiment_thread(prediction_horizon):
     logging.info("Thread %s: starting", prediction_horizon)
     data = Data(meteor_data=True, images=False, debug=False)
     data.build_df(10, 17, 1, months=[7, 8, 9, 10, 11, 12])
@@ -25,19 +25,25 @@ def run_experiment_thread(prediction_horizon):
 
 def run_svm_multi_thread():
     for i in prediction_horizons:
-        x = threading.Thread(target=run_experiment_thread, args=(i,))
+        x = threading.Thread(target=SVM_experiment_thread, args=(i,))
         x.start()
 
-def run_persistence_b():
-    print('Running persistence b expiriments')
+def persistence_b_thread(prediction_horizon):
+    logging.info("PERSISTENCE b Thread %s: starting", prediction_horizon)
     data = Data(meteor_data=False, images=False, debug=False)
     data.build_df(10, 17, 1, months=[7, 8, 9, 10, 11, 12])
-
+    data.set_prediction_horizon(prediction_horizon)
     persistence_b = persistence_model.Persistence_predictor_b(data)
     persistence_b.run_experiment()
 
+    logging.info("Thread %s: finishing", prediction_horizon)
 
-run_persistence_b()
+def run_persistenceB_multi_thread():
+    for i in prediction_horizons:
+        x = threading.Thread(target=persistence_b_thread, args=(i,))
+        x.start()
+
+run_persistenceB_multi_thread()
 
 
 # data = Data(meteor_data=True, images=False, debug=False)

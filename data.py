@@ -522,7 +522,7 @@ class Data:
     def normalize_data_sets(self):
         #0 year, 1 month, 2 day, 3 hour, 4 minute, 5 seconds, 6 temp, 7 humidity,
         #8 current ghi, 9 future ghi (y) , 10 csi, 11 azimuth, 12 zenith, 13 intensity,
-        #14 #cloudpixel, 15 harris, 16 edges
+        #14 cloudpixel, 15 harris, 16 edges
 
         colums_to_normalize = [6, 7]
         # if(self.meteor_data):
@@ -647,6 +647,7 @@ class Data:
 
     def set_pred_horizon_virtual(self, prediction_horizon):  # This function just changes the variable but doesnt label accoringly. This is needed for persistence model.
         self.pred_horizon = prediction_horizon  # set prediction horizon
+        self.label_df()
 
     def set_prediction_horizon(self, prediction_horizon):  # only for model 1
         printf('Setting prediction horizon to: ' + str(prediction_horizon) + '...')
@@ -754,11 +755,15 @@ class Data:
 # data.flatten_data_set_CNN()
 
 
+data = Data(meteor_data=False, images=False, debug=False)
+data.build_df(10, 17, 1, months=[7, 8])
+data.set_prediction_horizon(5)
+data.split_data_set(8, 11)
+data.flatten_data_set()
 
+np.set_printoptions(precision=3)
+print(data.y_test)
+print(data.y_train)
 
-# np.set_printoptions(precision=3)
-# print(data.y_test)
-# print(data.y_train)
-#
-# print(data.x_test)
-# print(data.x_train)
+print(data.x_test)
+print(data.x_train)

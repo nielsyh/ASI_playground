@@ -121,7 +121,7 @@ class Persistence_predictor_b:  # predict value as minute before
                 name = name + '_meteor'
 
             Metrics.write_results('Persistence_b' + str(name), self.data.x_test, self.data.y_test, y_pred,
-                                  99)
+                                  self.data.pred_horizon)
 
 
     def train(self):
