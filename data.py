@@ -754,16 +754,16 @@ class Data:
 # data.split_data_set(8, 28)
 # data.flatten_data_set_CNN()
 
-
-data = Data(meteor_data=False, images=False, debug=False)
-data.build_df(10, 17, 1, months=[7, 8])
-data.set_prediction_horizon(5)
-data.split_data_set(8, 11)
-data.flatten_data_set()
-
-np.set_printoptions(precision=3)
-print(data.y_test)
-print(data.y_train)
-
-print(data.x_test)
-print(data.x_train)
+#
+# data = Data(meteor_data=False, images=False, debug=False)
+# data.build_df(10, 17, 1, months=[7, 8])
+# data.set_prediction_horizon(5)
+# data.split_data_set(8, 11)
+# data.flatten_data_set()
+#
+# np.set_printoptions(precision=3)
+# print(data.y_test)
+# print(data.y_train)
+#
+# print(data.x_test)
+# print(data.x_train)

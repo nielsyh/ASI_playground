@@ -14,6 +14,7 @@ print(prediction_horizons)
 
 def SVM_experiment_thread(prediction_horizon):
     logging.info("Thread %s: starting", prediction_horizon)
+
     data = Data(meteor_data=True, images=False, debug=False)
     data.build_df(10, 17, 1, months=[7, 8, 9, 10, 11, 12])
     data.set_prediction_horizon(prediction_horizon)
@@ -30,9 +31,11 @@ def run_svm_multi_thread():
 
 def persistence_b_thread(prediction_horizon):
     logging.info("PERSISTENCE b Thread %s: starting", prediction_horizon)
+
     data = Data(meteor_data=False, images=False, debug=False)
     data.build_df(10, 17, 1, months=[7, 8, 9, 10, 11, 12])
     data.set_prediction_horizon(prediction_horizon)
+
     persistence_b = persistence_model.Persistence_predictor_b(data)
     persistence_b.run_experiment()
 
