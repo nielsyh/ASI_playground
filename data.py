@@ -633,6 +633,7 @@ class Data:
                 day_index += 1
 
                 for idx, data in enumerate(day_data):
+                    data[6] = Metrics.celsius_to_kelvin(data[6])  # convert to kelvin
                     self.mega_df[day_index][idx][0:9] = data  # adding data from csv
                     if self.images:
                         year, month, day, hour, minute, seconds = int(data[0]), int(data[1]), int(data[2]), int(

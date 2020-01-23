@@ -8,6 +8,7 @@ from keras.applications.resnet50 import ResNet50
 class resnet50:
     # windowSize minimum 32 for resnet-50
     def __init__(self, image_size, path=None):
+        pass
 
 
     def get_model(self, image_res):

@@ -9,6 +9,10 @@ class Metrics:
         pass
 
     @staticmethod
+    def celsius_to_kelvin(c):
+        return c + 273.15
+
+    @staticmethod
     def rmse(y_observed, y_predicted):
         return sqrt(mean_squared_error(y_observed, y_predicted))
 
