@@ -46,8 +46,9 @@ def run_persistenceB_multi_thread():
         x = threading.Thread(target=persistence_b_thread, args=(i,))
         x.start()
 
-run_persistenceB_multi_thread()
+# run_persistenceB_multi_thread()
 
+run_persistenceB_multi_thread()
 
 # data = Data(meteor_data=True, images=False, debug=False)
 # for i in tqdm(prediction_horizons, total=len(prediction_horizons)):
