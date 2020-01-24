@@ -13,9 +13,7 @@ class resnet50:
         self.model = 0
 
     def train_cnn(self):
-        print('CNN: ' + str((9, 1)) + ', horizon: ' + str(self.data.pred_horizon))
-        self.data.split_data_set(9, 11)
-        self.data.flatten_data_set_CNN()
+        # print('CNN: ' + str((9, 1)) + ', horizon: ' + str(self.data.pred_horizon))
 
         model = self.get_model(400)
         self.train(model, self.data.x_train, self.data.y_train)

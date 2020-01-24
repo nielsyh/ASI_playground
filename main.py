@@ -48,8 +48,10 @@ def run_persistenceB_multi_thread():
 
 
 def train_cnn():
-    data = Data(meteor_data=False, images=False, debug=True)
-    data.build_df_for_cnn(10, 17, 1, months=[7,8,9])
+    data = Data(meteor_data=False, images=False, debug=False)
+    data.build_df_for_cnn(10, 17, 1, months=[7, 8, 9])
+    data.split_data_set(9, 11)
+    data.flatten_data_set_CNN()
     model = cnn_model.resnet50(400, data)
     model.train_cnn()
     model.train(model.get_model(400), data.x_train, data.y_train)
@@ -57,6 +59,7 @@ def train_cnn():
 # run_persistenceB_multi_thread()
 # run_svm_multi_thread()
 train_cnn()
+
 
 
 
