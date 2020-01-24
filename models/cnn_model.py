@@ -4,12 +4,25 @@ from keras.models import Model
 from sklearn.externals import joblib
 import keras
 from keras.applications.resnet50 import ResNet50
+import calendar
 
 class resnet50:
     # windowSize minimum 32 for resnet-50
-    def __init__(self, image_size, path=None):
-        pass
+    def __init__(self, image_size, data):
+        self.data = data
+        self.model = 0
 
+    def train_cnn(self):
+        print('CNN: ' + str((9, 1)) + ', horizon: ' + str(self.data.pred_horizon))
+        self.data.split_data_set(9, 1)
+        self.data.flatten_data_set()
+        self.data.normalize_data_sets()
+
+        self.data.split_data_set(9, 11)
+        self.data.flatten_data_set_CNN()
+
+        model = self.get_model(400)
+        self.train(model, self.data.x_train, self.data.y_train)
 
     def get_model(self, image_res):
 
@@ -32,8 +45,10 @@ class resnet50:
         model.add(Dense(1, kernel_initializer='normal'))
         print(model.summary())
         model.compile(optimizer='adam', loss='mean_squared_error')
+        return model
 
-    def train(self, model, data, labels, epochs, batch_size):
+
+    def train(self, model, data, labels, epochs=50, batch_size=128):
         model.fit(data, labels, epochs=epochs, batch_size=batch_size)
 
     def predict(self, model, x_test, y_test):

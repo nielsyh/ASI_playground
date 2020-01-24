@@ -1,5 +1,5 @@
 from data import Data
-from models import persistence_model, regression_model, svm_model
+from models import persistence_model, regression_model, svm_model, cnn_model
 import time
 from data_visuals import plot_error
 from tqdm import tqdm
@@ -46,9 +46,17 @@ def run_persistenceB_multi_thread():
         x = threading.Thread(target=persistence_b_thread, args=(i,))
         x.start()
 
-# run_persistenceB_multi_thread()
-
 run_persistenceB_multi_thread()
+
+def train_cnn():
+    data = Data(meteor_data=False, images=False, debug=True)
+    data.build_df_for_cnn(10,17,1, months=[7,8,9])
+    cnn = cnn_model.resnet50(400, data)
+    cnn.train_cnn()
+
+
+
+
 
 # data = Data(meteor_data=True, images=False, debug=False)
 # for i in tqdm(prediction_horizons, total=len(prediction_horizons)):

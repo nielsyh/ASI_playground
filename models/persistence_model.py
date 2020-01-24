@@ -91,9 +91,11 @@ class Persistence_predictor_b:  # predict value as minute before
         self.model = 0
 
     def run_experiment(self):
+        print('start persistence b')
         self.day_month_to_predict = []
 
         for m in self.data.months:
+            print(m)
             last_day = calendar.monthrange(2019, m)[1]
             if m < 9:
                 continue
@@ -112,7 +114,7 @@ class Persistence_predictor_b:  # predict value as minute before
 
             y_pred, rmse, mae, mape = self.predict()
 
-            name = 0
+            name = '_horizon_' + str(self.data.pred_horizon)
             if self.data.debug:
                 name = name + '_debug'
             if self.data.images:
