@@ -101,6 +101,7 @@ class Data:
         print('size of a row: ' + str(self.size_of_row))
 
 
+
     def download_data(self, cam=1, overwrite=False, process=True):  # download data
         cam_url = 0
         file_url = 0
@@ -499,9 +500,11 @@ class Data:
         self.train_df = self.train_df.reshape((self.train_df.shape[0] * self.train_df.shape[1], -1))
 
         self.x_train = self.train_df[:, 3: self.train_df.shape[1]]
+        self.x_train = self.x_train.reshape((self.x_train.shape[0], 400, 400, 3))  # reshaping for tf
         self.y_train = self.train_df[:, 0]
 
         self.x_test = self.test_df[:, 3:self.test_df.shape[1]]
+        self.x_test = self.x_test.reshape((self.x_test.shape[0], 400, 400, 3))  # reshaping for tf
         self.y_test = self.test_df[:, 0]
 
 
@@ -549,21 +552,20 @@ class Data:
         printf('Processing months for CNN DF: ' + str(months))
 
         for m in months:
-            if m == 7:
+            if(self.debug):  # debug
+                days += 3
+            elif m == 7:
                 days += 8
             else:
                 year = int(month_to_year(m))
                 days += calendar.monthrange(year, m)[1]
 
-        if(self.debug):  # debug
-            days = 3
 
         #image res + label + month + day
         size_of_row = 3+(400*400*3)
         self.mega_df = np.zeros((days, self.queries_per_day, size_of_row ), dtype=np.uint16)
 
-
-
+        print(months)
         for m in tqdm(months, total=len(months), unit='Month progress'):
             if self.debug:  # debug
                 days = [26, 27, 28]
@@ -572,6 +574,7 @@ class Data:
             else:
                 days = list(range(1, calendar.monthrange(2019, m)[1] + 1))  # create an array with days for that month
 
+            print(days)
 
             for d in tqdm(days, total=len(days), unit='Day progress'):
                 # todo add sunrise/sundown for start end hour? half hour?
@@ -582,17 +585,13 @@ class Data:
 
                     self.mega_df[day_index][idx][0] = data[8]  # label
                     self.mega_df[day_index][idx][1] = data[1]  # month
-                    self.mega_df[day_index][idx][2] = data[2]  # day
 
+                    self.mega_df[day_index][idx][2] = data[2]  # day
                     year, month, day, hour, minute, seconds = int(data[0]), int(data[1]), int(data[2]), int(
                         data[3]), int(data[4]), int(data[5])
 
                     img = get_image_by_date_time(year, month, day, hour, minute, seconds)  # get image
-
                     self.mega_df[day_index][idx][3:size_of_row] = img.ravel()
-
-        printf('Building done')
-
 
 
     def build_df(self, start, end, step, months):

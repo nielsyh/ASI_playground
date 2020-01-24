@@ -28,12 +28,17 @@ def get_image_by_date_time(year, month, day, hour, minute, seconds):
         total_url = base_url + folder_url + img_url
         if os.path.isfile(total_url):
             image = cv2.imread(total_url)
+
             if(image is None):
                 seconds += 15
             else:
                 image_not_found=False
         else:
             seconds += 15
+
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+
 
     return pre_process_img(image, 400)
 

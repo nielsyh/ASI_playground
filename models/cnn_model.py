@@ -14,10 +14,6 @@ class resnet50:
 
     def train_cnn(self):
         print('CNN: ' + str((9, 1)) + ', horizon: ' + str(self.data.pred_horizon))
-        self.data.split_data_set(9, 1)
-        self.data.flatten_data_set()
-        self.data.normalize_data_sets()
-
         self.data.split_data_set(9, 11)
         self.data.flatten_data_set_CNN()
 
@@ -32,7 +28,7 @@ class resnet50:
                               input_shape=(image_res, image_res, 3))
 
         #freezeing all layers
-        for layer in base.Layers:
+        for layer in base.layers:
             layer.trainable = False
 
         print(base.summary())
