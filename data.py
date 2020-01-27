@@ -16,7 +16,7 @@ from datetime import date
 from tqdm import tqdm
 from sklearn.preprocessing import *
 
-enable_print = False
+enable_print = True
 
 
 def printf(str):
@@ -728,8 +728,10 @@ class Data:
         self.mega_df = np.load('mega_df_' + filename)
 
 ## build df for model 1
-# data = Data(meteor_data=True, images=False, debug=False)
-# data.build_df(10, 17, 1, months=[7])
+data = Data(meteor_data=True, images=True, debug=False)
+data.build_df(10, 17, 1, months=[7, 8, 9, 10, 11, 12])
+data.process_save_image_data('mega_df')
+
 # data.set_prediction_horizon(5)
 # data.split_data_set(7, 30)
 # data.flatten_data_set()

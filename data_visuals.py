@@ -114,4 +114,4 @@ def read_plot_file(file_name, model_name):
     plot_error_per_month(total_rmse, 'TITLE', date_tuples)
 
 
-read_plot_file('results/meteor_ghi_norm/SVM predictor_horizon_5_meteor.txt', 'SVM')
+# read_plot_file('results/meteor_ghi_norm/SVM predictor_horizon_5_meteor.txt', 'SVM')

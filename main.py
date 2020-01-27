@@ -57,8 +57,8 @@ def train_cnn():
     model.train(model.get_model(400), data.x_train, data.y_train)
 
 # run_persistenceB_multi_thread()
-run_svm_multi_thread()
-# train_cnn()
+# run_svm_multi_thread()
+train_cnn()
 
 
 
