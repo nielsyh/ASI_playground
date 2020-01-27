@@ -69,8 +69,8 @@ class Data:
     test_df = []
 
     months = []
-    size_of_row = 10  # row default size 9 + 1 for label
-    size_meteor_data = 3  # amount of columns from meteor data
+    size_of_row = 9  # row default size 8 + 1 for label
+    size_meteor_data = 8  # amount of columns from meteor data
     img_idx = 9  # index of column were image data starts
     queries_per_day = 0
     pred_horizon = 0
@@ -527,9 +527,9 @@ class Data:
         #8 current ghi, 9 future ghi (y) , 10 csi, 11 azimuth, 12 zenith, 13 intensity,
         #14 cloudpixel, 15 harris, 16 edges
 
-        colums_to_normalize = [6, 7]
-        # if(self.meteor_data):
-        #     colums_to_normalize.extend([9])
+        colums_to_normalize = [0,1,2,3,4,5,6,7,8]
+        if(self.meteor_data):
+            colums_to_normalize.extend([9,10,11,12,13,14,15])
         if(self.images):
             colums_to_normalize.extend([13, 14, 15, 16])
 
@@ -606,6 +606,7 @@ class Data:
         day_index = -1
 
         printf('Processing months: ' + str(months))
+
 
         for m in months:
             if m == 7:
@@ -699,7 +700,7 @@ class Data:
             csi, azimuth, zenith = [], [], []
 
             if self.meteor_data:
-                csi, azimuth, zenith = PvLibPlayground.get_meteor_data(m,
+                csi, azimuth, zenith, sun_earth_dis, ephemeris = PvLibPlayground.get_meteor_data(m,
                                                                        d,
                                                                        PvLibPlayground.get_times(2019,
                                                                                                  m,  # month
@@ -708,11 +709,14 @@ class Data:
                                                                                                  end,
                                                                                                  offset=int(self.pred_horizon)))  # end time
 
+
             for idx_timeslot, time_slot in enumerate(day):
                 if self.meteor_data:
                     self.mega_df[idx_day][idx_timeslot][9] = csi[idx_timeslot]
                     self.mega_df[idx_day][idx_timeslot][10] = azimuth[idx_timeslot]
                     self.mega_df[idx_day][idx_timeslot][11] = zenith[idx_timeslot]
+                    self.mega_df[idx_day][idx_timeslot][11] = sun_earth_dis[idx_timeslot]
+                    self.mega_df[idx_day][idx_timeslot][12:16] = ephemeris[idx_timeslot]
 
                 if (self.queries_per_day - self.pred_horizon) > idx_timeslot:
                     self.mega_df[idx_day][idx_timeslot][self.size_of_row-1] = self.mega_df[idx_day][idx_timeslot + self.pred_horizon][8]
@@ -727,18 +731,18 @@ class Data:
     def load_prev_mega_df(self, filename):
         self.mega_df = np.load('mega_df_' + filename)
 
-## build df for model 1
-data = Data(meteor_data=True, images=True, debug=False)
-data.build_df(10, 17, 1, months=[7, 8, 9, 10, 11, 12])
-data.process_save_image_data('mega_df')
-
+# ## build df for model 1
+# data = Data(meteor_data=True, images=False, debug=True)
+# data.build_df(10, 17, 1, months=[7])
+# # data.process_save_image_data('mega_df')
+#
 # data.set_prediction_horizon(5)
-# data.split_data_set(7, 30)
+# data.split_data_set(7, 26)
 # data.flatten_data_set()
 # data.normalize_data_sets()
 # np.set_printoptions(precision=3)
 # print(data.mega_df)
-
+#
 
 ## downloading and processing stuff
 # d.download_data(1, True)

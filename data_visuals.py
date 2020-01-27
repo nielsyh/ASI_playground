@@ -68,22 +68,21 @@ def plot_freq(dict, title):
 
     plt.show()
 
-def plot_error_per_month(errors, title, date_tuples):
+def plot_error_per_month(errors, names, title, yl, xl = 'Days'):
     ax = plt.axes()
-    plt.setp(ax.get_xticklabels(), rotation=90, horizontalalignment='right', fontsize='x-small')
-    plt.plot(date_tuples, errors, linestyle='-', label='label')
+    # plt.setp(ax.get_xticklabels(), rotation=90, horizontalalignment='right', fontsize='x-small')
 
+    for idx, i in enumerate(errors):
+        plt.plot(i, linestyle='--', label=names[idx])
 
     plt.legend()
     plt.title(title)
-    plt.xlabel('x1')
-    plt.ylabel('x2')
-    plt.setp(ax.get_xticklabels(), rotation=90, horizontalalignment='right', fontsize='x-small')
+    plt.xlabel(xl)
+    plt.ylabel(yl)
     plt.show()
     plt.close()
 
-
-def read_plot_file(file_name, model_name):
+def read_plot_file(file_name):  # returns errors per day
     total_rmse, total_mae, total_mape = [], [], []
     date_tuples = []
     with open(file_name) as fp:
@@ -91,7 +90,6 @@ def read_plot_file(file_name, model_name):
         y_true = []
         y_pred = []
         last_day = 11.0  # first day is 11/9/2019
-
 
         for line in fp:
             l = line.split(',')
@@ -110,8 +108,17 @@ def read_plot_file(file_name, model_name):
             y_true.append(float(l[5]))
             y_pred.append(float(l[6]))
 
+    return total_rmse, total_mae, total_mape
 
-    plot_error_per_month(total_rmse, 'TITLE', date_tuples)
 
 
-# read_plot_file('results/meteor_ghi_norm/SVM predictor_horizon_5_meteor.txt', 'SVM')
+# total_rmse1, total_mae1, total_mape1 =  read_plot_file('results/meteor_ghi_norm/SVM predictor_horizon_20_meteor.txt')
+# total_rmse2, total_mae2, total_mape2 =  read_plot_file('results/SVM_CSI/SVM predictor_horizon_20_meteor.txt')
+# total_rmse3, total_mae3, total_mape3 =  read_plot_file('results/persistence_b/Persistence_b_horizon_20.txt')
+#
+# errors = [total_rmse1, total_rmse2, total_rmse3]
+# names = ['SVM meteor PH5', 'SVM metoer NO NORM PH5', 'Persistence b PH5']
+#
+#
+#
+# plot_error_per_month(errors, names, 'Error over days', yl = 'Error in RMSE')

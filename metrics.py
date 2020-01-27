@@ -28,15 +28,15 @@ class Metrics:
 
     @staticmethod
     def get_error(y_observed, y_predicted):
-        print('RMSE')
+        # print('RMSE')
         rmse = Metrics.rmse(y_observed, y_predicted)
-        print(rmse)
-        print('MAE')
+        # print(rmse)
+        # print('MAE')
         mae = Metrics.mae(y_observed, y_predicted)
-        print(mae)
-        print('MAPE')
+        # print(mae)
+        # print('MAPE')
         mape = Metrics.mape(y_observed, y_predicted)
-        print(mape)
+        # print(mape)
         return rmse, mae, mape
 
     @staticmethod

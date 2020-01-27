@@ -11,9 +11,10 @@ import calendar
 class SVM_predictor:
     day_month_to_predict = []
 
-    def __init__(self, data):
+    def __init__(self, data, model_name):
         self.data = data
         self.model = 0
+        self.model_name = model_name
 
     def run_experiment(self):
         self.day_month_to_predict = []
@@ -39,7 +40,9 @@ class SVM_predictor:
             self.train()
             y_pred, rmse, mae, mape = self.predict()
 
-            name = '_horizon_' + str(self.data.pred_horizon)
+
+            name = str(self.model_name)
+            name = name + '_horizon_' + str(self.data.pred_horizon)
             if self.data.debug:
                 name = name + '_debug'
             if self.data.images:
@@ -47,7 +50,7 @@ class SVM_predictor:
             if self.data.meteor_data:
                 name = name + '_meteor'
 
-            Metrics.write_results('SVM predictor' + str(name), self.data.x_test, self.data.y_test, y_pred, self.data.pred_horizon)
+            Metrics.write_results(str(name), self.data.x_test, self.data.y_test, y_pred, self.data.pred_horizon)
 
     def train(self):
         # print('SVM: Training..')

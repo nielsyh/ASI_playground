@@ -72,6 +72,10 @@ class PvLibPlayground:
         pass
 
     @staticmethod
+    def get_sun_earth_distance(times):
+        return pvlib.solarposition.pyephem_earthsun_distance(times).values.tolist()
+
+    @staticmethod
     def get_solar_zenith_angle(month, day, times):
         doy = PvLibPlayground.get_day_of_year(month, day)
         return pvlib.solarposition.solar_zenith_analytical(PvLibPlayground.get_latitude(),
@@ -99,29 +103,32 @@ class PvLibPlayground:
         return ghic['ghi'].values.tolist()
 
     @staticmethod
+    def get_ephemeris_data(times):
+        #apparent_elevation : apparent sun elevation accounting for atmospheric refraction.
+        #elevation : actual elevation (not accounting for refraction) of the sun in decimal degrees, 0 = on horizon. The complement of the zenith angle.
+        #apparent_zenith : apparent sun zenith accounting for atmospheric refraction.
+        #solar_time : Solar time in decimal hours (solar noon is 12.00).
+        data = pvlib.solarposition.ephemeris(times, PvLibPlayground.get_latitude(), PvLibPlayground.get_longitude())[['apparent_elevation',
+                                                                                                                      'elevation',
+                                                                                                                      'apparent_zenith',
+                                                                                                                      'solar_time']].values.tolist()
+        return data
+
+    @staticmethod
     def get_meteor_data(month, day, times):  # todo add more
         csi = PvLibPlayground.get_clear_sky_irradiance(times)
         azimuth = PvLibPlayground.get_azimuth(month, day, times)
         zenith = PvLibPlayground.get_solar_zenith_angle(month, day, times)
-        return csi, azimuth, zenith
+        sun_earth_dist = PvLibPlayground.get_sun_earth_distance(times)
+        ephemeris = PvLibPlayground.get_ephemeris_data(times)
+        return csi, azimuth, zenith, sun_earth_dist, ephemeris
 
-    @staticmethod
-    # expirimental
-    def get_cloud_coverage(start, end):
-        model = GFS()
-        raw_data = model.get_data(PvLibPlayground.get_latitude(), PvLibPlayground.get_longitude(), start, end)
-        data = model.process_data(raw_data)
-        # data = model.get_processed_data(PvLibPlayground.get_latitude(), PvLibPlayground.get_longitude(), start, end)
-        return data
 
 # p = PvLibPlayground()
-# start = pd.Timestamp(year=2020, month=1, day=23, hour=9, minute=0)
-# end = pd.Timestamp(year=2020, month=1, day=23, hour=17, minute=58)
-# t = p.get_cloud_coverage(start, end)
+# times = PvLibPlayground.get_times(2019, 10,1, 7, 19)
+# t = PvLibPlayground.get_ephemeris_data(times)
 # with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
 #     print(t)
-# #
-# t = PvLibPlayground.get_df_times(start, end)
 #
 # print(PvLibPlayground.get_azimuth(10, 15, t))
 # PvLibPlayground.get_azimuth(10,15, PvLibPlayground.get_pd_time(10, 15, 12, 00))
