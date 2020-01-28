@@ -10,22 +10,17 @@ import calendar
 
 class ANN_Predictor():
 
-    def __init__(self, data, input_size):
+    model = 0
+
+    def __init__(self, data,init_epochs=200, epochs=50):
         self.data = data
-
-        # self.x_train = self.data.train_df[:, 0: self.data.train_df.shape[1] - 1]
-        # self.y_train = self.data.train_df[:, -1]
-        #
-        # self.x_test = self.data.test_df[:, 0:self.data.test_df.shape[1] - 1]
-        # self.y_test = self.data.test_df[:, -1]
-
-        self.model = 0
-        self.input_size = input_size
-        self.init_train_ = True
+        self.init_train = True
+        self.init_epochs = init_epochs
+        self.epochs = 50
 
     def get_model(self):
         model = keras.models.Sequential()
-        model.add(Dense(256, input_dim=self.data.x_train.shape[1], kernel_initializer='normal', activation='relu'))
+        model.add(Dense(256, input_dim=(self.data.size_of_row - 1), kernel_initializer='normal', activation='relu'))
         model.add(Dense(512, activation='relu'))
         model.add(Dense(512, activation='relu'))
         model.add(Dense(256, activation='relu'))
@@ -34,7 +29,6 @@ class ANN_Predictor():
         self.model = model
 
     def train(self,epochs=50, batch_size=128):
-        # print(self.x_train.shape)
         self.model.fit(self.data.x_train, self.data.y_train, epochs=epochs, batch_size=batch_size)
 
     def predict(self):
@@ -63,14 +57,13 @@ class ANN_Predictor():
             self.data.flatten_data_set()
             self.data.normalize_data_sets()
 
-            epochs = 50
+            epochs = self.epochs
             if self.init_train:
-                epochs = 200
+                epochs = self.init_epochs
                 self.init_train = False
 
             self.train(epochs=epochs)
             y_pred, rmse, mae, mape = self.predict()
-
 
             name = 'ANN_BETA'
 

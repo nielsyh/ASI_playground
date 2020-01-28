@@ -56,18 +56,14 @@ def train_cnn(month, day, months = [7,8,9,10,11,12]):
     model = cnn.get_model(400)
     model.train(model.get_model(400), data.x_train, data.y_train)
 
-def train_ann(month, day, prediction_horizon, months = [7,8,9,10,11,12]):
+def train_ann(prediction_horizon, months = [7,8,9,10,11,12]):
     data = Data(meteor_data=True, images=False, debug=False)
     data.build_df(10, 17, 1, months=months)
     data.set_prediction_horizon(prediction_horizon)
-
-    data.split_data_set(month, day)
-    data.flatten_data_set()
-    data.normalize_data_sets()
-    ann = ann_model.ANN_Predictor(data, data.size_of_row)
+    ann = ann_model.ANN_Predictor(data, init_epochs=200, epochs=50)
     ann.get_model()
-    ann.train(epochs=200)
+    ann.run_experiment()
 
 # run_persistenceB_multi_thread()
 # run_svm_multi_thread()
-train_ann(8,15,20, months=[7,8])
+train_ann(20, months=[7,8,9,10,11,12])
