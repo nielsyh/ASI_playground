@@ -16,8 +16,8 @@ module load gcc/7.2.0
 module load openmpi/gcc72/mlnx/3.0.0
 module load CUDA/10.0
 module load CUDA/DNN10.1
-#module load anaconda3/2019.03
+module load anaconda3/2019.03
 
-#conda init --all
-#conda activate my_env
+conda init --all
+conda activate my_env
 python3.6 main.py

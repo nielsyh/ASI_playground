@@ -10,16 +10,17 @@ import time
 
 
 prediction_horizons = list(range(1, 21))
+prediction_horizons = [1]
 print(prediction_horizons)
 
 def SVM_experiment_thread(prediction_horizon):
     logging.info("Thread %s: starting", prediction_horizon)
 
-    data = Data(meteor_data=True, images=False, debug=False)
-    data.build_df(10, 17, 1, months=[7, 8, 9, 10, 11, 12])
+    data = Data(meteor_data=True, images=False, debug=True)
+    data.build_df(10, 17, 1, months=[7,8,9,10,11,12])
     data.set_prediction_horizon(prediction_horizon)
 
-    svm = svm_model.SVM_predictor(data, model_name='SVM all normalized ephemeris')
+    svm = svm_model.SVM_predictor(data, model_name='SVM norm: 3-8, 9,15')
     svm.run_experiment()
 
     logging.info("Thread %s: finishing", prediction_horizon)

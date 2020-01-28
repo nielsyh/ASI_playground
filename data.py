@@ -527,9 +527,9 @@ class Data:
         #8 current ghi, 9 future ghi (y) , 10 csi, 11 azimuth, 12 zenith, 13 intensity,
         #14 cloudpixel, 15 harris, 16 edges
 
-        colums_to_normalize = [0,1,2,3,4,5,6,7,8]
+        colums_to_normalize = [3,4,5,6,7,8]
         if(self.meteor_data):
-            colums_to_normalize.extend([9,10,11,12,13,14,15])
+            colums_to_normalize.extend([9,15])
         if(self.images):
             colums_to_normalize.extend([13, 14, 15, 16])
 
