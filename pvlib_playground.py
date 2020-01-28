@@ -6,7 +6,7 @@ import pvlib
 from pvlib import clearsky, atmosphere, solarposition
 from pvlib.location import Location
 from pvlib.iotools import read_tmy3
-from pvlib.forecast import GFS
+
 
 class PvLibPlayground:
 
