@@ -69,7 +69,7 @@ class Data:
 
     months = []
     size_of_row = 9  # row default size 8 + 1 for label
-    size_meteor_data = 8  # amount of columns from meteor data
+    size_meteor_data = 9  # amount of columns from meteor data
     img_idx = 9  # index of column were image data starts
     queries_per_day = 0
     pred_horizon = 0
@@ -532,7 +532,7 @@ class Data:
 
         colums_to_normalize = [3, 4, 5, 6, 7, 8]
         if (self.meteor_data):
-            colums_to_normalize.extend([9, 15])
+            colums_to_normalize.extend([9, 10, 16])
         if (self.images):
             colums_to_normalize.extend([13, 14, 15, 16])
 
@@ -716,10 +716,11 @@ class Data:
             for idx_timeslot, time_slot in enumerate(day):
                 if self.meteor_data:
                     self.mega_df[idx_day][idx_timeslot][9] = csi[idx_timeslot]
-                    self.mega_df[idx_day][idx_timeslot][10] = azimuth[idx_timeslot]
-                    self.mega_df[idx_day][idx_timeslot][11] = zenith[idx_timeslot]
-                    self.mega_df[idx_day][idx_timeslot][11] = sun_earth_dis[idx_timeslot]
-                    self.mega_df[idx_day][idx_timeslot][12:16] = ephemeris[idx_timeslot]
+                    self.mega_df[idx_day][idx_timeslot][10] = (self.mega_df[idx_day][idx_timeslot][9] - self.mega_df[idx_day][idx_timeslot][8])  #csi - ghi
+                    self.mega_df[idx_day][idx_timeslot][11] = azimuth[idx_timeslot]
+                    self.mega_df[idx_day][idx_timeslot][12] = zenith[idx_timeslot]
+                    self.mega_df[idx_day][idx_timeslot][13] = sun_earth_dis[idx_timeslot]
+                    self.mega_df[idx_day][idx_timeslot][13:17] = ephemeris[idx_timeslot]
 
                 if (self.queries_per_day - self.pred_horizon) > idx_timeslot:
                     self.mega_df[idx_day][idx_timeslot][self.size_of_row - 1] = \

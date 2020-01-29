@@ -60,7 +60,7 @@ def train_ann(prediction_horizon, months = [7,8,9,10,11,12]):
     data = Data(meteor_data=True, images=False, debug=False)
     data.build_df(10, 17, 1, months=months)
     data.set_prediction_horizon(prediction_horizon)
-    ann = ann_model.ANN_Predictor(data, init_epochs=200, epochs=50)
+    ann = ann_model.ANN_Predictor(data, init_epochs=500, epochs=100)
     ann.get_model()
     ann.run_experiment()
 
