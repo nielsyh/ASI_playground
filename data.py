@@ -10,7 +10,7 @@ from datetime import time
 from data_visuals import *
 from metrics import Metrics
 from pvlib_playground import PvLibPlayground
-from features import get_image_by_date_time, int_to_str, extract_features
+from features import get_image_by_date_time, int_to_str, extract_features, show_img
 import calendar
 from datetime import date
 from tqdm import tqdm
@@ -68,8 +68,8 @@ class Data:
     test_df = []
 
     months = []
-    size_of_row = 9  # row default size 8 + 1 for label
-    size_meteor_data = 9  # amount of columns from meteor data
+    size_of_row = 10  # row default size 9 + 1 for label
+    size_meteor_data = 8  # amount of columns from meteor data
     img_idx = 9  # index of column were image data starts
     queries_per_day = 0
     pred_horizon = 0
@@ -530,9 +530,9 @@ class Data:
         # 8 current ghi, 9 future ghi (y) , 10 csi, 11 azimuth, 12 zenith, 13 intensity,
         # 14 cloudpixel, 15 harris, 16 edges
 
-        colums_to_normalize = [3, 4, 5, 6, 7, 8]
+        colums_to_normalize = [3, 4, 5, 6, 7]
         if (self.meteor_data):
-            colums_to_normalize.extend([9, 10, 16])
+            colums_to_normalize.extend([16])
         if (self.images):
             colums_to_normalize.extend([13, 14, 15, 16])
 
@@ -618,19 +618,19 @@ class Data:
 
         self.mega_df = np.zeros((days, self.queries_per_day, self.size_of_row), dtype=np.float)
 
-        for m in tqdm(months, total=len(months), unit=' Month progress for ' + str(self.pred_horizon)):
+        for m in tqdm(months, total=len(months), unit='Month progress'):
             if self.debug:  # debug
-                days = [25, 26, 27]
+                days = [26, 27, 28]
             elif m == 7:  # different for july..
-                days = [24, 25, 26, 27, 28, 29, 30, 31]
+                # days = [24, 25, 26, 27, 28, 29, 30, 31]
+                days = [26, 27, 28, 29, 30, 31]
             else:
                 days = list(range(1, calendar.monthrange(2019, m)[1] + 1))  # create an array with days for that month
 
-            for d in days:
+            for d in tqdm(days, total=len(days), unit='Days progress'):
                 # todo add sunrise/sundown for start end hour? half hour?
                 day_data = self.get_df_csv_day_RP(m, d, start, end, step).astype(int)
                 day_index += 1
-
                 for idx, data in enumerate(day_data):
                     data[6] = Metrics.celsius_to_kelvin(data[6])  # convert to kelvin
                     self.mega_df[day_index][idx][0:9] = data  # adding data from csv
@@ -730,17 +730,17 @@ class Data:
                     self.mega_df[idx_day][idx_timeslot][self.size_of_row - 1] = \
                     self.extra_df[idx_day][idx_timeslot - tmp_cnt][0]
 
-    def process_save_image_data(self, filename):
-        today = str(date.today())
-        np.savez_compressed('mega_df_' + filename + '_' + today, self.mega_df)
+    def save_df(self):
+        name = str(self.size_of_row) + '_' + str(self.images) + '_' + str(self.meteor_data)
+        np.save('mega_df_' + name + '_' , self.mega_df)
 
     def load_prev_mega_df(self, filename):
         self.mega_df = np.load('mega_df_' + filename)
 
 # ## build df for model 1
-# data = Data(meteor_data=True, images=False, debug=True)
+# data = Data(meteor_data=True, images=True, debug=True)
 # data.build_df(10, 17, 1, months=[7])
-# # data.process_save_image_data('mega_df')
+# data.save_df()
 #
 # data.set_prediction_horizon(5)
 # data.split_data_set(7, 26)

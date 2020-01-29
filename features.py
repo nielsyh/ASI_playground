@@ -3,7 +3,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 from scipy import ndimage
 import os.path
-
+import matplotlib.pyplot as plt
 
 def int_to_str(i):
     s = str(i)
@@ -19,29 +19,26 @@ def get_image_by_date_time(year, month, day, hour, minute, seconds):
     elif (year == 20):
         year = '2020'
 
-    image_not_found = True
-    while(image_not_found):
-        base_url = 'asi_16124/'
-        tmp_url = year + int_to_str(month) + int_to_str(day)
-        folder_url = tmp_url + '/'
-        img_url = tmp_url + int_to_str(hour) + int_to_str(minute) + int_to_str(seconds) + '_11.jpg'
-        total_url = base_url + folder_url + img_url
+    base_url = 'asi_16124/'
+    tmp_url = year + int_to_str(month) + int_to_str(day)
+    base_url = base_url + tmp_url + '/'  # folder
+
+    seconds_list = ['0', '15', '30', '45']
+    for s in seconds_list:
+        img_url = tmp_url + int_to_str(hour) + int_to_str(minute) + int_to_str(s) + '_11.jpg'
+        total_url = base_url+ img_url
+        # print(total_url)
         if os.path.isfile(total_url):
             image = cv2.imread(total_url)
-
-            if(image is None):
-                seconds += 15
+            if (image is None):
+                continue
             else:
-                image_not_found=False
-        else:
-            seconds += 15
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                return pre_process_img(image, 400)
 
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
-
-
-    return pre_process_img(image, 400)
-
+    print('CANT FIND IMAGE: ')
+    print(month, day, hour, minute)
+    return None
 
 def extract_features(img):  # get df from image
     features = np.zeros(4)
@@ -55,7 +52,6 @@ def extract_features(img):  # get df from image
 
 def resize_image(img, dim):
     return cv2.resize(img, (dim, dim), interpolation=cv2.INTER_LINEAR)
-
 
 def pre_process_img(img, dim):
     y = 26
@@ -110,64 +106,44 @@ def harris_corner_detector(img):
     return np.count_nonzero(dst)
     # print(corner_count)
 
-    # cv2.imshow('dst', img)
-    # if cv2.waitKey(0) & 0xff == 27:
-    #     cv2.destroyAllWindows()
 
 
 def edge_detector(img):
     edges = cv2.Canny(img, img.shape[0], img.shape[1])
     return np.count_nonzero(edges)
     # print(edge_count)
-    # cv2.imshow('edges', edges)
-    # if cv2.waitKey(0) & 0xff == 27:
-    #     cv2.destroyAllWindows()
 
 
 def number_of_cloud_pixels(img, threshold = 0.8):
     height, width, channels = img.shape
-
     amount_of_cloud_pixels = 0
 
     for h in range(0, height):
         for w in range(0, width):
-            b = img[h,w,0]
-            g = img[h,w,1]
-            r = img[h,w,2]
-
-            # if b == 0:
-            #     continue
-            # rbr = 1 + ((r-b) /b)
+            r = img[h,w,0]
+            b = img[h,w,1]
             np.seterr(divide='ignore', invalid='ignore')
             rbr = r/b
-
-            # nrbr = (r - b) / (r+b)
-            # rb = r - b
-            # brgb = (b/r) + (b/g)
-            # if brgb < 500:
-            # if nrbr > 0.15 and nrbr < 1:
-
             if rbr > 0.67 and rbr < 1:
                 amount_of_cloud_pixels += 1
                 img[h, w, 0] = 124
                 img[h, w, 1] = 252
                 img[h, w, 2] = 0
-
-    # print(amount_of_cloud_pixels)
-    # cv2.imshow('image', img)
-    # # cv2.imshow('orig', orig)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    # plt.imshow(img)
+    # plt.show()
     return amount_of_cloud_pixels
 
-
-class Features:
-    def __init__(self):
-        pass
+def show_img(img):
+    plt.imshow(img)
+    plt.show()
 
 
 # #
 # a = Features()
+# img = get_image_by_date_time(19,9,1,12,0,0)
+# number_of_cloud_pixels(img)
+
+
 # url = 'asi_16124/20190813/20190813153030_11.jpg'
 # # # url = 'test.PNG'
 # img = cv2.imread(url)
@@ -180,12 +156,12 @@ class Features:
 #
 # number_of_cloud_pixels(img)
 #
-# # cv2.imshow('res', img)
-# #
-# # if cv2.waitKey(0) & 0xff == 27:
-# #     cv2.destroyAllWindows()
+# cv2.imshow('res', img)
+#
+# if cv2.waitKey(0) & 0xff == 27:
+#     cv2.destroyAllWindows()
 #
 # # a.number_of_cloud_pixels(img)
 # # a.edge_detector(img)
-# # a.harris_corner_detector(img)
-# # print(intensity(img))
+# # # a.harris_corner_detector(img)
+# # # print(intensity(img))

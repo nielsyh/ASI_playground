@@ -7,6 +7,13 @@ import numpy as np
 import logging
 import threading
 import time
+import sys
+
+arg = sys.argv
+# 1 model 1=svm 2=ann 3=persistence
+# 2 debug 1=yes, default no
+# 3 prediction horizon 0 default
+
 
 
 prediction_horizons = list(range(1, 21))
@@ -16,11 +23,11 @@ print(prediction_horizons)
 def SVM_experiment_thread(prediction_horizon):
     logging.info("Thread %s: starting", prediction_horizon)
 
-    data = Data(meteor_data=True, images=False, debug=True)
+    data = Data(meteor_data=True, images=False, debug=False)
     data.build_df(10, 17, 1, months=[7,8,9,10,11,12])
     data.set_prediction_horizon(prediction_horizon)
 
-    svm = svm_model.SVM_predictor(data, model_name='SVM norm: 3-8, 9,15')
+    svm = svm_model.SVM_predictor(data, model_name='SVM norm: 3-7,16')
     svm.run_experiment()
 
     logging.info("Thread %s: finishing", prediction_horizon)
@@ -66,4 +73,5 @@ def train_ann(prediction_horizon, months = [7,8,9,10,11,12]):
 
 # run_persistenceB_multi_thread()
 # run_svm_multi_thread()
-train_ann(20, months=[7,8,9,10,11,12])
+# train_ann(20, months=[7,8,9,10,11,12])
+train_ann(20, months=[7,8,9])

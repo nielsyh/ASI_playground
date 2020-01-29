@@ -110,21 +110,27 @@ def read_plot_file(file_name):  # returns errors per day
                 last_day = day
 
             y_true.append(float(l[5]))
+            if l[6][0] == '[':
+                l[6] = float(l[6][1:-2])
+                # print(l[6])
+
             y_pred.append(float(l[6]))
 
     return total_rmse, total_mae, total_mape
 
-
 #
+# #
 # total_rmse1, total_mae1, total_mape1 =  read_plot_file('results/meteor_ghi_norm/SVM predictor_horizon_20_meteor.txt')
 # total_rmse2, total_mae2, total_mape2 =  read_plot_file('results/SVM_CSI/SVM predictor_horizon_20_meteor.txt')
 # total_rmse3, total_mae3, total_mape3 =  read_plot_file('results/persistence_b/Persistence_b_horizon_20.txt')
-# total_rmse4, total_mae4, total_mape4 =  read_plot_file('results/SVM_all_norm_ephemeris/SVM all normalized ephemeris_horizon_20_meteor.txt')
+# total_rmse4, total_mae4, total_mape4 =  read_plot_file('results/SVM norm_ 3-8, 9,15/SVM norm_ 3-8, 9,15_horizon_20_meteor.txt')
+# total_rmse5, total_mae5, total_mape5 =  read_plot_file('results/ANN_BETA_horizon_20_meteor.txt')
 #
 #
 #
-# errors = [total_rmse1, total_rmse2, total_rmse3, total_rmse4]
-# names = ['SVM meteor PH5', 'SVM metoer NO NORM PH5', 'Persistence b PH5', 'SVM all norm + eph']
+# errors = [total_rmse1, total_rmse2, total_rmse3, total_rmse4, total_rmse5]
+# # errors = [total_mae1, total_mae2, total_mae3, total_mae4, total_mae5]
+# names = ['SVM meteor PH5', 'SVM metoer NO NORM PH5', 'Persistence b PH5', 'SVM norm 3:8,9,15 + eph', 'ANN']
 #
 #
 #
