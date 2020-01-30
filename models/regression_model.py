@@ -52,7 +52,7 @@ class Regression_predictor(Predictor_template):
 
     def train(self):
         print('REG: Training..')
-        self.logisticRegr = LogisticRegression()
+        self.logisticRegr = LogisticRegression(max_iter=1000)
         self.logisticRegr.fit(self.data.x_train, self.data.y_train)
         print('done..')
 
@@ -60,6 +60,7 @@ class Regression_predictor(Predictor_template):
         print('REG: Predicting..')
         y_pred = self.logisticRegr.predict(self.data.x_test)
         rmse, mae, mape = Metrics.get_error(self.data.y_test, y_pred)
+        print(rmse)
         return y_pred, rmse, mae, mape
 
     def save(self, name):

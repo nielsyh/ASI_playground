@@ -62,6 +62,7 @@ class SVM_predictor:
         # print('SVM: Predicting..')
         y_pred = self.model.predict(self.data.x_test)
         rmse, mae, mape = Metrics.get_error(self.data.y_test, y_pred)
+        print(rmse)
         return y_pred, rmse, mae, mape
 
     def save(self, name):
@@ -72,6 +73,4 @@ class SVM_predictor:
         with open(name, 'rb') as file:
             self.model = pickle.load(file)
 
-# a = SVM_predictor()
-# a.train()
-# a.predict()
+

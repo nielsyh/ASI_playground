@@ -1,4 +1,4 @@
-
+from datetime import time
 
 import matplotlib.pyplot as plt
 import matplotlib.style as style
@@ -68,6 +68,7 @@ def plot_freq(dict, title):
 
     plt.show()
 
+
 def plot_error_per_month(errors, names, title, yl, xl = 'Days'):
     ax = plt.axes()
     # plt.setp(ax.get_xticklabels(), rotation=90, horizontalalignment='right', fontsize='x-small')
@@ -82,7 +83,39 @@ def plot_error_per_month(errors, names, title, yl, xl = 'Days'):
     plt.show()
     plt.close()
 
-def read_plot_file(file_name):  # returns errors per day
+def plot_prediction_per_day(predicts, names, title, yl, xl = 'Days'):
+    ax = plt.axes()
+    # plt.setp(ax.get_xticklabels(), rotation=90, horizontalalignment='right', fontsize='x-small')
+
+    for idx, i in enumerate(predicts):
+        plt.plot(i, linestyle='--', label=names[idx])
+
+    plt.legend()
+    plt.title(title)
+    plt.xlabel(xl)
+    plt.ylabel(yl)
+    plt.show()
+    plt.close()
+
+def file_to_day_data(file_name, month, day):
+    predicted, actual = [],[]
+    times = []
+    with open(file_name) as fp:
+        for line in fp:
+            l = line.split(',')
+            if(float(l[0]) == month):
+                if(float(l[1]) == day):
+                    actual.append(float(l[5]))
+                    if l[6][0] == '[':
+                        l[6] = float(l[6][1:-2])
+                    predicted.append(float(l[6]))
+
+
+    return predicted, actual
+
+
+
+def file_to_day_error(file_name):  # returns errors per day
     total_rmse, total_mae, total_mape = [], [], []
     date_tuples = []
     with open(file_name) as fp:
@@ -118,20 +151,25 @@ def read_plot_file(file_name):  # returns errors per day
 
     return total_rmse, total_mae, total_mape
 
+# d = 10
+# m = 10
+# predicted, actual = file_to_day_data('results/ANN_BETA_horizon_20_meteor.txt', m, d)
+# pred_2, _ = [],[]# file_to_day_data('results/persistence_b/Persistence_b_horizon_20.txt', m, d)
+# pred3, _ =  file_to_day_data('results/meteor_ghi_norm/SVM predictor_horizon_20_meteor.txt', m, d)
 #
-# #
-# total_rmse1, total_mae1, total_mape1 =  read_plot_file('results/meteor_ghi_norm/SVM predictor_horizon_20_meteor.txt')
-# total_rmse2, total_mae2, total_mape2 =  read_plot_file('results/SVM_CSI/SVM predictor_horizon_20_meteor.txt')
-# total_rmse3, total_mae3, total_mape3 =  read_plot_file('results/persistence_b/Persistence_b_horizon_20.txt')
-# total_rmse4, total_mae4, total_mape4 =  read_plot_file('results/SVM norm_ 3-8, 9,15/SVM norm_ 3-8, 9,15_horizon_20_meteor.txt')
-# total_rmse5, total_mae5, total_mape5 =  read_plot_file('results/ANN_BETA_horizon_20_meteor.txt')
-#
+# predicted = []
+# names = ['ann', 'actual', 'Persistence', 'SVR']
+# plot_prediction_per_day([predicted, actual, pred_2, pred3], names, 'TITLE', 'xl', 'yl')
+
+
+# total_rmse1, total_mae1, total_mape1 =  file_to_day_error('results/meteor_ghi_norm/SVM predictor_horizon_20_meteor.txt')
+# total_rmse2, total_mae2, total_mape2 =  file_to_day_error('results/SVM norm_3-10,16/SVM norm_ 3-8, 9,10,16_horizon_20_meteor.txt')
+# total_rmse3, total_mae3, total_mape3 =  file_to_day_error('results/persistence_b/Persistence_b_horizon_20.txt')
+# total_rmse4, total_mae4, total_mape4 =  file_to_day_error('results/SVM norm_3_7,16/SVM norm_ 3-7,16_horizon_20_meteor.txt')
+# total_rmse5, total_mae5, total_mape5 =  file_to_day_error('results/ANN_BETA_horizon_20_meteor.txt')
 #
 #
 # errors = [total_rmse1, total_rmse2, total_rmse3, total_rmse4, total_rmse5]
 # # errors = [total_mae1, total_mae2, total_mae3, total_mae4, total_mae5]
-# names = ['SVM meteor PH5', 'SVM metoer NO NORM PH5', 'Persistence b PH5', 'SVM norm 3:8,9,15 + eph', 'ANN']
-#
-#
-#
+# names = ['SVM meteor PH5', 'SVM 3-10,16', 'Persistence b PH5', 'SVM 3-7,16', 'ANN']
 # plot_error_per_month(errors, names, 'Error over days', yl = 'Error in RMSE')

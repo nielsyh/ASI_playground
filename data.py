@@ -69,7 +69,7 @@ class Data:
 
     months = []
     size_of_row = 10  # row default size 9 + 1 for label
-    size_meteor_data = 8  # amount of columns from meteor data
+    size_meteor_data = 18  # amount of columns from meteor data
     img_idx = 9  # index of column were image data starts
     queries_per_day = 0
     pred_horizon = 0
@@ -493,8 +493,8 @@ class Data:
                 print('found: ' + str(day_idx))
                 break
 
-        self.train_df = self.mega_df[0:day_idx]
-        self.test_df = self.mega_df[day_idx]
+        self.train_df = np.copy(self.mega_df[0:day_idx])
+        self.test_df = np.copy(self.mega_df[day_idx])
 
         printf('done')
 
@@ -525,14 +525,14 @@ class Data:
 
         printf('done')
 
-    def normalize_data_sets(self):
+    def normalize_data_sets(self, colums_to_normalize = [6,7,8], metoer_to_normalize= [9,10,13,17,18,19,22,26]):
         # 0 year, 1 month, 2 day, 3 hour, 4 minute, 5 seconds, 6 temp, 7 humidity,
         # 8 current ghi, 9 future ghi (y) , 10 csi, 11 azimuth, 12 zenith, 13 intensity,
         # 14 cloudpixel, 15 harris, 16 edges
 
-        colums_to_normalize = [3, 4, 5, 6, 7]
+        colums_to_normalize = colums_to_normalize
         if (self.meteor_data):
-            colums_to_normalize.extend([16])
+            colums_to_normalize.extend(metoer_to_normalize)
         if (self.images):
             colums_to_normalize.extend([13, 14, 15, 16])
 
@@ -541,6 +541,9 @@ class Data:
         self.x_train[:, colums_to_normalize] = normalize(self.x_train[:, colums_to_normalize], axis=0, norm='l2')
         self.x_test[:, colums_to_normalize] = normalize(self.x_test[:, colums_to_normalize], axis=0, norm='l2')
         # print('done')
+
+    def drop_columns(self, colums_to_drop):
+        self.x_train = np.delete(self.x_train,colums_to_drop,1)
 
     def build_df_for_cnn(self, start, end, step, months):
         self.start = start
@@ -558,7 +561,7 @@ class Data:
             if (self.debug):  # debug
                 days += 3
             elif m == 7:
-                days += 8
+                days += 6
             else:
                 year = int(month_to_year(m))
                 days += calendar.monthrange(year, m)[1]
@@ -572,7 +575,7 @@ class Data:
             if self.debug:  # debug
                 days = [26, 27, 28]
             elif m == 7:  # different for july..
-                days = [24, 25, 26, 27, 28, 29, 30, 31]
+                days = [26, 27, 28, 29, 30, 31]
             else:
                 days = list(range(1, calendar.monthrange(2019, m)[1] + 1))  # create an array with days for that month
 
@@ -586,8 +589,8 @@ class Data:
                 for idx, data in enumerate(day_data):
                     self.mega_df[day_index][idx][0] = data[8]  # label
                     self.mega_df[day_index][idx][1] = data[1]  # month
-
                     self.mega_df[day_index][idx][2] = data[2]  # day
+
                     year, month, day, hour, minute, seconds = int(data[0]), int(data[1]), int(data[2]), int(
                         data[3]), int(data[4]), int(data[5])
 
@@ -611,7 +614,7 @@ class Data:
             if self.debug:  # debug
                 days += 3
             elif m == 7:
-                days += 8
+                days += 6
             else:
                 year = int(month_to_year(m))
                 days += calendar.monthrange(year, m)[1]
@@ -630,10 +633,29 @@ class Data:
             for d in tqdm(days, total=len(days), unit='Days progress'):
                 # todo add sunrise/sundown for start end hour? half hour?
                 day_data = self.get_df_csv_day_RP(m, d, start, end, step).astype(int)
+                if self.meteor_data:
+                    csi, azimuth, zenith, sun_earth_dis, ephemeris = PvLibPlayground.get_meteor_data(m,
+                                                                                                         d,
+                                                                                                         PvLibPlayground.get_times(
+                                                                                                             2019,
+                                                                                                             m,  # month
+                                                                                                             d,  # day
+                                                                                                             start,
+                                                                                                             # start time
+                                                                                                             end))  # end time
                 day_index += 1
                 for idx, data in enumerate(day_data):
                     data[6] = Metrics.celsius_to_kelvin(data[6])  # convert to kelvin
                     self.mega_df[day_index][idx][0:9] = data  # adding data from csv
+
+                    if self.meteor_data:
+                        self.mega_df[day_index][idx][9] = csi[idx]
+                        self.mega_df[day_index][idx][10] = ( self.mega_df[day_index][idx][9] - self.mega_df[day_index][idx][8])  # csi - ghi
+                        self.mega_df[day_index][idx][11] = azimuth[idx]
+                        self.mega_df[day_index][idx][12] = zenith[idx]
+                        self.mega_df[day_index][idx][13] = sun_earth_dis[idx]
+                        self.mega_df[day_index][idx][14:18] = ephemeris[idx]
+
                     if self.images:
                         year, month, day, hour, minute, seconds = int(data[0]), int(data[1]), int(data[2]), int(
                             data[3]), int(data[4]), int(data[5])
@@ -700,6 +722,9 @@ class Data:
 
             csi, azimuth, zenith = [], [], []
 
+            if m == 0:
+                print(idx_day, day)
+
             if self.meteor_data:
                 csi, azimuth, zenith, sun_earth_dis, ephemeris = PvLibPlayground.get_meteor_data(m,
                                                                                                  d,
@@ -715,12 +740,12 @@ class Data:
 
             for idx_timeslot, time_slot in enumerate(day):
                 if self.meteor_data:
-                    self.mega_df[idx_day][idx_timeslot][9] = csi[idx_timeslot]
-                    self.mega_df[idx_day][idx_timeslot][10] = (self.mega_df[idx_day][idx_timeslot][9] - self.mega_df[idx_day][idx_timeslot][8])  #csi - ghi
-                    self.mega_df[idx_day][idx_timeslot][11] = azimuth[idx_timeslot]
-                    self.mega_df[idx_day][idx_timeslot][12] = zenith[idx_timeslot]
-                    self.mega_df[idx_day][idx_timeslot][13] = sun_earth_dis[idx_timeslot]
-                    self.mega_df[idx_day][idx_timeslot][13:17] = ephemeris[idx_timeslot]
+                    self.mega_df[idx_day][idx_timeslot][18] = csi[idx_timeslot]
+                    self.mega_df[idx_day][idx_timeslot][19] = (self.mega_df[idx_day][idx_timeslot][9] - self.mega_df[idx_day][idx_timeslot][8])  #csi - ghi
+                    self.mega_df[idx_day][idx_timeslot][20] = azimuth[idx_timeslot]
+                    self.mega_df[idx_day][idx_timeslot][21] = zenith[idx_timeslot]
+                    self.mega_df[idx_day][idx_timeslot][22] = sun_earth_dis[idx_timeslot]
+                    self.mega_df[idx_day][idx_timeslot][23:27] = ephemeris[idx_timeslot]
 
                 if (self.queries_per_day - self.pred_horizon) > idx_timeslot:
                     self.mega_df[idx_day][idx_timeslot][self.size_of_row - 1] = \
@@ -737,18 +762,18 @@ class Data:
     def load_prev_mega_df(self, filename):
         self.mega_df = np.load('mega_df_' + filename)
 
-# ## build df for model 1
-# data = Data(meteor_data=True, images=True, debug=True)
+# # ## build df for model 1
+# data = Data(meteor_data=True, images=False, debug=True)
 # data.build_df(10, 17, 1, months=[7])
-# data.save_df()
+# # data.save_df()
 #
 # data.set_prediction_horizon(5)
-# data.split_data_set(7, 26)
+# data.split_data_set(7, 27)
 # data.flatten_data_set()
 # data.normalize_data_sets()
 # np.set_printoptions(precision=3)
 # print(data.mega_df)
-#
+
 
 ## downloading and processing stuff
 # d.download_data(1, True)

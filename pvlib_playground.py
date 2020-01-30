@@ -125,7 +125,11 @@ class PvLibPlayground:
 
 
 # p = PvLibPlayground()
-# times = PvLibPlayground.get_times(2019, 10,1, 7, 19)
+# times1 = PvLibPlayground.get_times(2019, 10,1, 7, 19)
+# times2 = PvLibPlayground.get_times(2019, 10,1, 7, 19,offset=3)
+#
+# print(PvLibPlayground.get_ephemeris_data(times1))
+# print(PvLibPlayground.get_ephemeris_data(times2))
 # t = PvLibPlayground.get_ephemeris_data(times)
 # with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
 #     print(t)
