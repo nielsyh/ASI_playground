@@ -86,4 +86,4 @@ class resnet50:
                 name = name + '_meteor'
 
             Metrics.write_results(str(name), self.data.x_test, self.data.y_test, y_pred, self.data.pred_horizon)
-            self.save_model(str(exp[0]) + str(exp[1]))
+            self.save_model('model_' + str(exp[0]) + str(exp[1]))

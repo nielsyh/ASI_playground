@@ -56,6 +56,7 @@ def run_persistenceB_multi_thread():
 def train_cnn(prediction_horizon, months = [7,8,9,10,11,12]):
     data = Data(meteor_data=False, images=False, debug=False)
     data.build_df_for_cnn(10, 17, 1, months=months)
+    data.save_df_cnn()
     # data.set_prediction_horizon(prediction_horizon)
     cnn = cnn_model.resnet50(400, data)
     cnn.get_model(400)
@@ -65,11 +66,12 @@ def train_ann(prediction_horizon, months = [7,8,9,10,11,12]):
     data = Data(meteor_data=True, images=False, debug=False)
     data.build_df(10, 17, 1, months=months)
     data.set_prediction_horizon(prediction_horizon)
-    ann = ann_model.ANN_Predictor(data, init_epochs=500, epochs=100)
+    ann = ann_model.ANN_Predictor(data, init_epochs=500, epochs=300)
     ann.get_model()
     ann.run_experiment()
 
-run_svm_multi_thread()
+# run_svm_multi_thread()
+train_ann(20)
 
 # run_persistenceB_multi_thread()
 # run_svm_multi_thread()

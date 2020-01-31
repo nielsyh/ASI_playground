@@ -12,6 +12,23 @@ def int_to_str(i):
     else:
         return '0' + s
 
+def get_full_image_by_date_time(month, day, hour, minute, seconds):
+    seconds_list = ['0', '15', '30', '45']
+
+    base_url = 'asi_16124/'
+    tmp_url = '2019' + int_to_str(month) + int_to_str(day)
+    base_url = base_url + tmp_url + '/'  # folder
+
+    for s in seconds_list:
+        img_url = tmp_url + int_to_str(hour) + int_to_str(minute) + int_to_str(s) + '_11.jpg'
+        total_url = base_url + img_url
+        print(total_url)
+        if os.path.isfile(total_url):
+            image = cv2.imread(total_url)
+            if (image is None):
+                continue
+            else:
+                return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
 def get_image_by_date_time(year, month, day, hour, minute, seconds):
     if (year == 19):

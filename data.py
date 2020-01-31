@@ -595,7 +595,12 @@ class Data:
                         data[3]), int(data[4]), int(data[5])
 
                     img = get_image_by_date_time(year, month, day, hour, minute, seconds)  # get image
-                    self.mega_df[day_index][idx][3:size_of_row] = img.ravel()
+                    try:
+                        self.mega_df[day_index][idx][3:size_of_row] = img.ravel()
+                    except:
+                        print('Broken image: ')
+                        print(month, day, minute, seconds)
+                        continue
 
     def build_df(self, start, end, step, months):
 
@@ -659,10 +664,15 @@ class Data:
                     if self.images:
                         year, month, day, hour, minute, seconds = int(data[0]), int(data[1]), int(data[2]), int(
                             data[3]), int(data[4]), int(data[5])
-                        img = get_image_by_date_time(year, month, day, hour, minute, seconds)  # get image
-                        self.mega_df[day_index][idx][self.img_idx:(self.size_of_row - 1)] = extract_features(
-                            img)  # get features from image
-                        del img  # delete img for mem
+                        try:
+                            img = get_image_by_date_time(year, month, day, hour, minute, seconds)  # get image
+                            self.mega_df[day_index][idx][self.img_idx:(self.size_of_row - 1)] = extract_features(
+                                img)  # get features from image
+                            del img  # delete img for mem
+                        except:
+                            print("IMAGE NOT FOUND")
+                            print(month, day, minute, seconds)
+                            self.mega_df[day_index][idx][self.img_idx:(self.size_of_row - 1)] = np.zeros(4)
 
         # YEAR, MONTH, DAY, HOURS, MINUTES, SECONDS, TEMP, IRRADIANCE, IMAGE
         printf('Building done')
@@ -759,13 +769,16 @@ class Data:
         name = str(self.size_of_row) + '_' + str(self.images) + '_' + str(self.meteor_data)
         np.save('mega_df_' + name + '_' , self.mega_df)
 
+    def save_df_cnn(self):
+        np.save('mega_df_CNN', self.mega_df)
+
     def load_prev_mega_df(self, filename):
         self.mega_df = np.load('mega_df_' + filename)
 
-# # ## build df for model 1
+# ## build df for model 1
 # data = Data(meteor_data=True, images=False, debug=True)
-# data.build_df(10, 17, 1, months=[7])
-# # data.save_df()
+# data.build_df(10, 17, 1, months=[7,8,9,10,11,12])
+# data.save_df()
 #
 # data.set_prediction_horizon(5)
 # data.split_data_set(7, 27)
@@ -776,7 +789,7 @@ class Data:
 
 
 ## downloading and processing stuff
-# d.download_data(1, True)
+# d.download_data(1, True)F
 # process_csv("peridata_16124_20190723.csv")
 # d.images_information()
 # d.plot_per_month(9, 5, 19)

@@ -21,8 +21,9 @@ class ANN_Predictor():
     def get_model(self):
         model = keras.models.Sequential()
         model.add(Dense(256, input_dim=(self.data.size_of_row - 1), kernel_initializer='normal', activation='relu'))
-        model.add(Dense(512, activation='relu',))
-        model.add(Dropout(0.25))
+        model.add(Dropout(0.1))
+        model.add(Dense(512, activation='relu'))
+        model.add(Dropout(0.1))
         model.add(Dense(256, activation='relu'))
         model.add(Dense(1, activation='relu'))
         model.compile(loss='mean_squared_error', optimizer='adam')
