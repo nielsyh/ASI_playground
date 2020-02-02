@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from keras.callbacks import Callback
+
 from data import Data
 from metrics import Metrics
 # from models.model_template import Predictor_template
@@ -7,6 +9,17 @@ from keras.layers import Input, Dense, concatenate, MaxPool2D, GlobalAveragePool
 import keras
 from keras.models import load_model
 import calendar
+
+
+class TestCallback(Callback):
+    def __init__(self, xtest, ytest):
+        self.xtest = xtest
+        self.ytest = ytest
+
+    def on_epoch_end(self, epoch, logs={}):
+        x, y = self.xtest, self.ytest
+        loss, acc = self.model.evaluate(x, y, verbose=0)
+        print('\nTesting loss: {}, acc: {}\n'.format(loss, acc))
 
 class ANN_Predictor():
 
@@ -30,7 +43,8 @@ class ANN_Predictor():
         self.model = model
 
     def train(self,epochs=50, batch_size=128):
-        self.model.fit(self.data.x_train, self.data.y_train, epochs=epochs, batch_size=batch_size)
+        self.model.fit(self.data.x_train, self.data.y_train, epochs=epochs, batch_size=batch_size,
+                       callbacks=[TestCallback((self.data.x_test, self.data.y_test))])
 
     def predict(self):
         y_pred =  self.model.predict(self.data.x_test)

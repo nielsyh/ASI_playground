@@ -773,10 +773,10 @@ class Data:
         np.save('mega_df_CNN', self.mega_df)
 
     def load_prev_mega_df(self, filename):
-        self.mega_df = np.load('mega_df_' + filename)
+        self.mega_df = np.load(filename)
 
 # ## build df for model 1
-# data = Data(meteor_data=True, images=False, debug=True)
+# data = Data(meteor_data=True, images=True, debug=False)
 # data.build_df(10, 17, 1, months=[7,8,9,10,11,12])
 # data.save_df()
 #

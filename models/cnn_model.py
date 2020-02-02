@@ -9,7 +9,7 @@ import calendar
 
 class resnet50:
     # windowSize minimum 32 for resnet-50
-    def __init__(self, image_size, data, init_epochs=200, epochs = 50):
+    def __init__(self, data, init_epochs=200, epochs=50):
         self.data = data
         self.init_train = True
         self.init_epochs = init_epochs
@@ -26,10 +26,10 @@ class resnet50:
         self.model.add(base)
         # model.add(Conv2D(64, kernel_size=3, input_shape=(224,224,3)))
         self.model.add(Flatten())
-        self.model.add(Dense(100, kernel_initializer='normal'))
-        self.model.add(Dense(10))
+        self.model.add(Dense(256, kernel_initializer='normal'))
+        self.model.add(Dense(124))
         self.model.add(Dense(1))
-        print(self.model.summary())
+        # print(self.model.summary())
         self.model.compile(optimizer='adam', loss='mean_squared_error')
 
     def train(self, epochs=50, batch_size=128):
@@ -75,15 +75,6 @@ class resnet50:
             self.train(epochs=epochs)
             y_pred, rmse, mae, mape = self.predict()
 
-            name = 'CNN_BETA'
-
-            name = name + '_horizon_' + str(self.data.pred_horizon)
-            if self.data.debug:
-                name = name + '_debug'
-            if self.data.images:
-                name = name + '_images'
-            if self.data.meteor_data:
-                name = name + '_meteor'
-
+            name = 'CNN_BETA' + str(exp[0]) + str(exp[1])
             Metrics.write_results(str(name), self.data.x_test, self.data.y_test, y_pred, self.data.pred_horizon)
-            self.save_model('model_' + str(exp[0]) + str(exp[1]))
+            self.save_model(name)

@@ -23,9 +23,9 @@ def SVM_experiment_thread(prediction_horizon):
     logging.info("Thread %s: starting", prediction_horizon)
 
     data = Data(meteor_data=True, images=False, debug=False)
-    data.build_df(10, 17, 1, months=[7,8,9,10,11,12])
+    # data.build_df(10, 17, 1, months=[7,8,9,10,11,12])
+    data.load_prev_mega_df('mega_df_32_True_True_.npy')
     data.set_prediction_horizon(prediction_horizon)
-
     svm = svm_model.SVM_predictor(data, model_name='SVM norm: default')
     svm.run_experiment()
 
@@ -55,15 +55,17 @@ def run_persistenceB_multi_thread():
 
 def train_cnn(prediction_horizon, months = [7,8,9,10,11,12]):
     data = Data(meteor_data=False, images=False, debug=False)
-    data.build_df_for_cnn(10, 17, 1, months=months)
-    data.save_df_cnn()
+    data.build_df_for_cnn(12, 13, 1, months=months)
+    # data.save_df_cnn()
     # data.set_prediction_horizon(prediction_horizon)
-    cnn = cnn_model.resnet50(400, data)
+    cnn = cnn_model.resnet50(data, init_epochs=3, epochs=3)
     cnn.get_model(400)
     cnn.run_experiment()
 
-def train_ann(prediction_horizon, months = [7,8,9,10,11,12]):
+def train_ann(prediction_horizon, months):
+    print(months)
     data = Data(meteor_data=True, images=False, debug=False)
+
     data.build_df(10, 17, 1, months=months)
     data.set_prediction_horizon(prediction_horizon)
     ann = ann_model.ANN_Predictor(data, init_epochs=500, epochs=300)
@@ -71,10 +73,10 @@ def train_ann(prediction_horizon, months = [7,8,9,10,11,12]):
     ann.run_experiment()
 
 # run_svm_multi_thread()
-train_ann(20)
+# train_ann(20, months=[9])
 
 # run_persistenceB_multi_thread()
-# run_svm_multi_thread()
+run_svm_multi_thread()
 # train_ann(20, months=[7,8,9,10,11,12])
 # train_cnn(20, months=[7,8,9,10,11,12])
 
