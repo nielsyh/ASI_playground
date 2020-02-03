@@ -772,8 +772,14 @@ class Data:
     def save_df_cnn(self):
         np.save('mega_df_CNN', self.mega_df)
 
-    def load_prev_mega_df(self, filename):
+    def load_prev_mega_df(self, filename):  # todo get data from df
+        self.start = 10
+        self.end = 17
+        self.step = 1
+        self.months = [7,8,9,10,11,12]
+        self.queries_per_day = int(((self.end - self.start) * 60 / self.step))  # amount of data in one day
         self.mega_df = np.load(filename)
+        print('loaded')
 
 # ## build df for model 1
 # data = Data(meteor_data=True, images=True, debug=False)

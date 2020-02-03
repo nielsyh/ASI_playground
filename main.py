@@ -22,11 +22,11 @@ print(prediction_horizons)
 def SVM_experiment_thread(prediction_horizon):
     logging.info("Thread %s: starting", prediction_horizon)
 
-    data = Data(meteor_data=True, images=False, debug=False)
+    data = Data(meteor_data=True, images=True, debug=False)
     # data.build_df(10, 17, 1, months=[7,8,9,10,11,12])
     data.load_prev_mega_df('mega_df_32_True_True_.npy')
     data.set_prediction_horizon(prediction_horizon)
-    svm = svm_model.SVM_predictor(data, model_name='SVM norm: default')
+    svm = svm_model.SVM_predictor(data, model_name='SVM norm: default + images')
     svm.run_experiment()
 
     logging.info("Thread %s: finishing", prediction_horizon)

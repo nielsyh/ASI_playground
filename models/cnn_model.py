@@ -6,6 +6,7 @@ from keras.applications.resnet50 import ResNet50
 from keras.models import load_model
 from metrics import Metrics
 import calendar
+import numpy as np
 
 class resnet50:
     # windowSize minimum 32 for resnet-50
@@ -29,7 +30,7 @@ class resnet50:
         self.model.add(Dense(256, kernel_initializer='normal'))
         self.model.add(Dense(124))
         self.model.add(Dense(1))
-        # print(self.model.summary())
+        print(self.model.summary())
         self.model.compile(optimizer='adam', loss='mean_squared_error')
 
     def train(self, epochs=50, batch_size=128):
@@ -40,12 +41,17 @@ class resnet50:
         rmse, mae, mape = Metrics.get_error(self.data.y_test, y_pred)
         return y_pred, rmse, mae, mape
 
-
     def save_model(self, name):
-        self.model.save(str(name) + '.h5')  # creates a HDF5 file 'my_model.h5'
+        for i in [2,3,4]:
+            weights = self.model.layers[i].get_weights()
+            np.save(str(name) + str(i), weights)
+            # self.model.save(str(name) + '.h5')  # creates a HDF5 file 'my_model.h5'
 
     def load_model(self, name):
-        self.model = load_model(str(name) + '.h5')
+        # self.model = load_model(str(name) + '.h5')
+        for i in [2,3,4]:
+            weights  =np.load(str(name)+str(i)+'.npy')
+            self.model.layers[i].set_weights(weights)
 
     def run_experiment(self):
         self.day_month_to_predict = []
