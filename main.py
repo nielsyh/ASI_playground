@@ -26,7 +26,7 @@ def SVM_experiment_thread(prediction_horizon):
     # data.build_df(10, 17, 1, months=[7,8,9,10,11,12])
     data.load_prev_mega_df('mega_df_32_True_True_.npy')
     data.set_prediction_horizon(prediction_horizon)
-    svm = svm_model.SVM_predictor(data, model_name='SVM norm: default + images')
+    svm = svm_model.SVM_predictor(data, model_name='SVM norm: default + images + metoer')
     svm.run_experiment()
 
     logging.info("Thread %s: finishing", prediction_horizon)

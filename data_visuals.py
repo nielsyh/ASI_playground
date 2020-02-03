@@ -155,23 +155,19 @@ def file_to_day_error(file_name):  # returns errors per day
 # m = 12
 # predicted, actual = file_to_day_data('SVM norm_ default_horizon_19_meteor.txt', m, d)
 # pred_2, _ = file_to_day_data('results/persistence_b/Persistence_b_horizon_19.txt', m, d)
-# # pred3, _ =  file_to_day_data('results/meteor_ghi_norm/SVM predictor_horizon_20_meteor.txt', m, d)
+# pred3, _ =  file_to_day_data('results/meteor_ghi_norm/SVM predictor_horizon_20_meteor.txt', m, d)
 # #
 # # predicted = []
 # names = ['SVR new', 'actual', 'Persistence']
 # plot_prediction_per_day([predicted, actual, pred_2], names, 'TITLE', 'xl', 'yl')
 
 #
-# total_rmse1, total_mae1, total_mape1 =  file_to_day_error('results/meteor_ghi_norm/SVM predictor_horizon_19_meteor.txt')
+# # total_rmse1, total_mae1, total_mape1 =  file_to_day_error('results/meteor_ghi_norm/SVM predictor_horizon_19_meteor.txt')
 # total_rmse2, total_mae2, total_mape2 =  file_to_day_error('results/SVM norm_3-10,16/SVM norm_ 3-8, 9,10,16_horizon_19_meteor.txt')
 # total_rmse3, total_mae3, total_mape3 =  file_to_day_error('results/persistence_b/Persistence_b_horizon_19.txt')
-# # total_rmse4, total_mae4, total_mape4 =  file_to_day_error('SVM norm_ default_horizon_19_meteor.txt')
-# total_rmse5, total_mae5, total_mape5 =  file_to_day_error('ANN_BETA_horizon_20_meteor.txt')
+# total_rmse4, total_mae4, total_mape4 =  file_to_day_error('results/SVM norm_default_images_meteor/SVM norm_ default + images_horizon_20_images_meteor.txt')
+# # total_rmse5, total_mae5, total_mape5 =  file_to_day_error('ANN_BETA_horizon_20_meteor.txt')
 #
-#
-# errors = [total_rmse3, total_rmse5]
-# # total_rmse1, total_rmse2 = [],[]
-# # errors = [total_mae1, total_mae2, total_mae3, total_mae4, total_mae5]
-# # 'SVM meteor PH5', 'SVM 3-10,16',
-# names = ['Persistence b PH5', 'ANN']
+# errors = [total_rmse2, total_rmse3, total_rmse4]
+# names = ['SVM norm_ 3-8, 9,10,16', 'Persistence b PH5', 'SVM default with images']
 # plot_error_per_month(errors, names, 'Error over days', yl = 'Error in RMSE')
