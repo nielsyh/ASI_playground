@@ -150,18 +150,18 @@ def file_to_day_error(file_name):  # returns errors per day
             y_pred.append(float(l[6]))
 
     return total_rmse, total_mae, total_mape
-
-# d = 10
-# m = 12
-# predicted, actual = file_to_day_data('SVM norm_ default_horizon_19_meteor.txt', m, d)
+#
+# d = 11
+# m = 8
+# predicted, actual = file_to_day_data('results/SVM norm_ default_horizon_19_meteor.txt', m, d)
 # pred_2, _ = file_to_day_data('results/persistence_b/Persistence_b_horizon_19.txt', m, d)
-# pred3, _ =  file_to_day_data('results/meteor_ghi_norm/SVM predictor_horizon_20_meteor.txt', m, d)
-# #
-# # predicted = []
+# # pred3, _ =  file_to_day_data('results/meteor_ghi_norm/SVM predictor_horizon_20_meteor.txt', m, d)
+# # #
+# # # predicted = []
 # names = ['SVR new', 'actual', 'Persistence']
 # plot_prediction_per_day([predicted, actual, pred_2], names, 'TITLE', 'xl', 'yl')
-
 #
+# #
 # # total_rmse1, total_mae1, total_mape1 =  file_to_day_error('results/meteor_ghi_norm/SVM predictor_horizon_19_meteor.txt')
 # total_rmse2, total_mae2, total_mape2 =  file_to_day_error('results/SVM norm_3-10,16/SVM norm_ 3-8, 9,10,16_horizon_19_meteor.txt')
 # total_rmse3, total_mae3, total_mape3 =  file_to_day_error('results/persistence_b/Persistence_b_horizon_19.txt')

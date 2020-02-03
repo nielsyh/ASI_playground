@@ -3,9 +3,8 @@ import matplotlib.pyplot as plt
 from keras.callbacks import Callback
 from keras.regularizers import l2
 
-from data import Data
+# from data_ts import *
 from metrics import Metrics
-# from models.model_template import Predictor_template
 from keras.layers import Input, Dense, concatenate, MaxPool2D, GlobalAveragePooling2D, Dropout, Conv2D, Flatten
 import keras
 from keras.models import load_model
@@ -22,11 +21,11 @@ class TestCallback(Callback):
         loss = self.model.evaluate(x, y, verbose=0)
         print('\nTesting loss: {}\n'.format(loss))
 
-class ANN_Predictor():
+class ANN():
 
     model = 0
 
-    def __init__(self, data,init_epochs, epochs):
+    def __init__(self, data, init_epochs, epochs):
         self.data = data
         self.init_train = True
         self.init_epochs = init_epochs
@@ -34,21 +33,22 @@ class ANN_Predictor():
 
     def get_model(self):
         model = keras.models.Sequential()
-        model.add(Dense(10, input_dim=(31), kernel_initializer='normal', activation='relu'))
+        model.add(Dense(124, input_dim=(self.data.train_x_df.shape[1]), kernel_initializer='normal', activation='relu'))
         model.add(Dropout(0.1))
-        model.add(Dense(50, activation='relu',kernel_regularizer=l2(0.01), bias_regularizer=l2(0.01)))
+        model.add(Dense(256, activation='relu',kernel_regularizer=l2(0.01), bias_regularizer=l2(0.01)))
         model.add(Dropout(0.1))
+        model.add(Dense(124, activation='relu'))
         model.add(Dense(1, activation='relu'))
         model.compile(loss='mean_squared_error', optimizer='adam')
         self.model = model
 
     def train(self,epochs=50, batch_size=128):
-        self.model.fit(self.data.x_train, self.data.y_train, epochs=epochs, batch_size=batch_size, validation_data=(self.data.x_test, self.data.y_test),
-                       callbacks=[TestCallback(self.data.x_test, self.data.y_test)])
+        self.model.fit(self.data.train_x_df, self.data.train_y_df, epochs=epochs, batch_size=batch_size, validation_data=(self.data.val_x_df, self.data.val_y_df),
+                       callbacks=[TestCallback(self.data.test_x_df, self.data.test_y_df)])
 
     def predict(self):
-        y_pred =  self.model.predict(self.data.x_test)
-        rmse, mae, mape = Metrics.get_error(self.data.y_test, y_pred)
+        y_pred =  self.model.predict(self.data.test_x_df)
+        rmse, mae, mape = Metrics.get_error(self.data.test_y_df, y_pred)
         return y_pred, rmse, mae, mape
 
     def run_experiment(self):
@@ -66,11 +66,11 @@ class ANN_Predictor():
             for d in days:
                 self.day_month_to_predict.append((m, d))
 
-        self.day_month_to_predict = [(12,10), (12,20), (12,25)]
-        # self.day_month_to_predict = [(7, 28)]
+        # self.day_month_to_predict = [(12,10), (12,20), (12,25)]
+        # self.day_month_to_predict = [(8, 28)]
 
         for exp in self.day_month_to_predict:
-            print('ANN: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
+            print('ANN SEQUENCE: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
             self.data.split_data_set(exp[0], exp[1])
             self.data.flatten_data_set()
             self.data.normalize_data_sets()
@@ -83,17 +83,17 @@ class ANN_Predictor():
             self.train(epochs=epochs)
             y_pred, rmse, mae, mape = self.predict()
 
-            name = 'ANN_BETA'
+            name = 'ANN_BETA_SEQUENCE'
 
             name = name + '_horizon_' + str(self.data.pred_horizon)
             if self.data.debug:
                 name = name + '_debug'
-            if self.data.images:
-                name = name + '_images'
+            # if self.data.images:
+            #     name = name + '_images'
             if self.data.meteor_data:
                 name = name + '_meteor'
 
-            Metrics.write_results(str(name), self.data.x_test, self.data.y_test, y_pred, self.data.pred_horizon)
+            Metrics.write_results(str(name), self.data.test_x_df, self.data.test_y_df, y_pred, self.data.pred_horizon)
 
     def save_model(self):
         name = 'ann_' + str(self.data.month_split) + '_' + str(self.data.day_split) + '_' + str(self.data.pred_horizon)
@@ -101,3 +101,11 @@ class ANN_Predictor():
 
     def load_model(self, path):
         self.model = load_model(str(path) + '.h5')
+
+
+# data = Data_TS(True, 20)
+# data.build_ts_df(8,11,[8],1)
+# data.split_data_set(8,27)
+# data.flatten_data_set()
+# data.normalize_data_sets()
+#

@@ -15,4 +15,4 @@ module load CUDA/10.0
 module load CUDA/DNN10.1
 module load anaconda3/2019.10
 
-python main.py
+python data_ts.py

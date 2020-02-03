@@ -90,6 +90,8 @@ class Data:
         self.y_train = 0
         self.x_test = 0
         self.y_test = 0
+        self.x_val = 0
+        self.y_val = 0
 
         if self.meteor_data:  # adjusting df row length according to amount of data
             self.size_of_row += self.size_meteor_data
@@ -495,6 +497,7 @@ class Data:
 
         self.train_df = np.copy(self.mega_df[0:day_idx])
         self.test_df = np.copy(self.mega_df[day_idx])
+        self.val_df = np.copy(self.mega_df[day_idx+1:-1])
 
         printf('done')
 
@@ -516,12 +519,19 @@ class Data:
 
         self.train_df = self.train_df.reshape((self.train_df.shape[0] * self.train_df.shape[1], -1))
         # self.test_df = self.test_df.reshape((self.test_df.shape[0] * self.test_df.shape[1], -1))
+        self.val_df = self.val_df.reshape((self.val_df.shape[0] * self.val_df.shape[1], -1))
 
         self.x_train = self.train_df[:, 0: self.train_df.shape[1] - 1]
         self.y_train = self.train_df[:, -1]
 
         self.x_test = self.test_df[:, 0:self.test_df.shape[1] - 1]
         self.y_test = self.test_df[:, -1]
+
+        self.x_val = self.val_df[:, 0:self.val_df.shape[1] - 1]
+        self.y_val = self.val_df[:, -1]
+
+        self.x_train = np.concatenate((self.x_train, self.x_val))
+        self.y_train = np.concatenate((self.y_train, self.y_val))
 
         printf('done')
 
@@ -539,6 +549,7 @@ class Data:
 
         self.x_train[:, colums_to_normalize] = normalize(self.x_train[:, colums_to_normalize], axis=0, norm='l2')
         self.x_test[:, colums_to_normalize] = normalize(self.x_test[:, colums_to_normalize], axis=0, norm='l2')
+        self.x_val[:, colums_to_normalize] = normalize(self.x_val[:, colums_to_normalize], axis=0, norm='l2')
         # print('done')
 
     def drop_columns(self, colums_to_drop):
@@ -600,6 +611,8 @@ class Data:
                         print('Broken image: ')
                         print(month, day, minute, seconds)
                         continue
+
+
 
     def build_df(self, start, end, step, months):
 
