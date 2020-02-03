@@ -28,7 +28,6 @@ def SVM_experiment_thread(prediction_horizon):
     data.set_prediction_horizon(prediction_horizon)
     svm = svm_model.SVM_predictor(data, model_name='SVM norm: default + images + metoer')
     svm.run_experiment()
-
     logging.info("Thread %s: finishing", prediction_horizon)
 
 def run_svm_multi_thread():
