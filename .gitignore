@@ -9,3 +9,5 @@ cred.txt
 plots/*
 *.png
 results/*
+*.txt
+*.npy
