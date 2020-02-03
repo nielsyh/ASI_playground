@@ -18,8 +18,8 @@ class TestCallback(Callback):
 
     def on_epoch_end(self, epoch, logs={}):
         x, y = self.xtest, self.ytest
-        loss, acc = self.model.evaluate(x, y, verbose=0)
-        print('\nTesting loss: {}, acc: {}\n'.format(loss, acc))
+        loss = self.model.evaluate(x, y, verbose=0)
+        print('\nTesting loss: {}\n'.format(loss))
 
 class ANN_Predictor():
 
@@ -33,7 +33,7 @@ class ANN_Predictor():
 
     def get_model(self):
         model = keras.models.Sequential()
-        model.add(Dense(256, input_dim=(self.data.size_of_row - 1), kernel_initializer='normal', activation='relu'))
+        model.add(Dense(256, input_dim=(31), kernel_initializer='normal', activation='relu'))
         model.add(Dropout(0.1))
         model.add(Dense(512, activation='relu'))
         model.add(Dropout(0.1))
@@ -44,7 +44,7 @@ class ANN_Predictor():
 
     def train(self,epochs=50, batch_size=128):
         self.model.fit(self.data.x_train, self.data.y_train, epochs=epochs, batch_size=batch_size,
-                       callbacks=[TestCallback((self.data.x_test, self.data.y_test))])
+                       callbacks=[TestCallback(self.data.x_test, self.data.y_test)])
 
     def predict(self):
         y_pred =  self.model.predict(self.data.x_test)
@@ -65,6 +65,9 @@ class ANN_Predictor():
 
             for d in days:
                 self.day_month_to_predict.append((m, d))
+
+        self.day_month_to_predict = [(12,10), (12,20), (12,30)]
+        self.day_month_to_predict = [(7, 28)]
 
         for exp in self.day_month_to_predict:
             print('ANN: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))

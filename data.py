@@ -534,7 +534,7 @@ class Data:
         if (self.meteor_data):
             colums_to_normalize.extend(metoer_to_normalize)
         if (self.images):
-            colums_to_normalize.extend([29,30,31,32])
+            colums_to_normalize.extend([27,28,29,30])
         printf('normalzing for: ' + str(colums_to_normalize))
 
         self.x_train[:, colums_to_normalize] = normalize(self.x_train[:, colums_to_normalize], axis=0, norm='l2')
