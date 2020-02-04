@@ -10,16 +10,28 @@ from pvlib.iotools import read_tmy3
 
 class PvLibPlayground:
 
+    cam = 1
+
     def __init__(self):
         pass
 
     @staticmethod
+    def set_cam(cam):
+        PvLibPlayground.cam = cam
+        # print('CAM SET TO: ' + str(cam))
+
+
+    @staticmethod
     def get_longitude():
-        return 37.091549
+        if PvLibPlayground.cam == 1:
+            return 37.091549
+        return 37.095253
 
     @staticmethod
     def get_latitude():
-        return -2.363556
+        if PvLibPlayground.cam == 1:
+            return -2.363556
+        return -2.354785
 
     @staticmethod
     def get_altitude():
@@ -28,7 +40,7 @@ class PvLibPlayground:
     @staticmethod
     #todo get real attitude on
     def get_location_almeria():
-        return Location(37.091549, -2.363556, tz='UTC', altitude=PvLibPlayground.get_altitude())
+        return Location(PvLibPlayground.get_longitude(), PvLibPlayground.get_latitude(), tz='UTC', altitude=PvLibPlayground.get_altitude())
 
     @staticmethod
     def get_df_times(start, end):

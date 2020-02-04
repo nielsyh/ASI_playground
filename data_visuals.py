@@ -105,6 +105,8 @@ def file_to_day_data(file_name, month, day):
             l = line.split(',')
             if(float(l[0]) == month):
                 if(float(l[1]) == day):
+                    if l[5][0] == '[':
+                        l[5] = float(l[5][1:-2])
                     actual.append(float(l[5]))
                     if l[6][0] == '[':
                         l[6] = float(l[6][1:-2])
@@ -142,32 +144,40 @@ def file_to_day_error(file_name):  # returns errors per day
                 y_pred = []
                 last_day = day
 
-            y_true.append(float(l[5]))
+            if l[5][0] == '[':
+                l[5] = float(l[5][1:-2])
             if l[6][0] == '[':
                 l[6] = float(l[6][1:-2])
-                # print(l[6])
 
+
+
+            y_true.append(float(l[5]))
             y_pred.append(float(l[6]))
+
 
     return total_rmse, total_mae, total_mape
 #
-# d = 11
-# m = 8
-# predicted, actual = file_to_day_data('results/SVM norm_ default_horizon_19_meteor.txt', m, d)
+# d = 15
+# m = 9
+# predicted, actual = file_to_day_data('results/ANN_BETA_SEQUENCE_hor20_124_256kb0.01_124.txt', m, d)
+#
 # pred_2, _ = file_to_day_data('results/persistence_b/Persistence_b_horizon_19.txt', m, d)
+#
 # # pred3, _ =  file_to_day_data('results/meteor_ghi_norm/SVM predictor_horizon_20_meteor.txt', m, d)
 # # #
 # # # predicted = []
-# names = ['SVR new', 'actual', 'Persistence']
+# names = ['ANN run 2', 'actual', 'Persistence']
 # plot_prediction_per_day([predicted, actual, pred_2], names, 'TITLE', 'xl', 'yl')
+
 #
-# #
-# # total_rmse1, total_mae1, total_mape1 =  file_to_day_error('results/meteor_ghi_norm/SVM predictor_horizon_19_meteor.txt')
+# total_rmse1, total_mae1, total_mape1 =  file_to_day_error('results/meteor_ghi_norm/SVM predictor_horizon_19_meteor.txt')
 # total_rmse2, total_mae2, total_mape2 =  file_to_day_error('results/SVM norm_3-10,16/SVM norm_ 3-8, 9,10,16_horizon_19_meteor.txt')
 # total_rmse3, total_mae3, total_mape3 =  file_to_day_error('results/persistence_b/Persistence_b_horizon_19.txt')
 # total_rmse4, total_mae4, total_mape4 =  file_to_day_error('results/SVM norm_default_images_meteor/SVM norm_ default + images_horizon_20_images_meteor.txt')
-# # total_rmse5, total_mae5, total_mape5 =  file_to_day_error('ANN_BETA_horizon_20_meteor.txt')
+# total_rmse5, total_mae5, total_mape5 =  file_to_day_error('results/ANN_BETA_SEQUENCE_horizon_20_124_dp0.1_256_dp0.1_124meteor.txt')
+# total_rmse6, total_mae6, total_mape6 =  file_to_day_error('ANN_BETA_SEQUENCE_4x50.txt')
 #
-# errors = [total_rmse2, total_rmse3, total_rmse4]
-# names = ['SVM norm_ 3-8, 9,10,16', 'Persistence b PH5', 'SVM default with images']
+# total_rmse2 = []
+# errors = [total_rmse2, total_rmse3, total_rmse5, total_rmse6]
+# names = ['SVM norm_ 3-8, 9,10,16', 'Persistence b PH5', 'ANN sequence', 'ANN sequence 2']
 # plot_error_per_month(errors, names, 'Error over days', yl = 'Error in RMSE')

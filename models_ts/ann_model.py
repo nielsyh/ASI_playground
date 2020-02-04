@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from keras.callbacks import Callback
 from keras.regularizers import l2
+from keras import optimizers
 
 # from data_ts import *
 from metrics import Metrics
@@ -24,27 +25,37 @@ class TestCallback(Callback):
 class ANN():
 
     model = 0
+    history = None
 
-    def __init__(self, data, init_epochs, epochs):
+    def __init__(self, data, init_epochs, epochs, name):
         self.data = data
         self.init_train = True
         self.init_epochs = init_epochs
         self.epochs = epochs
+        self.name = name
 
     def get_model(self):
         model = keras.models.Sequential()
         model.add(Dense(124, input_dim=(self.data.train_x_df.shape[1]), kernel_initializer='normal', activation='relu'))
-        model.add(Dropout(0.1))
-        model.add(Dense(256, activation='relu',kernel_regularizer=l2(0.01), bias_regularizer=l2(0.01)))
-        model.add(Dropout(0.1))
-        model.add(Dense(124, activation='relu'))
+        model.add(Dense(256, activation='relu', kernel_regularizer=l2(0.01), bias_regularizer=l2(0.01)))
+        model.add(Dense(124, activation='relu', kernel_regularizer=l2(0.01), bias_regularizer=l2(0.01)))
         model.add(Dense(1, activation='relu'))
-        model.compile(loss='mean_squared_error', optimizer='adam')
+        opt = optimizers.Adam()
+        model.compile(loss='mean_squared_error', optimizer=opt)
         self.model = model
 
     def train(self,epochs=50, batch_size=128):
-        self.model.fit(self.data.train_x_df, self.data.train_y_df, epochs=epochs, batch_size=batch_size, validation_data=(self.data.val_x_df, self.data.val_y_df),
+        self.history = self.model.fit(self.data.train_x_df, self.data.train_y_df, epochs=epochs, batch_size=batch_size, validation_data=(self.data.val_x_df, self.data.val_y_df),
                        callbacks=[TestCallback(self.data.test_x_df, self.data.test_y_df)])
+
+    def plot_history(self):
+        plt.plot(self.history.history['loss'])
+        plt.plot(self.history.history['val_loss'])
+        plt.title('model loss')
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'test'], loc='upper left')
+        plt.show()
 
     def predict(self):
         y_pred =  self.model.predict(self.data.test_x_df)
@@ -67,13 +78,14 @@ class ANN():
                 self.day_month_to_predict.append((m, d))
 
         # self.day_month_to_predict = [(12,10), (12,20), (12,25)]
-        # self.day_month_to_predict = [(8, 28)]
+        # self.day_month_to_predict = [(9, 15)]
 
         for exp in self.day_month_to_predict:
             print('ANN SEQUENCE: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
             self.data.split_data_set(exp[0], exp[1])
             self.data.flatten_data_set()
             self.data.normalize_data_sets()
+            self.get_model()
 
             epochs = self.epochs
             if self.init_train:
@@ -81,19 +93,9 @@ class ANN():
                 self.init_train = False
 
             self.train(epochs=epochs)
+            # self.plot_history()
             y_pred, rmse, mae, mape = self.predict()
-
-            name = 'ANN_BETA_SEQUENCE'
-
-            name = name + '_horizon_' + str(self.data.pred_horizon)
-            if self.data.debug:
-                name = name + '_debug'
-            # if self.data.images:
-            #     name = name + '_images'
-            if self.data.meteor_data:
-                name = name + '_meteor'
-
-            Metrics.write_results(str(name), self.data.test_x_df, self.data.test_y_df, y_pred, self.data.pred_horizon)
+            Metrics.write_results(str(self.name), self.data.test_x_df, self.data.test_y_df, y_pred, self.data.pred_horizon)
 
     def save_model(self):
         name = 'ann_' + str(self.data.month_split) + '_' + str(self.data.day_split) + '_' + str(self.data.pred_horizon)
