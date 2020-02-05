@@ -344,10 +344,10 @@ class DataFrameNormal:
         self.mega_df = np.load(filename)
         print('loaded')
 
-## build df for model 1
-data = Data(meteor_data=True, images=False, debug=True)
-data.build_df(10, 17, 1, months=[7])
-# data.save_df()
+# ## build df for model 1
+# data = Data(meteor_data=True, images=False, debug=True)
+# data.build_df(10, 17, 1, months=[7])
+# # data.save_df()
 #
 # data.set_prediction_horizon(5)
 # data.split_data_set(7, 27)

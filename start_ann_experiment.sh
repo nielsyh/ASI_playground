@@ -7,7 +7,7 @@
 #SBATCH --nodes=1
 #SBATCH -o job.%N.%j.out  # STDOUT
 #SBATCH -e job.%N.%j.err  # STDERR
-#SBATCH --job-name=$1.$2.ANN
+#SBATCH -J $1 $2
 
 module purge
 module load userspace/all userspace/custom opt/all
