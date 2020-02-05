@@ -229,13 +229,13 @@ class DataFrameSequence:
 
         shape = self.mega_df_x_1.shape
         a = self.mega_df_x_1.reshape(shape[2], shape[0]*shape[1]*shape[3])
-        a[:, colums_to_normalize]  = normalize(a[:, colums_to_normalize])
+        a[:, colums_to_normalize]  = normalize(a[:, colums_to_normalize], axis=0, norm='l2')
         self.mega_df_x_1 = a.reshape(shape)
 
         if self.cams == 2:
             shape = self.mega_df_x_2.shape
             a = self.mega_df_x_2.reshape(shape[2], shape[0] * shape[1] * shape[3])
-            a[:, colums_to_normalize] = normalize(a[:, colums_to_normalize])
+            a[:, colums_to_normalize]  = normalize(a[:, colums_to_normalize], axis=0, norm='l2')
             self.mega_df_x_2 = a.reshape(shape)
 
     def flatten_data_set_to_3d(self):

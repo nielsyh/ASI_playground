@@ -11,6 +11,7 @@ def LSTM_experiment(minutes_sequence, cams):
     data = DataFrameSequence(False, 20)
     data.build_ts_df(start,end,[7,8,9,10,11,12],minutes_sequence,cams)
     data.normalize_mega_df()
+    data.save_df()
     # data.load_prev_mega_df()
     name_cam = str(cams) + 'CAM_'
     name_time = str(minutes_sequence) + 'Minutes_'
