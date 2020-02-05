@@ -3,7 +3,7 @@ from models_ts import ann_model, lstm_model
 import sys
 
 init_epochs = 200
-epochs = 100
+epochs = 50
 start = 8
 end = 19
 
