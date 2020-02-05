@@ -56,7 +56,7 @@ class LSTM_predictor():
         model.compile(loss='mean_squared_error', optimizer=opt)
         self.model = model
 
-    def train(self,epochs=50, batch_size=56):
+    def train(self,epochs=50, batch_size=128):
         self.model.fit(self.data.train_x_df, self.data.train_y_df, epochs=epochs, batch_size=batch_size, validation_data=(self.data.val_x_df, self.data.val_y_df),
                        callbacks=[TestCallback(self.data.test_x_df, self.data.test_y_df)])
 
@@ -87,7 +87,6 @@ class LSTM_predictor():
             print('ANN SEQUENCE: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
             self.data.split_data_set(exp[0], exp[1])
             self.data.flatten_data_set_to_3d()
-            # self.data.normalize_data_sets()
             self.get_model()
 
             epochs = self.epochs

@@ -3,8 +3,6 @@ import matplotlib.pyplot as plt
 from keras.callbacks import Callback
 from keras.regularizers import l2
 from keras import optimizers
-
-# from data_ts import *
 from metrics import Metrics
 from keras.layers import Input, Dense, concatenate, MaxPool2D, GlobalAveragePooling2D, Dropout, Conv2D, Flatten
 import keras
@@ -84,7 +82,6 @@ class ANN():
             print('ANN SEQUENCE: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
             self.data.split_data_set(exp[0], exp[1])
             self.data.flatten_data_set()
-            self.data.normalize_data_sets()
             self.get_model()
 
             epochs = self.epochs
@@ -103,11 +100,3 @@ class ANN():
 
     def load_model(self, path):
         self.model = load_model(str(path) + '.h5')
-
-
-# data = Data_TS(True, 20)
-# data.build_ts_df(8,11,[8],1)
-# data.split_data_set(8,27)
-# data.flatten_data_set()
-# data.normalize_data_sets()
-#

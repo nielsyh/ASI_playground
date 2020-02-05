@@ -76,7 +76,7 @@ class DataFrameSequence:
             if self.debug:
                 days = [26,27,28,29]
             elif m == 7:
-                days = [26,27,28,29,30]
+                days = [26,27,28,29,30,31]
 
             for d in tqdm(days, total=len(days), unit='Days progress'):
                 # todo add sunrise/sundown for start end hour? half hour?
@@ -220,17 +220,23 @@ class DataFrameSequence:
 
         print('done')
 
-    def normalize_data_sets(self, colums_to_normalize = [6,7,8], metoer_to_normalize= [9,12,16]):
-        colums_to_normalize = colums_to_normalize
+
+    def normalize_mega_df(self, ctn = [6,7,8], metoer_to_normalize= [9,12,16]):
+        colums_to_normalize = ctn
         if (self.meteor_data):
             colums_to_normalize.extend(metoer_to_normalize)
+        print('Mega normalzing for: ' + str(colums_to_normalize))
 
-        print('normalzing for: ' + str(colums_to_normalize))
+        shape = self.mega_df_x_1.shape
+        a = self.mega_df_x_1.reshape(shape[2], shape[0]*shape[1]*shape[3])
+        a[:, colums_to_normalize]  = normalize(a[:, colums_to_normalize])
+        self.mega_df_x_1 = a.reshape(shape)
 
-
-        self.train_x_df[:, colums_to_normalize] = normalize(self.train_x_df[:,colums_to_normalize], axis=0, norm='l2')
-        self.test_x_df[:,colums_to_normalize] = normalize(self.test_x_df[:, colums_to_normalize], axis=0, norm='l2')
-        self.val_x_df[:,colums_to_normalize] = normalize(self.val_x_df[:, colums_to_normalize], axis=0, norm='l2')
+        if self.cams == 2:
+            shape = self.mega_df_x_2.shape
+            a = self.mega_df_x_2.reshape(shape[2], shape[0] * shape[1] * shape[3])
+            a[:, colums_to_normalize] = normalize(a[:, colums_to_normalize])
+            self.mega_df_x_2 = a.reshape(shape)
 
     def flatten_data_set_to_3d(self):
         print('Flattening..')
@@ -255,30 +261,42 @@ class DataFrameSequence:
 
     def save_df(self):
         name = 'mega_df'
-        np.save(name + 'x', self.mega_df_x)
-        np.save(name + 'y', self.mega_df_y)
+        np.save(name + 'x', self.mega_df_x_1)
+        np.save(name + 'y', self.mega_df_y_1)
+
+        if self.cams == 2:
+            np.save(name + 'x2', self.mega_df_x_2)
+            np.save(name + 'y2', self.mega_df_y_2)
 
 
     def load_prev_mega_df(self):  # todo get data from df
-        self.start = 9
-        self.end = 18
+        self.start = 8
+        self.end = 19
         self.step = 1
         self.months = [7,8,9,10,11,12]
         # self.queries_per_day = int(((self.end - self.start) * 60 / self.step))  # amount of data in one day
         self.mega_df_x = np.load('mega_dfx.npy')
         self.mega_df_x = np.load('mega_dfy.npy')
+        if self.cams == 2:
+            self.mega_df_x = np.load('mega_dfx2.npy')
+            self.mega_df_x = np.load('mega_dfy2.npy')
+
         print('loaded')
 
 #
 # data = DataFrameSequence(False, 20)
-# data.build_ts_df(10,13,[9],45,2)
+# data.build_ts_df(10,13,[9,10],45,2)
 # data.split_data_set(9,27)
 
 # data = DataFrameSequence(False, 20)
 # data.build_ts_df(9,18,[7,8,9,10],1)
 # # data.save_df()
-# # data.split_data_set(8,25)
-# # data.flatten_data_set_to_3d()
+# data.split_data_set(8,25)
+# data.flatten_data_set_to_3d()
+# data
+
+
+
 # # data.normalize_data_sets()
 # # data.load_prev_mega_df()
 # ann = ann_model.ANN(data, 50, 50)

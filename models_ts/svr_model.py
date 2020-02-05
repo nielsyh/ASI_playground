@@ -1,8 +1,5 @@
-import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.svm import SVC
-from sklearn.metrics import classification_report, confusion_matrix
-from data import Data
+from dataframe_sequence import DataFrameSequence
 from metrics import Metrics
 import pickle
 import calendar
@@ -11,10 +8,10 @@ import calendar
 class SVM_predictor:
     day_month_to_predict = []
 
-    def __init__(self, data, model_name):
+    def __init__(self, data, name):
         self.data = data
         self.model = 0
-        self.model_name = model_name
+        self.name = name
 
     def run_experiment(self):
         self.day_month_to_predict = []
@@ -31,37 +28,28 @@ class SVM_predictor:
             for d in days:
                 self.day_month_to_predict.append((m, d))
 
+
+        # self.day_month_to_predict = [(9,11)]
+
         for exp in self.day_month_to_predict:
             print('SVM: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
             self.data.split_data_set(exp[0], exp[1])
             self.data.flatten_data_set()
-            self.data.normalize_data_sets()
-
             self.train()
             y_pred, rmse, mae, mape = self.predict()
 
-
-            name = str(self.model_name)
-            name = name + '_horizon_' + str(self.data.pred_horizon)
-            if self.data.debug:
-                name = name + '_debug'
-            if self.data.images:
-                name = name + '_images'
-            if self.data.meteor_data:
-                name = name + '_meteor'
-
-            Metrics.write_results(str(name), self.data.x_test, self.data.y_test, y_pred, self.data.pred_horizon)
+            Metrics.write_results(str(self.name), self.data.test_x_df, self.data.test_y_df, y_pred, self.data.pred_horizon)
 
     def train(self):
-        # print('SVM: Training..')
+        print('SVM: Training..')
         self.svclassifier = SVC(kernel='rbf', gamma='auto')
-        self.model = self.svclassifier.fit(self.data.x_train, self.data.y_train)
-        # print('done..')
+        self.model = self.svclassifier.fit(self.data.train_x_df, self.data.train_y_df)
+        print('done..')
 
     def predict(self):
-        # print('SVM: Predicting..')
-        y_pred = self.model.predict(self.data.x_test)
-        rmse, mae, mape = Metrics.get_error(self.data.y_test, y_pred)
+        print('SVM: Predicting..')
+        y_pred = self.model.predict(self.data.test_x_df)
+        rmse, mae, mape = Metrics.get_error(self.data.test_y_df, y_pred)
         print(rmse)
         return y_pred, rmse, mae, mape
 
