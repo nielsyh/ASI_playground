@@ -39,16 +39,18 @@ class LSTM_predictor():
 
     model = 0
 
-    def __init__(self, data, init_epochs, epochs):
+    def __init__(self, data, init_epochs, epochs, name):
         self.data = data
         self.init_train = True
         self.init_epochs = init_epochs
         self.epochs = epochs
+        self.name = name
 
     def get_model(self):
         model = Sequential()
-        model.add(LSTM(30, activation='relu', input_shape=(60, 17)))
-        model.add(Dense(10, activation='relu'))
+        model.add(LSTM(124, activation='relu', input_shape=(30, 18)))
+        model.add(Dense(50, activation='relu'))
+        model.add(Dense(25, activation='relu'))
         model.add(Dense(1))
         opt = optimizers.Adam()
         model.compile(loss='mean_squared_error', optimizer=opt)
@@ -79,7 +81,7 @@ class LSTM_predictor():
                 self.day_month_to_predict.append((m, d))
 
         # self.day_month_to_predict = [(12,10), (12,20), (12,25)]
-        self.day_month_to_predict = [(9, 11)]
+        # self.day_month_to_predict = [(9, 15)]
 
         for exp in self.day_month_to_predict:
             print('ANN SEQUENCE: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
@@ -98,15 +100,7 @@ class LSTM_predictor():
 
             name = 'LSTM_BETA_SEQUENCE'
 
-            name = name + '_horizon_' + str(self.data.pred_horizon)
-            if self.data.debug:
-                name = name + '_debug'
-            # if self.data.images:
-            #     name = name + '_images'
-            if self.data.meteor_data:
-                name = name + '_meteor'
-
-            Metrics.write_results(str(name), self.data.test_x_df, self.data.test_y_df, y_pred, self.data.pred_horizon)
+            Metrics.write_results(str(self.name), self.data.test_x_df, self.data.test_y_df, y_pred, self.data.pred_horizon)
 
     def save_model(self):
         name = 'LSTM_' + str(self.data.month_split) + '_' + str(self.data.day_split) + '_' + str(self.data.pred_horizon)

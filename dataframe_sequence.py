@@ -117,9 +117,15 @@ class DataFrameSequence:
                         elif v == 9:
                             ts[0:minutes, v] = csi[i:i + minutes]
                         elif v == 10:
-                            a = day_data[i:i+minutes, 8]
+                            a = day_data[i:i + minutes, 8]
                             b = csi[i:i + minutes]
-                            ts[0:minutes, v] = [x/y for x, y in zip(a, b)]  # clear sky index
+                            c = []
+                            for x,y in zip(a,b):
+                                if y == 0:
+                                    c.append(0)
+                                else:
+                                    c.append(x/y)
+                            ts[0:minutes, v] = c  # clear sky index
                         elif v == 11:
                             ts[0:minutes, v] = azimuth[i:i + minutes]
                         elif v == 12:
@@ -137,7 +143,13 @@ class DataFrameSequence:
                             elif v == 10:
                                 a = day_data_2[i:i + minutes, 8]
                                 b = csi2[i:i + minutes]
-                                ts[0:minutes, v] = [x / y for x, y in zip(a, b)]  # clear sky index
+                                c = []
+                                for x,y in zip(a,b):
+                                    if y == 0:
+                                        c.append(0)
+                                    else:
+                                        c.append(x/y)
+                                ts2[0:minutes, v] = c  # clear sky index
                             elif v == 11:
                                 ts2[0:minutes, v] = azimuth2[i:i + minutes]
                             elif v == 12:
