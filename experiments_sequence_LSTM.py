@@ -16,7 +16,7 @@ def LSTM_experiment(minutes_sequence, cams):
     lstm.run_experiment()
 
 def LSTM_test():
-    data = DataFrameSequence(False, 20)
+    data = DataFrameSequence(True, 20)
     data.build_ts_df(start, end, [9], 60, 1)
     name_cam = str(1) + 'CAM_'
     name_time = str(60) + 'Minutes_'
@@ -39,4 +39,6 @@ cams = int(sys.argv[2])
 print('Minutes sequence: ' + str(minutes_sequence))
 print('Cams: ' + str(cams))
 LSTM_experiment(minutes_sequence, cams)
+
+# LSTM_test()
 

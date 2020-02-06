@@ -79,7 +79,7 @@ class LSTM_predictor():
             for d in days:
                 self.day_month_to_predict.append((m, d))
 
-        # self.day_month_to_predict = [(8, 27)]
+        self.day_month_to_predict = [(9, 27)]
 
         for exp in self.day_month_to_predict:
             print('ANN SEQUENCE: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
