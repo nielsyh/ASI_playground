@@ -275,11 +275,11 @@ class DataFrameSequence:
         self.step = 1
         self.months = [7,8,9,10,11,12]
         # self.queries_per_day = int(((self.end - self.start) * 60 / self.step))  # amount of data in one day
-        self.mega_df_x = np.load('mega_dfx.npy')
-        self.mega_df_x = np.load('mega_dfy.npy')
+        self.mega_df_x_1 = np.load('mega_dfx.npy')
+        self.mega_df_y_1 = np.load('mega_dfy.npy')
         if self.cams == 2:
-            self.mega_df_x = np.load('mega_dfx2.npy')
-            self.mega_df_x = np.load('mega_dfy2.npy')
+            self.mega_df_x_2 = np.load('mega_dfx2.npy')
+            self.mega_df_y_2 = np.load('mega_dfy2.npy')
 
         print('loaded')
 

@@ -332,6 +332,7 @@ def get_df_csv_day_RP(month, day, start, end,
 def plot_per_month(month, start, end, step):
     df = get_df_csv_month(month, start, end, step)
     hours = list(range(start, end))
+    hours = list(range(start, end))
     minutes = list(range(0, 60, step))
     times, avg_temp, var_temp, avg_ghi, var_ghi, var_ghi, tick_times = ([] for i in range(7))
 
