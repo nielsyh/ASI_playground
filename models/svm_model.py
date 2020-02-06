@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, confusion_matrix
-from data import Data
 from metrics import Metrics
 import pickle
 import calendar

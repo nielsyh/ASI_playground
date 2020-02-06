@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from data import Data
 from metrics import Metrics
 import pickle
 

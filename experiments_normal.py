@@ -38,17 +38,16 @@ def run_svm_multi_thread():
 
 def persistence_b_thread(prediction_horizon):
     logging.info("PERSISTENCE b Thread %s: starting", prediction_horizon)
-
-    data = DataFrameSequence(meteor_data=False, images=False, debug=False)
-    data.build_df(10, 17, 1, months=[7, 8, 9, 10, 11, 12])
+    data = DataFrameNormal(meteor_data=False, images=False, debug=False)
+    data.build_df(9, 18, 1, months=[9, 10, 11, 12])
     data.set_prediction_horizon(prediction_horizon)
-
     persistence_b = persistence_model.Persistence_predictor_b(data)
     persistence_b.run_experiment()
 
     logging.info("Thread %s: finishing", prediction_horizon)
 
 def run_persistenceB_multi_thread():
+    prediction_horizons = [20]
     for i in prediction_horizons:
         x = threading.Thread(target=persistence_b_thread, args=(i,))
         x.start()
@@ -71,4 +70,13 @@ def train_ann(prediction_horizon, months = [7,8,9,10,11,12]):
     ann = ann_model.ANN_Predictor(data, init_epochs=200, epochs=200)
     ann.get_model()
     ann.run_experiment()
+
+# run_persistenceB_multi_thread()
+
+data = DataFrameNormal(meteor_data=False, images=False, debug=False)
+data.build_df(9, 18, 1, months=[9, 10, 11, 12])
+data.set_prediction_horizon(20)
+persistence_b = persistence_model.Persistence_predictor_b(data)
+persistence_b.run_experiment()
+
 

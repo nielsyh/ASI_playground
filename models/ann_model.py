@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from keras.callbacks import Callback
 from keras.regularizers import l2
 
-from data import Data
 from metrics import Metrics
 # from models.model_template import Predictor_template
 from keras.layers import Input, Dense, concatenate, MaxPool2D, GlobalAveragePooling2D, Dropout, Conv2D, Flatten

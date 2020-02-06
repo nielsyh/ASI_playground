@@ -73,7 +73,7 @@ class DataFrameNormal:
 
         self.train_df = self.train_df.reshape((self.train_df.shape[0] * self.train_df.shape[1], -1))
         # self.test_df = self.test_df.reshape((self.test_df.shape[0] * self.test_df.shape[1], -1))
-        self.val_df = self.val_df.reshape((self.val_df.shape[0] * self.val_df.shape[1], -1))
+        # self.val_df = self.val_df.reshape((self.val_df.shape[0] * self.val_df.shape[1], -1))
 
         self.x_train = self.train_df[:, 0: self.train_df.shape[1] - 1]
         self.y_train = self.train_df[:, -1]
@@ -81,11 +81,11 @@ class DataFrameNormal:
         self.x_test = self.test_df[:, 0:self.test_df.shape[1] - 1]
         self.y_test = self.test_df[:, -1]
 
-        self.x_val = self.val_df[:, 0:self.val_df.shape[1] - 1]
-        self.y_val = self.val_df[:, -1]
+        # self.x_val = self.val_df[:, 0:self.val_df.shape[1] - 1]
+        # self.y_val = self.val_df[:, -1]
 
-        self.x_train = np.concatenate((self.x_train, self.x_val))
-        self.y_train = np.concatenate((self.y_train, self.y_val))
+        # self.x_train = np.concatenate((self.x_train, self.x_val))
+        # self.y_train = np.concatenate((self.y_train, self.y_val))
 
         print('done')
 
@@ -146,7 +146,7 @@ class DataFrameNormal:
 
             for d in tqdm(days, total=len(days), unit='Day progress'):
                 # todo add sunrise/sundown for start end hour? half hour?
-                day_data = self.get_df_csv_day_RP(m, d, start, end, step).astype(int)
+                day_data = get_df_csv_day_RP(m, d, start, end, step).astype(int)
                 day_index += 1
 
                 for idx, data in enumerate(day_data):
@@ -273,7 +273,7 @@ class DataFrameNormal:
 
             for d in days:
                 # todo add sunrise/sundown for start end
-                extra = self.get_df_csv_day_RP(m, d, self.end, self.end + 1, self.step).astype(int)
+                extra = get_df_csv_day_RP(m, d, self.end, self.end + 1, self.step).astype(int)
                 day_index += 1
 
                 for idx, data in enumerate(extra):  # getting label data for predictions
@@ -283,6 +283,21 @@ class DataFrameNormal:
                         continue
 
         self.label_df()
+        print('done')
+
+    def split_data_set(self, m, d):
+        print('Splitting with train until month: ' + str(m) + ', day: ' + str(d) + '...')
+
+        day_idx = 0
+        for idx, day in enumerate(self.mega_df):  #find index month
+            if int(day[0][1]) == m and int(day[0][2]) == d and day_idx == 0:
+                day_idx = idx
+                print('found: ' + str(day_idx))
+                break
+
+        self.train_df = self.mega_df[0:day_idx]
+        self.test_df = self.mega_df[day_idx]
+
         print('done')
 
     def label_df(self):

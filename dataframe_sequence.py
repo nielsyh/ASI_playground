@@ -187,7 +187,7 @@ class DataFrameSequence:
             self.train_x_df = np.copy(self.mega_df_x_1[0:day_idx])
             self.train_y_df = np.copy(self.mega_df_y_1[0:day_idx])
 
-        else:  # double training data
+        elif self.cams == 2:  # double training data
             self.train_x_df = np.concatenate((np.copy(self.mega_df_x_1[0:day_idx]), np.copy(self.mega_df_x_2[0:day_idx])))
             self.train_y_df = np.concatenate((np.copy(self.mega_df_y_1[0:day_idx]), np.copy(self.mega_df_y_2[0:day_idx])))
 

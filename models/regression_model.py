@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
-from data import Data
 from metrics import Metrics
 from models.model_template import Predictor_template
 import pickle

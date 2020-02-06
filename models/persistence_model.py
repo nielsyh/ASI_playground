@@ -115,13 +115,6 @@ class Persistence_predictor_b:  # predict value as minute before
             y_pred, rmse, mae, mape = self.predict()
 
             name = '_horizon_' + str(self.data.pred_horizon)
-            if self.data.debug:
-                name = name + '_debug'
-            if self.data.images:
-                name = name + '_images'
-            if self.data.meteor_data:
-                name = name + '_meteor'
-
             Metrics.write_results('Persistence_b' + str(name), self.data.x_test, self.data.y_test, y_pred,
                                   self.data.pred_horizon)
 

@@ -48,7 +48,7 @@ class LSTM_predictor():
 
     def get_model(self):
         model = Sequential()
-        model.add(LSTM(50, activation='relu', input_shape=(25, 18)))
+        model.add(LSTM(50, activation='relu', input_shape=(self.data.train_x_df.shape[1], self.data.train_x_df.shape[2])))
         model.add(Dense(5, activation='relu'))
         model.add(Dense(1))
         opt = optimizers.Adam()
@@ -79,8 +79,7 @@ class LSTM_predictor():
             for d in days:
                 self.day_month_to_predict.append((m, d))
 
-        # self.day_month_to_predict = [(12,10), (12,20), (12,25)]
-        # self.day_month_to_predict = [(9, 15)]
+        # self.day_month_to_predict = [(8, 27)]
 
         for exp in self.day_month_to_predict:
             print('ANN SEQUENCE: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
@@ -95,9 +94,6 @@ class LSTM_predictor():
 
             self.train(epochs=epochs)
             y_pred, rmse, mae, mape = self.predict()
-
-            name = 'LSTM_BETA_SEQUENCE'
-
             Metrics.write_results(str(self.name), self.data.test_x_df, self.data.test_y_df, y_pred, self.data.pred_horizon)
 
     def save_model(self):
