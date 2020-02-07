@@ -38,7 +38,8 @@ class SVM_predictor:
             self.train()
             y_pred, rmse, mae, mape = self.predict()
 
-            Metrics.write_results(str(self.name), self.data.test_x_df, self.data.test_y_df, y_pred, self.data.pred_horizon)
+            Metrics.write_results(str(self.name), self.data.test_x_df.reshape(
+        (self.data.test_x_df.shape[0], self.data.sequence_len_minutes, self.data.number_of_features)), self.data.test_y_df, y_pred, self.data.pred_horizon)
 
     def train(self):
         print('SVM: Training..')

@@ -58,6 +58,15 @@ class Metrics:
         f.close()
 
     @staticmethod
+    def write_results_SVR(model, x_test, y_actual, y_pred, horizon):
+        y_actual = y_actual.ravel()
+        # y_pred = y_pred.ravel()
+        f = open(str(model) + ".txt", "a")
+        for idx, value in enumerate(x_test):
+            Metrics.write_to_file(f, value[-1,1], value[-1,2], value[-1,3], value[-1,4], horizon, y_actual[idx], y_pred[idx])
+        f.close()
+
+    @staticmethod
     def write_results(model, x_test, y_actual, y_pred, horizon):
         f = open(str(model) + ".txt", "a")
         for idx, value in enumerate(x_test):
