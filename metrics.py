@@ -49,19 +49,30 @@ class Metrics:
         print(Metrics.mape(y_observed, y_predicted))
 
     @staticmethod
-    def write_results(model, x_test, y_actual, y_pred, horizon):
+    def write_results_NN(model, x_test, y_actual, y_pred, horizon):
+        y_actual = y_actual.ravel()
+        y_pred = y_pred.ravel()
+        f = open(str(model) + ".txt", "a")
         for idx, value in enumerate(x_test):
-            Metrics.write_to_file(model, value[1], value[2], value[3], value[4], horizon, y_actual[idx], y_pred[idx])
+            Metrics.write_to_file(f, value[-1,1], value[-1,2], value[-1,3], value[-1,4], horizon, y_actual[idx], y_pred[idx])
+        f.close()
+
+    @staticmethod
+    def write_results(model, x_test, y_actual, y_pred, horizon):
+        f = open(str(model) + ".txt", "a")
+        for idx, value in enumerate(x_test):
+            Metrics.write_to_file(f, value[1], value[2], value[3], value[4], horizon, y_actual[idx], y_pred[idx])
+        f.close()
 
     @staticmethod
     def write_results_sequence(model, x_test, y_actual, y_pred, horizon):
+        f = open(str(model) + ".txt", "a")
         for idx, value in enumerate(x_test):
-            Metrics.write_to_file(model, value[1], value[2], value[3], value[4], horizon, y_actual[idx], y_pred[idx])
+            Metrics.write_to_file(f, value[1], value[2], value[3], value[4], horizon, y_actual[idx], y_pred[idx])
+        f.close()
 
     @staticmethod
-    def write_to_file(model, month, day, hour, minute, horizon, actual, predicted):
-        f = open(str(model) + ".txt", "a")
+    def write_to_file(f, month, day, hour, minute, horizon, actual, predicted):
         f.write(str(month) + "," + str(day) + "," + str(hour) + "," + str(minute) + "," + str(horizon) + "," + str(actual) + "," + str(predicted))
         f.write('\n')
-        f.close()
 

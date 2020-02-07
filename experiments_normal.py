@@ -74,7 +74,7 @@ def train_ann(prediction_horizon, months = [7,8,9,10,11,12]):
 # run_persistenceB_multi_thread()
 
 data = DataFrameNormal(meteor_data=False, images=False, debug=False)
-data.build_df(9, 18, 1, months=[9, 10, 11, 12])
+data.build_df(8, 19, 1, months=[9, 10, 11, 12])
 data.set_prediction_horizon(20)
 persistence_b = persistence_model.Persistence_predictor_b(data)
 persistence_b.run_experiment()

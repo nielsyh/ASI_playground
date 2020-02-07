@@ -94,7 +94,7 @@ class LSTM_predictor():
 
             self.train(epochs=epochs)
             y_pred, rmse, mae, mape = self.predict()
-            Metrics.write_results(str(self.name), self.data.test_x_df, self.data.test_y_df, y_pred, self.data.pred_horizon)
+            Metrics.write_results_NN(str(self.name), self.data.test_x_df, self.data.test_y_df, y_pred, self.data.pred_horizon)
 
     def save_model(self):
         name = 'LSTM_' + str(self.data.month_split) + '_' + str(self.data.day_split) + '_' + str(self.data.pred_horizon)

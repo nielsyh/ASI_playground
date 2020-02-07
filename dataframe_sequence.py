@@ -5,10 +5,6 @@ from tqdm import tqdm
 import pandas as pd
 from sklearn.preprocessing import normalize
 
-# from models_ts.ann_model import ANN_Predictor
-from models_ts import ann_model, lstm_model
-
-
 class DataFrameSequence:
 
     meteor_data = True

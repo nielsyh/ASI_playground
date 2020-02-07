@@ -1,8 +1,9 @@
-from datetime import time
-
 import matplotlib.pyplot as plt
 import matplotlib.style as style
 from metrics import *
+from datetime import time, timedelta
+import datetime
+import matplotlib.pyplot
 
 style.use('seaborn-poster') #sets the size of the charts
 style.use('ggplot')
@@ -97,6 +98,64 @@ def plot_prediction_per_day(predicts, names, title, yl, xl = 'Days'):
     plt.show()
     plt.close()
 
+def plot_with_times(predicts, times, names, title, yl, xl = 'Days'):
+    ax = plt.axes()
+    ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter('%H:%M'))
+    plt.setp(ax.get_xticklabels(), rotation=45, horizontalalignment='right')
+    for idx, i in enumerate(predicts):
+        if idx == 0:
+            plt.plot_date(times[idx], i, linestyle='-', marker='None', label=names[idx])
+        else:
+            plt.plot_date(times[idx], i, linestyle='dotted',marker='None', label=names[idx])
+
+    plt.legend()
+    plt.title(title)
+    plt.xlabel(xl)
+    plt.ylabel(yl)
+    plt.show()
+    plt.close()
+
+def file_to_dates(file, month, day, offset):
+    predicted, actual = [],[]
+    times = []
+    with open(file) as fp:
+        for line in fp:
+            l = line.split(',')
+            if(float(l[0]) == month):
+                if(float(l[1]) == day):
+
+                    year = 2019
+                    month = int(float(l[0]))
+                    day = int(float(l[1]))
+                    hour = int(float(l[2]))
+                    minute = int(float(l[3]))
+
+                    pred_horizon = int(float(l[4]))
+
+                    if l[5][0] == '[':
+                        true = float(l[5][1:-2])
+                    else:
+                        true = float(l[5])
+                    if l[6][0] == '[':
+                        pred = float(l[6][1:-2])
+                    else:
+                        pred = float(l[6])
+
+
+                    if offset > 0:
+                        a = time(hour=hour, minute=minute, second=0)
+                        b = (datetime.datetime.combine(datetime.date(1, 1, 1), a) + datetime.timedelta(minutes=offset)).time()
+                        a = datetime.datetime(year=2019, month=int(month), day=int(day), hour=b.hour, minute=b.minute)
+                    else:
+                        a = datetime.datetime(year=2019, month=int(month), day=int(day), hour=int(hour), minute=int(minute))
+
+                    a = matplotlib.dates.date2num(a)
+
+                    predicted.append(pred)
+                    actual.append(true)
+                    times.append(a)
+    return predicted, actual, times
+
 def file_to_day_data(file_name, month, day):
     predicted, actual = [],[]
     times = []
@@ -105,6 +164,10 @@ def file_to_day_data(file_name, month, day):
             l = line.split(',')
             if(float(l[0]) == month):
                 if(float(l[1]) == day):
+                    # if (float(l[2]) == 18 and float(l[3]) > 30):
+                    #     print('skip')
+                    #     print(l[3])
+                    #     continue
                     if l[5][0] == '[':
                         l[5] = float(l[5][1:-2])
                     actual.append(float(l[5]))
@@ -114,6 +177,33 @@ def file_to_day_data(file_name, month, day):
 
 
     return predicted, actual
+
+def file_to_day_data2(file_name, month, day):
+    predicted, actual = [],[]
+    times = []
+    with open(file_name) as fp:
+        index = 0
+        for line in fp:
+            if index < 29:
+                index = index +1
+                continue
+            l = line.split(',')
+            if(float(l[0]) == month):
+                if(float(l[1]) == day):
+                    # if (float(l[2]) == 18 and float(l[3]) > 30):
+                    #     print('skip')
+                    #     print(l[3])
+                    #     continue
+                    if l[5][0] == '[':
+                        l[5] = float(l[5][1:-2])
+                    actual.append(float(l[5]))
+                    if l[6][0] == '[':
+                        l[6] = float(l[6][1:-2])
+                    predicted.append(float(l[6]))
+
+
+    return predicted, actual
+
 
 
 
@@ -156,30 +246,24 @@ def file_to_day_error(file_name):  # returns errors per day
 
 
     return total_rmse, total_mae, total_mape
-#
-# d = 11
-# m = 9
-# predicted, actual = file_to_day_data('ANN_BETA_SEQUENCE_2cam_45min.txt', m, d)
-#
-# pred_2, _ = file_to_day_data('results/persistence_b/Persistence_b_horizon_19.txt', m, d)
-#
-# pred3, _ =  file_to_day_data('results/meteor_ghi_norm/SVM predictor_horizon_20_meteor.txt', m, d)
-# # #
-# # # predicted = []
-# names = ['ANN run 2', 'actual', 'Persistence']
-# plot_prediction_per_day([predicted, actual, pred_2], names, 'TITLE', 'xl', 'yl')
-#
-# # #
-# # # total_rmse1, total_mae1, total_mape1 =  file_to_day_error('results/meteor_ghi_norm/SVM predictor_horizon_19_meteor.txt')
-# # total_rmse1, total_mae1, total_mape1 =  file_to_day_error('ANN_BETA_SEQUENCE_2cam_45min.txt')
-# # # total_rmse2, total_mae2, total_mape2 =  file_to_day_error('results/SVM norm_3-10,16/SVM norm_ 3-8, 9,10,16_horizon_19_meteor.txt')
-# # # total_rmse3, total_mae3, total_mape3 =  file_to_day_error('results/persistence_b/Persistence_b_horizon_20__.txt')
-# # # total_rmse4, total_mae4, total_mape4 =  file_to_day_error('results/SVM norm_default_images_meteor/SVM norm_ default + images_horizon_20_images_meteor.txt')
-# # # total_rmse5, total_mae5, total_mape5 =  file_to_day_error('results/ANN_BETA_SEQUENCE_horizon_20_124_dp0.1_256_dp0.1_124meteor.txt')
-# # # total_rmse6, total_mae6, total_mape6 =  file_to_day_error('ANN_BETA_SEQUENCE_4x50.txt')
-# #
-# # #
-# # # total_rmse2 = []
-# # errors = [total_rmse1]#, total_rmse2, total_rmse2, total_rmse3, total_rmse5, total_rmse6]
-# # names = ['ANN 2cam 30min']#},'SVM norm_ 3-8, 9,10,16', 'Persistence b PH5', 'ANN sequence', 'ANN sequence 2']
-# # plot_error_per_month(errors, names, 'Error over days', yl = 'Error in RMSE')
+
+
+def test_plot():
+    m = 10
+    for i in list(range(1, 10)):
+        predicted, actual, times = file_to_dates('Persistence_b_horizon_20.txt', m, i, 0)
+        predicted2, actual2, times2 = file_to_dates('ANN_BETA_SEQUENCE_1CAM_30Minutes_.txt', m, i, 30)
+        predicted22, actual22, times22 = file_to_dates('ANN_BETA_SEQUENCE_2CAM_30Minutes_.txt', m, i, 30)
+
+        predicted4, actual4, times4 = file_to_dates('ANN_BETA_SEQUENCE_1CAM_45Minutes_.txt', m, i, 45)
+        predicted42, actual42, times42 = file_to_dates('ANN_BETA_SEQUENCE_2CAM_45Minutes_.txt', m, i, 45)
+
+        predicted5, actual5, times5 = file_to_dates('ANN_BETA_SEQUENCE_1CAM_60Minutes_.txt', m, i, 60)
+        predicted52, actual52, times52 = file_to_dates('ANN_BETA_SEQUENCE_2CAM_60Minutes_.txt', m, i, 60)
+
+        names = ['Truth', 'Persistence', 'ANN 1 30', 'ANN 2 30', 'ANN 1 45','ANN 2 45', 'ANN 1 60', 'ANN 2 60']
+        plot_with_times([actual2, predicted, predicted2, predicted22, predicted4, predicted42, predicted5, predicted52],
+                        [times2, times, times2, times22, times4,times42, times5, times52],
+                        names, 'GHI forecast ' + str(i) + '/' + str(m), 'GHI in W/m2', xl='Time of day')
+
+# test_plot()
