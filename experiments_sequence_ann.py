@@ -31,8 +31,6 @@ def ann_test():
         (data.test_x_df.shape[0], data.sequence_len_minutes, data.number_of_features)),
                               data.test_y_df, y_pred, data.pred_horizon)
 
-
-
 minutes_sequence = int(sys.argv[1])
 cams = int(sys.argv[2])
 print('Minutes sequence: ' + str(minutes_sequence))
