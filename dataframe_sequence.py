@@ -82,7 +82,8 @@ class DataFrameSequence:
             for d in tqdm(days, total=len(days), unit='Days progress'):
                 # todo add sunrise/sundown for start end hour? half hour?
                 day_data = get_df_csv_day_RP(m, d, start, end+1, 1).astype(int)
-                intensity, cloudpixels, corners, edges = get_features_by_day(m, d, start, end+1)
+                if self.images:
+                    intensity, cloudpixels, corners, edges = get_features_by_day(m, d, start, end+1)
 
                 if cams == 2:
                     day_data_2 = get_df_csv_day_RP(m, d, start, end+1, 1, cam=2).astype(int)

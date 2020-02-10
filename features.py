@@ -42,12 +42,20 @@ def get_features_by_day(month, day, start, end):
 
     for h in tqdm(hours, total=len(hours), unit='Hours progress'):
         for m in minutes:
-            img = get_image_by_date_time(19, month, day, h, m, 0)
-            tmp = extract_features(img)
-            intensity.append(tmp[0])
-            number_of_cloud_pixels.append(tmp[1])
-            harris_corner_detector.append(tmp[2])
-            edge_detector.append((tmp[3]))
+            try:
+                img = get_image_by_date_time(19, month, day, h, m, 0)
+                tmp = extract_features(img)
+                intensity.append(tmp[0])
+                number_of_cloud_pixels.append(tmp[1])
+                harris_corner_detector.append(tmp[2])
+                edge_detector.append((tmp[3]))
+            except:
+                print('CANT FIND IMG')
+                print(month, day, h, m)
+                intensity.append(0)
+                number_of_cloud_pixels.append(0)
+                harris_corner_detector.append(0)
+                edge_detector.append(0)
 
     return intensity, number_of_cloud_pixels, harris_corner_detector,edge_detector
 
