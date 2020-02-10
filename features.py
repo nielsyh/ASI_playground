@@ -4,6 +4,7 @@ from PIL import Image, ImageDraw
 from scipy import ndimage
 import os.path
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 def int_to_str(i):
     s = str(i)
@@ -29,6 +30,26 @@ def get_full_image_by_date_time(month, day, hour, minute, seconds):
                 continue
             else:
                 return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+def get_features_by_day(month, day, start, end):
+    intensity = []
+    number_of_cloud_pixels = []
+    harris_corner_detector = []
+    edge_detector = []
+
+    hours = list(range(start, end))
+    minutes = list(range(0,60))
+
+    for h in tqdm(hours, total=len(hours), unit='Hours progress'):
+        for m in minutes:
+            img = get_image_by_date_time(19, month, day, h, m, 0)
+            tmp = extract_features(img)
+            intensity.append(tmp[0])
+            number_of_cloud_pixels.append(tmp[1])
+            harris_corner_detector.append(tmp[2])
+            edge_detector.append((tmp[3]))
+
+    return intensity, number_of_cloud_pixels, harris_corner_detector,edge_detector
 
 def get_image_by_date_time(year, month, day, hour, minute, seconds):
     if (year == 19):

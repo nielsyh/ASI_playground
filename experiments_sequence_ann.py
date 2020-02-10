@@ -9,12 +9,13 @@ start = 6
 end = 20
 
 def ann_experiment(minutes_sequence, cams):
-    data = DataFrameSequence(False, 20)
+    data = DataFrameSequence(False, 20, True)
     data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], minutes_sequence, cams)
+    data.save_df()
     data.normalize_mega_df()
     name_cam = str(cams) + 'CAM_'
     name_time = str(minutes_sequence) + 'Minutes_'
-    ann = ann_model.ANN(data, init_epochs, epochs, 'ANN_BETA_SEQUENCE_' + name_cam + name_time)
+    ann = ann_model.ANN(data, init_epochs, epochs, 'ANN_BETA_SEQUENCE_IMG' + name_cam + name_time)
     ann.run_experiment()
 
 def ann_test():

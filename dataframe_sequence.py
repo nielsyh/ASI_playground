@@ -4,6 +4,7 @@ import calendar
 from tqdm import tqdm
 import pandas as pd
 from sklearn.preprocessing import normalize
+from features import get_features_by_day
 
 class DataFrameSequence:
 
@@ -27,9 +28,13 @@ class DataFrameSequence:
 
     cams = 1
 
-    def __init__(self, debug, pred_horizon):
+    def __init__(self, debug, pred_horizon, images=False):
         self.debug = debug
         self.pred_horizon = pred_horizon
+        self.images = images
+        if images:
+            self.number_of_features = self.number_of_features + 4
+            print('DF with images')
 
     def build_ts_df(self, start, end, months, lenth_tm, cams):
         self.start = start
@@ -77,6 +82,8 @@ class DataFrameSequence:
             for d in tqdm(days, total=len(days), unit='Days progress'):
                 # todo add sunrise/sundown for start end hour? half hour?
                 day_data = get_df_csv_day_RP(m, d, start, end+1, 1).astype(int)
+                intensity, cloudpixels, corners, edges = get_features_by_day(m, d, start, end+1)
+
                 if cams == 2:
                     day_data_2 = get_df_csv_day_RP(m, d, start, end+1, 1, cam=2).astype(int)
 
@@ -128,8 +135,17 @@ class DataFrameSequence:
                             ts[0:minutes, v] = zenith[i:i + minutes]
                         elif v == 13:
                             ts[0:minutes, v] = sun_earth_dis[i:i + minutes]
-                        elif v > 14:
+                        elif v > 13 and v < 18:
                             ts[0:minutes, v] = [item[v - 14] for item in ephemeris[i:i+minutes]]
+                        elif v == 18:
+                            ts[0:minutes, v] = intensity[i:i + minutes]
+                        elif v == 19:
+                            ts[0:minutes, v] = cloudpixels[i:i + minutes]
+                        elif v == 20:
+                            ts[0:minutes, v] = corners[i:i + minutes]
+                        elif v == 21:
+                            ts[0:minutes, v] = edges[i:i + minutes]
+
 
                         if cams == 2:
                             if v < 9:
@@ -221,6 +237,8 @@ class DataFrameSequence:
         colums_to_normalize = ctn
         if (self.meteor_data):
             colums_to_normalize.extend(metoer_to_normalize)
+        if self.images:
+            colums_to_normalize.extend([18,19,20,21])
         print('Mega normalzing for: ' + str(colums_to_normalize))
 
         shape = self.mega_df_x_1.shape
