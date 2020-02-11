@@ -11,7 +11,7 @@ end = 20
 prediction_horizons = list(range(1, 21))
 
 def LSTM_experiment(minutes_sequence, cams):
-    data = DataFrameSequence(True, 20, False)
+    data = DataFrameSequence(False, 20, False)
     data.build_ts_df(start,end,[7,8,9,10,11,12],minutes_sequence,cams)
     name_cam = str(cams) + 'CAM_'
     name_time = str(minutes_sequence) + 'Minutes_'

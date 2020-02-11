@@ -23,18 +23,29 @@ class DataFrameSequence:
     test_y_df = None
     val_y_df = None
 
-    number_of_features = 18
+    number_of_features = 18-9
+    meteor_features = 9
     sequence_len_minutes = 60
 
     cams = 1
 
-    def __init__(self, debug, pred_horizon, images=False):
+    def __init__(self, debug, pred_horizon, metoer=True, images=False):
         self.debug = debug
         self.pred_horizon = pred_horizon
         self.images = images
+        self.meteor_data = metoer
+        self.index_img = 9
+
+        if metoer:
+            self.number_of_features = self.number_of_features + self.meteor_features
+            self.index_img = 18
+
         if images:
             self.number_of_features = self.number_of_features + 4
             print('DF with images')
+
+        if images and self.cams == 2:
+            raise ValueError('Cams 2 and images not possible')
 
     def build_ts_df(self, start, end, months, lenth_tm, cams):
         self.start = start
@@ -118,9 +129,9 @@ class DataFrameSequence:
                     for v in range(variables):
                         if v < 9:
                             ts[0:minutes, v] = day_data[i:i + minutes, v]
-                        elif v == 9:
+                        elif v == 9 and self.meteor_data:
                             ts[0:minutes, v] = csi[i:i + minutes]
-                        elif v == 10:
+                        elif v == 10 and self.meteor_data:
                             a = day_data[i:i + minutes, 8]
                             b = csi[i:i + minutes]
                             c = []
@@ -130,30 +141,32 @@ class DataFrameSequence:
                                 else:
                                     c.append(x/y)
                             ts[0:minutes, v] = c  # clear sky index
-                        elif v == 11:
+
+                        elif v == 11 and self.meteor_data:
                             ts[0:minutes, v] = azimuth[i:i + minutes]
-                        elif v == 12:
+                        elif v == 12 and self.meteor_data:
                             ts[0:minutes, v] = zenith[i:i + minutes]
-                        elif v == 13:
+                        elif v == 13 and self.meteor_data:
                             ts[0:minutes, v] = sun_earth_dis[i:i + minutes]
                         elif v > 13 and v < 18:
                             ts[0:minutes, v] = [item[v - 14] for item in ephemeris[i:i+minutes]]
-                        elif v == 18:
+
+                        elif v == self.index_img:
                             ts[0:minutes, v] = intensity[i:i + minutes]
-                        elif v == 19:
+                        elif v == self.index_img+1:
                             ts[0:minutes, v] = cloudpixels[i:i + minutes]
-                        elif v == 20:
+                        elif v == self.index_img+2:
                             ts[0:minutes, v] = corners[i:i + minutes]
-                        elif v == 21:
+                        elif v == self.index_img+3:
                             ts[0:minutes, v] = edges[i:i + minutes]
 
 
                         if cams == 2:
                             if v < 9:
                                 ts2[0:minutes, v] = day_data_2[i:i + minutes, v]
-                            elif v == 9:
+                            elif v == 9 and self.meteor_data:
                                 ts2[0:minutes, v] = csi2[i:i + minutes]
-                            elif v == 10:
+                            elif v == 10 and self.meteor_data:
                                 a = day_data_2[i:i + minutes, 8]
                                 b = csi2[i:i + minutes]
                                 c = []
@@ -163,13 +176,13 @@ class DataFrameSequence:
                                     else:
                                         c.append(x/y)
                                 ts2[0:minutes, v] = c  # clear sky index
-                            elif v == 11:
+                            elif v == 11 and self.meteor_data:
                                 ts2[0:minutes, v] = azimuth2[i:i + minutes]
-                            elif v == 12:
+                            elif v == 12 and self.meteor_data:
                                 ts2[0:minutes, v] = zenith2[i:i + minutes]
-                            elif v == 13:
+                            elif v == 13 and self.meteor_data:
                                 ts2[0:minutes, v] = sun_earth_dis2[i:i + minutes]
-                            elif v > 14:
+                            elif v > 14 and self.meteor_data:
                                 ts2[0:minutes, v] = [item[v - 14] for item in ephemeris2[i:i + minutes]]
 
                     self.mega_df_x_1[day_index, i] = ts
