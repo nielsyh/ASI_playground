@@ -42,6 +42,19 @@ def plot_time_avg(tick_times, times, values, values_label, lx, ly, title, values
 
     plt.show()
 
+def plot_time_avg_multi(tick_times, times, values, values_label, lx, ly, title):
+    plt.xticks(tick_times)
+    plt.xticks(rotation=45)
+
+    for idx, val in enumerate(values):
+        plt.plot(times[idx], val, linestyle='-', label=values_label[idx])
+
+    plt.legend()
+    plt.title(title)
+    plt.xlabel(lx)
+    plt.ylabel(ly)
+
+    plt.show()
 
 def plot_2_models(tick_times, times, values_m1, values_m2, lx, ly, title):
 

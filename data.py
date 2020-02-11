@@ -1,13 +1,15 @@
+import datetime
 import ftplib
+import matplotlib
 from builtins import enumerate
 import os
 
 import pandas as pd
 import numpy as np
-import time
+from datetime import time
 from os import listdir, path
 import cv2
-from data_visuals import plot_time_avg, plot_freq, plot_2_models
+from data_visuals import plot_time_avg, plot_freq, plot_2_models, plot_time_avg_multi
 from metrics import Metrics
 from pvlib_playground import PvLibPlayground
 from features import get_image_by_date_time, int_to_str, extract_features, show_img
@@ -330,32 +332,63 @@ def get_df_csv_day_RP(month, day, start, end,
         print(file_name)
         return None
 
-def plot_per_month(month, start, end, step):
-    df = get_df_csv_month(month, start, end, step)
-    hours = list(range(start, end))
-    hours = list(range(start, end))
-    minutes = list(range(0, 60, step))
-    times, avg_temp, var_temp, avg_ghi, var_ghi, var_ghi, tick_times = ([] for i in range(7))
+def plot_per_month(start, end, step):
+    times0, avg_temp0, var_temp0, avg_ghi0, var_ghi0, var_ghi0, avg_hum0, var_hum0, tick_times0 = ([] for i in range(9))
 
-    for h in hours:
-        tick_times.append(time(h, 0, 0))  # round hours
-        tick_times.append(time(h, 30, 0))  # half hours
-        for m in minutes:
-            tmp_avg, tmp_var = get_avg_var_by_minute(df, h, m)
-            tmp_time = time(h, m, 0)
-            times.append(tmp_time)
-            avg_temp.append(tmp_avg[0])
-            var_temp.append(tmp_var[0])
-            # todo tmp[1] = humidity
-            avg_ghi.append(tmp_avg[2])
-            var_ghi.append(tmp_var[2])
+    months = [8,9,10,11,12]
+    for mon in months:
+        df = get_df_csv_month(mon, start, end, step)
+        hours = list(range(start, end))
+        minutes = list(range(0, 60, step))
+        times, avg_temp, var_temp, avg_ghi, var_ghi, var_ghi, avg_hum, var_hum, tick_times = ([] for i in range(9))
+
+        for h in hours:
+            tick_times.append(time(h, 0, 0))  # round hours
+            tick_times.append(time(h, 30, 0))  # half hours
+            for m in minutes:
+                tmp_avg, tmp_var = get_avg_var_by_minute(df, h, m)
+
+                # a = datetime.datetime(year=2019, month=int(m), hour=h, minute=m)
+                # a = matplotlib.dates.date2num(a)
+                # times.append(a)
+                tmp_time = time(h, m, 0)
+                times.append(tmp_time)
+
+                avg_temp.append(tmp_avg[0])
+                var_temp.append(tmp_var[0])
+
+                avg_hum.append(tmp_avg[1])
+                var_hum.append(tmp_var[1])
+
+                avg_ghi.append(tmp_avg[2])
+                var_ghi.append(tmp_var[2])
+
+        times0.append(times)
+        tick_times0.append(tick_times)
+
+        avg_temp0.append(avg_temp)
+        var_temp0.append(var_temp)
+
+        avg_ghi0.append(avg_ghi)
+        var_ghi0.append(var_ghi)
+
+        avg_hum0.append(avg_hum)
+        var_hum0.append(var_hum)
+
+
+        #avg_temp0, var_temp0, avg_ghi0, var_ghi0, var_ghi0, avg_hum0, var_hum0, tick_times0
+
+    labels = ['August', 'September', 'October', 'November', 'December']
+
     # plot data
-    plot_time_avg(tick_times, times, avg_temp, 'time', 'Temp. in celsius', 'avg. Temp. in month ' + str(month))
-    plot_time_avg(tick_times, times, var_temp, 'time', 'Variance temp.', 'var. Temp. in month ' + str(month))
-    plot_time_avg(tick_times, times, avg_ghi, 'time', 'GHI in W/m^2', 'avg. GHI in month ' + str(month))
-    plot_time_avg(tick_times, times, var_ghi, 'time', 'Varian'
-                                                      'ce GHI', 'var. GHI in month ' + str(month))
+    plot_time_avg_multi(tick_times0[0], times0, avg_temp0, labels, 'time', 'Temp. in Celsius', 'avg. Temp. in months')
+    plot_time_avg_multi(tick_times0[0], times0, var_temp0, labels,  'time', 'Variance temp. Celsius.', 'var. Temp. in months')
 
+    plot_time_avg_multi(tick_times0[0], times0, avg_ghi0, labels, 'time', 'GHI in W/m^2', 'avg. GHI in months')
+    plot_time_avg_multi(tick_times0[0], times0, var_ghi0, labels, 'time', 'Variance GHI', 'var. GHI in months')
+
+    plot_time_avg_multi(tick_times0[0], times0, avg_hum0, labels,  'time', 'Humidity', 'avg. Humidity in months')
+    plot_time_avg_multi(tick_times0[0], times0, var_hum0, labels,  'time', 'Variance Humidity', 'var. Humidity in months')
 
 def plot_day(day, month, start, end, step):
     df = get_df_csv_day_RP(month, day, start, end, step)
