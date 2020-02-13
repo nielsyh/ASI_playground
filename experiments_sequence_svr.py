@@ -4,9 +4,11 @@ from models_ts import svr_model
 import threading
 import sys
 
+
 start = 6
 end = 20
 prediction_horizons = list(range(1, 21))
+
 
 def SVR_experiment_thread(prediction_horizon, minutes_sequence, cams):
     print('start SVR: ' + str(prediction_horizon))
@@ -36,9 +38,18 @@ def run_svm_multi_thread(minutes_sequence, cams):
         x = threading.Thread(target=SVR_experiment_thread, args=(i,minutes_sequence,cams))
         x.start()
 
-minutes_sequence = int(sys.argv[1])
-cams = int(sys.argv[2])
-print('Minutes sequence: ' + str(minutes_sequence))
-print('Cams: ' + str(cams))
-# SVR_test(
-run_svm_multi_thread(minutes_sequence, cams)
+def optimize():
+    data = DataFrameSequence(False, 20, True, False)
+    data.build_ts_df(6, 18, [7,8,9,10,11,12], 60, 1)
+    data.normalize_mega_df()
+    data.split_data_set(12, 1)
+    data.flatten_data_set()
+    svr = svr_model.SVM_predictor(data, 'SVR optimze')
+    svr.optimize()
+
+# minutes_sequence = int(sys.argv[1])
+# cams = int(sys.argv[2])
+# print('Minutes sequence: ' + str(minutes_sequence))
+# print('Cams: ' + str(cams))
+# run_svm_multi_thread(minutes_sequence, cams)
+optimize()

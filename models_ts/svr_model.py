@@ -3,6 +3,7 @@ from dataframe_sequence import DataFrameSequence
 from metrics import Metrics
 import pickle
 import calendar
+from sklearn.model_selection import GridSearchCV
 
 
 class SVM_predictor:
@@ -56,6 +57,21 @@ class SVM_predictor:
         rmse, mae, mape = Metrics.get_error(self.data.test_y_df, y_pred)
         print(rmse)
         return y_pred, rmse, mae, mape
+
+    def optimize(self):
+        # defining parameter range
+        param_grid = {'C': [0.1, 1, 10, 100, 1000],
+                      'gamma': [1, 0.1, 0.01, 0.001, 0.0001],
+                      'kernel': ['rbf']}
+
+        grid = GridSearchCV(SVC(), param_grid, refit=True, verbose=3)
+        # fitting the model for grid search
+        grid.fit(self.data.train_x_df, self.data.train_y_df)
+
+        # print best parameter after tuning
+        print(grid.best_params_)
+        # print how our model looks after hyper-parameter tuning
+        print(grid.best_estimator_)
 
     def save(self, name):
         with open(name, 'wb') as file:

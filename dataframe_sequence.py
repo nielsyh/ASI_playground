@@ -23,7 +23,7 @@ class DataFrameSequence:
     test_y_df = None
     val_y_df = None
 
-    number_of_features = 18-9
+    number_of_features = 9
     meteor_features = 9
     sequence_len_minutes = 60
 
