@@ -67,6 +67,9 @@ class ANN():
         return self.history
 
     def plot_history(self, settings, num):
+        axes = plt.gca()
+        # axes.set_xlim([xmin, xmax])
+        axes.set_ylim([0, 100000])
         plt.plot(self.history.history['loss'])
         plt.plot(self.history.history['val_loss'])
         plt.title('model loss ' + str(settings))

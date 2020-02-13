@@ -42,15 +42,13 @@ def optimize():
     data = DataFrameSequence(False, 20, True, False)
     data.build_ts_df(6, 18, [7,8,9,10,11,12], 60, 1)
     data.normalize_mega_df()
-    data.split_data_set(12, 1)
+    data.split_data_set(11,15)
     data.flatten_data_set()
 
-    # nodes = [(32,64,32),(64, 128, 64), (128, 256, 128)]
-    nodes = [(64, 128, 64), (128, 256, 128)]
-    # activations = ['relu', 'sigmoid']
-    activations = ['relu']
+    nodes = [(32,64,32),(64, 128, 64), (128, 256, 128)]
+    activations = ['relu', 'sigmoid']
     opts = ['Adam', 'RMSprop']
-    drop_out = [0.1, 0]
+    drop_out = [0, 0.1, 0.5]
     learning_rate = [0.001, 0.01, 0.1]
 
     ann = ann_model.ANN(data, 3, 3, 'ANN_BETA_SEQUENCE_TEST')
@@ -67,8 +65,7 @@ def optimize():
                             opt = optimizers.RMSprop(lr=lr)
 
                         ann.set_model(n, a, opt, d)
-                        out = ann.train(40)
-                        print(out)
+                        out = ann.train(10)
                         res.append(out)
                         settings = 'nodes: ' + str(n) + ' activation: ' + str(a) + ' optimizer: ' + str(o) + ' dropout: ' + str(d) + ' lr: ' + str(lr)
                         sets.append(settings)
@@ -79,18 +76,25 @@ def optimize():
 
     best_val_loss = min_vals.index(min(min_vals))
     print('BEST VAL LOSS: ')
-    print(settings[best_val_loss])
+    print(sets[best_val_loss])
+    print('val loss: ' + str(min(min_vals)))
+    print('epoch: ')
+    print(res[best_val_loss].history['val_loss'].index(min(res[best_val_loss].history['val_loss'])))
 
-    best_loss = min_vals.index(min(min_loss))
-    print('BEST LOSS: ')
-    print(settings[best_loss])
+    best_loss = min_loss.index(min(min_loss))
+    print('BEST Train LOSS: ')
+    print(sets[best_loss])
+    print('train loss: ' + str(min(min_loss)))
+    print('epoch: ')
+    print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
 
 
-minutes_sequence = int(sys.argv[1])
-cams = int(sys.argv[2])
-print('Minutes sequence: ' + str(minutes_sequence))
-print('Cams: ' + str(cams))
-ann_experiment(minutes_sequence, cams)
-# # ann_test()
+# minutes_sequence = int(sys.argv[1])
+# cams = int(sys.argv[2])
+# print('Minutes sequence: ' + str(minutes_sequence))
+# print('Cams: ' + str(cams))
+# ann_experiment(minutes_sequence, cams)
+# ann_test()
+optimize()
 
 
