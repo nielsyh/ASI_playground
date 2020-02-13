@@ -32,7 +32,7 @@ def LSTM_test():
 
 def SVR_experiment_thread(prediction_horizon, minutes_sequence, cams):
     print('start SVR: ' + str(prediction_horizon))
-    data = DataFrameSequence(False,prediction_horizon)
+    data = DataFrameSequence(False,prediction_horizon, True, False)
     data.build_ts_df(start,end,[7,8,9,10,11,12],minutes_sequence,cams)
     data.normalize_mega_df()
     name_cam = str(cams) + 'CAM_'
@@ -42,7 +42,7 @@ def SVR_experiment_thread(prediction_horizon, minutes_sequence, cams):
     print('Finish SVR: ' + str(prediction_horizon))
 
 def SVR_test():
-    data = DataFrameSequence(True, 20)
+    data = DataFrameSequence(True, 20, True, False)
     data.build_ts_df(start, end, [9], 60, 1)
     svr = svr_model.SVM_predictor(data, 'SVR SEQ TEST')
     data.normalize_mega_df()
