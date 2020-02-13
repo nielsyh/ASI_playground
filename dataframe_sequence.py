@@ -29,7 +29,7 @@ class DataFrameSequence:
 
     cams = 1
 
-    def __init__(self, debug, pred_horizon, metoer=True, images=False):
+    def __init__(self, debug, pred_horizon, metoer, images):
         self.debug = debug
         self.pred_horizon = pred_horizon
         self.images = images
@@ -298,8 +298,8 @@ class DataFrameSequence:
 
 
     def load_prev_mega_df(self):  # todo get data from df
-        self.start = 8
-        self.end = 19
+        self.start = 6
+        self.end = 20
         self.step = 1
         self.months = [7,8,9,10,11,12]
         # self.queries_per_day = int(((self.end - self.start) * 60 / self.step))  # amount of data in one day

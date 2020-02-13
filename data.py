@@ -332,6 +332,12 @@ def get_df_csv_day_RP(month, day, start, end,
         print(file_name)
         return None
 
+def plot_metoer_per_month(start, end , step):
+    months = [8,9]
+
+    for mon in months:
+        df = PvLibPlayground.get_meteor_data()
+
 def plot_per_month(start, end, step):
     times0, avg_temp0, var_temp0, avg_ghi0, var_ghi0, var_ghi0, avg_hum0, var_hum0, tick_times0 = ([] for i in range(9))
 
@@ -348,9 +354,6 @@ def plot_per_month(start, end, step):
             for m in minutes:
                 tmp_avg, tmp_var = get_avg_var_by_minute(df, h, m)
 
-                # a = datetime.datetime(year=2019, month=int(m), hour=h, minute=m)
-                # a = matplotlib.dates.date2num(a)
-                # times.append(a)
                 tmp_time = time(h, m, 0)
                 times.append(tmp_time)
 
@@ -430,8 +433,16 @@ def plot_day(day, month, start, end, step):
 def plot_persistence_day(day, month, start, end, step):
 
     df_truth = get_df_csv_day_RP(month, day, start, end, step)
-    previous_day = '0' + str(int(day) - 1)  # cao ni mam fix this
-    df_pred = get_df_csv_day_RP(month, get_prev_day(day), start, end, step)
+    df_pred = get_df_csv_day_RP(month, day, start-1, end, step)
+    copy = df_pred.copy()
+
+    for i in range(0, len(df_pred)):
+        if i < 20:
+            continue
+        else:
+            df_pred[i][8] = copy[i - 20][8]
+
+    df_pred = df_pred[60:]
 
     hours = list(range(start, end))
     minutes = list(range(0, 60, step))
@@ -461,40 +472,22 @@ def get_error_month(month, start, end, step):
     y_observed = []
     y_predicted = []
 
-    for i in range(2, 30):
+    for i in range(1, 30):
+        df_truth = get_df_csv_day_RP(month, i, start, end, step)
+        df_pred = get_df_csv_day_RP(month, i, start - 1, end, step)
+        copy = df_pred.copy()
 
-        day = str(i)
-        if len(day) == 1:
-            day = '0' + day
+        for i in range(0, len(df_pred)):
+            if i < 20:
+                continue
+            else:
+                df_pred[i][8] = copy[i - 20][8]
 
-        df_truth = get_df_csv_day_RP(month, day, start, end, step)
-        df_pred = get_df_csv_day_RP(month, get_prev_day(day), start, end, step)  # todo include prev month
+        df_pred = df_pred[60:]
 
-        hours = list(range(start, end))
-        minutes = list(range(0, 60, step))
-        times, ghi_pred, ghi_truth, tick_times = ([] for i in range(4))
-
-        for h in hours:
-            tick_times.append(time(h, 0, 0))  # round hours
-            tick_times.append(time(h, 30, 0))  # half hours
-            for m in minutes:
-                rows_truth = get_ghi_temp_by_minute(df_truth, h, m)
-                rows_pred = get_ghi_temp_by_minute(df_pred, h, m)
-                tmp_time = time(h, m, 0)
-
-                # sometimes data is missing then skip.
-                if (len(rows_truth) > 0 and len(rows_pred) > 0):
-                    ghi_truth_tmp = rows_truth[0][7]
-                    ghi_pred_tmp = rows_pred[0][7]
-                    times.append(tmp_time)
-                    ghi_truth.append(ghi_truth_tmp)
-                    ghi_pred.append(ghi_pred_tmp)
-
-        y_observed.append(ghi_truth)
-        y_predicted.append(ghi_pred)
-
-    y_observed = flatten(y_observed)
-    y_predicted = flatten(y_predicted)
+        for idx, val in enumerate(df_truth):
+            y_observed.append(val[8])
+            y_predicted.append(df_pred[idx][8])
 
     print('RMSE')
     print(Metrics.rmse(y_observed, y_predicted))

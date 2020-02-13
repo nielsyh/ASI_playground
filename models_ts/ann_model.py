@@ -10,6 +10,7 @@ from keras.models import load_model
 import calendar
 
 
+
 class TestCallback(Callback):
     def __init__(self, xtest, ytest):
         self.xtest = xtest
@@ -32,6 +33,24 @@ class ANN():
         self.epochs = epochs
         self.name = name
 
+    def set_model(self, nodes, activation, opt, drop_out):
+        model = keras.models.Sequential()
+        model.add(Dense(nodes[0], input_dim=(self.data.train_x_df.shape[1]), kernel_initializer='normal', activation='relu'))
+
+        if drop_out > 0:
+            model.add(Dropout(drop_out))
+
+        model.add(Dense(nodes[1], activation=activation))
+
+        if drop_out > 0:
+            model.add(Dropout(drop_out))
+
+        model.add(Dense(nodes[2], activation=activation))
+        model.add(Dense(1, activation=activation))
+        # opt = optimizers.Adam()
+        model.compile(loss='mean_squared_error', optimizer=opt)
+        self.model = model
+
     def get_model(self):
         model = keras.models.Sequential()
         model.add(Dense(124, input_dim=(self.data.train_x_df.shape[1]), kernel_initializer='normal', activation='relu'))
@@ -45,15 +64,18 @@ class ANN():
     def train(self,epochs=50, batch_size=128):
         self.history = self.model.fit(self.data.train_x_df, self.data.train_y_df, epochs=epochs, batch_size=batch_size, validation_data=(self.data.val_x_df, self.data.val_y_df),
                        callbacks=[TestCallback(self.data.test_x_df, self.data.test_y_df)])
+        return self.history
 
-    def plot_history(self):
+    def plot_history(self, settings):
         plt.plot(self.history.history['loss'])
         plt.plot(self.history.history['val_loss'])
-        plt.title('model loss')
+        plt.title('model loss ' + str(settings))
         plt.ylabel('loss')
         plt.xlabel('epoch')
-        plt.legend(['train', 'test'], loc='upper left')
+        plt.legend(['train', 'validation'], loc='upper left')
         plt.show()
+        # plt.savefig(str(settings) + '.png')
+
 
     def predict(self):
         y_pred =  self.model.predict(self.data.test_x_df)
