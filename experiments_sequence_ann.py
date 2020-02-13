@@ -4,8 +4,8 @@ from models_ts import ann_model, lstm_model
 import sys
 from keras import optimizers
 
-init_epochs = 200
-epochs = 50
+init_epochs = 50
+epochs = 10
 start = 6
 end = 20
 
@@ -15,9 +15,9 @@ min_vals = []
 min_loss = []
 
 def ann_experiment(minutes_sequence, cams):
-    data = DataFrameSequence(False, 20,True, True)
+    data = DataFrameSequence(False, 20,True, False)
     data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], minutes_sequence, cams)
-    data.load_prev_mega_df()
+    # data.load_prev_mega_df()
     data.normalize_mega_df()
     name_cam = str(cams) + 'CAM_'
     name_time = str(minutes_sequence) + 'Minutes_'
@@ -77,11 +77,11 @@ def optimize():
                         min_vals.append(min(out.history['val_loss']))
 
 
-# minutes_sequence = int(sys.argv[1])
-# cams = int(sys.argv[2])
-# print('Minutes sequence: ' + str(minutes_sequence))
-# print('Cams: ' + str(cams))
-# ann_experiment(minutes_sequence, cams)
+minutes_sequence = int(sys.argv[1])
+cams = int(sys.argv[2])
+print('Minutes sequence: ' + str(minutes_sequence))
+print('Cams: ' + str(cams))
+ann_experiment(minutes_sequence, cams)
 # # ann_test()
 
 

@@ -37,7 +37,7 @@ def SVR_experiment_thread(prediction_horizon, minutes_sequence, cams):
     data.normalize_mega_df()
     name_cam = str(cams) + 'CAM_'
     name_time = str(minutes_sequence) + 'Minutes_'
-    svr = svr_model.SVM_predictor(data, 'SVR SEQUENCE_' + str(name_cam) + str(name_time) + '_pred_hor_' + str(prediction_horizon))
+    svr = svr_model.SVM_predictor(data, 'SVR SEQUENCE PREM_' + str(name_cam) + str(name_time) + '_pred_hor_' + str(prediction_horizon))
     svr.run_experiment()
     print('Finish SVR: ' + str(prediction_horizon))
 
@@ -62,5 +62,6 @@ minutes_sequence = int(sys.argv[1])
 cams = int(sys.argv[2])
 print('Minutes sequence: ' + str(minutes_sequence))
 print('Cams: ' + str(cams))
-LSTM_experiment(minutes_sequence, cams)
-# SVR_test()
+# LSTM_experiment(minutes_sequence, cams)
+# SVR_test(
+run_svm_multi_thread()

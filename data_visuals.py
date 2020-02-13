@@ -221,22 +221,22 @@ def file_to_months(file, offset):
 def days_plot():
     m = 10
     for i in list(range(1, 10)):
-        predicted, actual, times = file_to_dates('Persistence_b_horizon_20.txt', m, i, 0)
-        predicted2, actual2, times2 = file_to_dates('ANN_BETA_SEQUENCE_1CAM_30Minutes_.txt', m, i, 30)
-        predicted22, actual22, times22 = file_to_dates('ANN_BETA_SEQUENCE_2CAM_30Minutes_.txt', m, i, 30)
+        predicted, actual, times = file_to_dates('results/Persistence_b_horizon_20.txt', m, i, 0)
+        predicted2, actual2, times2 = file_to_dates('results/ANN_BETA_SEQUENCE_1CAM_30Minutes_.txt', m, i, 30)
+        # predicted22, actual22, times22 = file_to_dates('results/ANN_BETA_SEQUENCE_2CAM_30Minutes_.txt', m, i, 30)
 
-        predicted4, actual4, times4 = file_to_dates('ANN_BETA_SEQUENCE_1CAM_45Minutes_.txt', m, i, 45)
-        predicted42, actual42, times42 = file_to_dates('ANN_BETA_SEQUENCE_2CAM_45Minutes_.txt', m, i, 45)
+        predicted4, actual4, times4 = file_to_dates('results/ANN_BETA_SEQUENCE_1CAM_45Minutes_.txt', m, i, 45)
+        # predicted42, actual42, times42 = file_to_dates('results/ANN_BETA_SEQUENCE_2CAM_45Minutes_.txt', m, i, 45)
 
-        predicted5, actual5, times5 = file_to_dates('ANN_BETA_SEQUENCE_1CAM_60Minutes_.txt', m, i, 60)
-        predicted52, actual52, times52 = file_to_dates('ANN_BETA_SEQUENCE_2CAM_60Minutes_.txt', m, i, 60)
+        predicted5, actual5, times5 = file_to_dates('results/ANN_BETA_SEQUENCE_1CAM_60Minutes_.txt', m, i, 60)
+        predicted52, actual52, times52 = file_to_dates('results/ANN_BETA_SEQUENCE_2CAM_60Minutes_.txt', m, i, 60)
 
-        predicted6, actual6, times6 = file_to_dates('ANN_BETA_SEQUENCE_IMG1CAM_60Minutes_.txt', m, i, 0)
+        # predicted6, actual6, times6 = file_to_dates('results/ANN_BETA_SEQUENCE_IMG1CAM_60Minutes_.txt', m, i, 0)
 
 
         names = ['Truth', 'Persistence', 'ANN 1 30', 'ANN 2 30', 'ANN 1 45','ANN 2 45', 'ANN 1 60', 'ANN 2 60', 'ANN 60 img']
-        plot_with_times([actual2, predicted, predicted2, predicted22, predicted4, predicted42, predicted5, predicted52, predicted6],
-                        [times2, times, times2, times22, times4,times42, times5, times52, times6],
+        plot_with_times([actual2, predicted, predicted2, predicted4, predicted5, predicted52],
+                        [times2, times, times2, times4, times5, times52 ],
                         names, 'GHI forecast ' + str(i) + '/' + str(m), 'GHI in W/m2', xl='Time of day')
 
 def file_to_day_error(file_name):  # returns errors per day
@@ -279,7 +279,6 @@ def file_to_day_error(file_name):  # returns errors per day
             y_pred.append(float(l[6]))
 
     return times, total_rmse, total_mae, total_mape
-
 
 
 def plot_months_error_day():

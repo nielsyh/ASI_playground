@@ -28,8 +28,8 @@ class SVM_predictor:
             for d in days:
                 self.day_month_to_predict.append((m, d))
 
-
-        # self.day_month_to_predict = [(9,11)]
+        prem = [(10,5), (10,6), (10,7), (10,8), (10,20)]
+        self.day_month_to_predict = prem
 
         for exp in self.day_month_to_predict:
             print('SVM: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
@@ -39,7 +39,10 @@ class SVM_predictor:
             y_pred, rmse, mae, mape = self.predict()
 
             Metrics.write_results(str(self.name), self.data.test_x_df.reshape(
-        (self.data.test_x_df.shape[0], self.data.sequence_len_minutes, self.data.number_of_features)), self.data.test_y_df, y_pred, self.data.pred_horizon)
+                (self.data.test_x_df.shape[0],
+                 self.data.sequence_len_minutes,
+                 self.data.number_of_features)),
+                                  self.data.test_y_df, y_pred, self.data.pred_horizon)
 
     def train(self):
         print('SVM: Training..')

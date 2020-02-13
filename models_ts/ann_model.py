@@ -97,8 +97,8 @@ class ANN():
             for d in days:
                 self.day_month_to_predict.append((m, d))
 
-        # self.day_month_to_predict = [(12,10), (12,20), (12,25)]
-        # self.day_month_to_predict = [(9, 15)]
+        prem = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
+        self.day_month_to_predict = prem
 
         for exp in self.day_month_to_predict:
             print('ANN SEQUENCE: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
