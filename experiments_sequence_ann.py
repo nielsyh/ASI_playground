@@ -54,7 +54,7 @@ def optimize():
     learning_rate = [0.001, 0.01, 0.1]
 
     ann = ann_model.ANN(data, 3, 3, 'ANN_BETA_SEQUENCE_TEST')
-
+    num = 0
     for n in nodes:
         for a in activations:
             for o in opts:
@@ -72,9 +72,18 @@ def optimize():
                         res.append(out)
                         settings = 'nodes: ' + str(n) + ' activation: ' + str(a) + ' optimizer: ' + str(o) + ' dropout: ' + str(d) + ' lr: ' + str(lr)
                         sets.append(settings)
-                        ann.plot_history(settings)
+                        ann.plot_history(settings, num)
                         min_loss.append(min(out.history['loss']))
                         min_vals.append(min(out.history['val_loss']))
+                        num = num + 1
+
+    best_val_loss = min_vals.index(min(min_vals))
+    print('BEST VAL LOSS: ')
+    print(settings[best_val_loss])
+
+    best_loss = min_vals.index(min(min_loss))
+    print('BEST LOSS: ')
+    print(settings[best_loss])
 
 
 minutes_sequence = int(sys.argv[1])

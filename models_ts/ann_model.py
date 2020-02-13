@@ -66,7 +66,7 @@ class ANN():
                        callbacks=[TestCallback(self.data.test_x_df, self.data.test_y_df)])
         return self.history
 
-    def plot_history(self, settings):
+    def plot_history(self, settings, num):
         plt.plot(self.history.history['loss'])
         plt.plot(self.history.history['val_loss'])
         plt.title('model loss ' + str(settings))
@@ -74,7 +74,7 @@ class ANN():
         plt.xlabel('epoch')
         plt.legend(['train', 'validation'], loc='upper left')
         plt.show()
-        # plt.savefig(str(settings) + '.png')
+        plt.savefig(str(num) + '.png')
 
 
     def predict(self):
