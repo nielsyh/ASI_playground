@@ -12,3 +12,4 @@ plots/*
 results/*
 *.txt
 *.npy
+search_grid/*

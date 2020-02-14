@@ -1,11 +1,12 @@
 from dataframe_sequence import DataFrameSequence
 from metrics import Metrics
-from models_ts import ann_model, lstm_model
+from models_ts import ann_model
 import sys
 from keras import optimizers
+import threading
 
-init_epochs = 50
-epochs = 10
+init_epochs = 40
+epochs = 40
 start = 6
 end = 20
 
@@ -13,30 +14,42 @@ res = []
 sets = []
 min_vals = []
 min_loss = []
+prediction_horizons = list(range(1, 21))
 
-def ann_experiment(minutes_sequence, cams):
+#BONUSSES/TODO
+#forecast metoeor data
+#data 24 hours ago
+#
+
+def run_ann_multi_thread(minutes_sequence, cams):
+    for i in prediction_horizons:
+        x = threading.Thread(target=ann_experiment, args=(i,minutes_sequence,cams))
+        x.start()
+
+def ann_experiment(prediction_horizon, minutes_sequence, cams):
     data = DataFrameSequence(False, 20,True, False)
     data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], minutes_sequence, cams)
     # data.load_prev_mega_df()
     data.normalize_mega_df()
     name_cam = str(cams) + 'CAM_'
     name_time = str(minutes_sequence) + 'Minutes_'
-    ann = ann_model.ANN(data, init_epochs, epochs, 'ANN_BETA_SEQUENCE_IMG' + name_cam + name_time)
+    ann = ann_model.ANN(data, init_epochs, epochs, 'ANN_BETA_SEQUENCE_IMG_40EPOCH' + name_cam + name_time)
     ann.run_experiment()
 
 def ann_test():
-    data = DataFrameSequence(True, 20, True, False)
-    data.build_ts_df(5, 10, [9], 60, 1)
+    data = DataFrameSequence(False, 20, True, False)
+    data.build_ts_df(5, 20, [7,8,9], 100, 1)
     data.normalize_mega_df()
     ann = ann_model.ANN(data, 3, 3, 'ANN_BETA_SEQUENCE_TEST')
-    data.split_data_set(9, 27)
+    data.split_data_set(9, 20)
     data.flatten_data_set()
     ann.get_model()
-    ann.train(3)
+    ann.train(100)
+    ann.plot_history('s1',1)
     y_pred, rmse, mae, mape = ann.predict()
-    Metrics.write_results_NN('ANN_TEST', data.test_x_df.reshape(
-        (data.test_x_df.shape[0], data.sequence_len_minutes, data.number_of_features)),
-                              data.test_y_df, y_pred, data.pred_horizon)
+    # Metrics.write_results_NN('ANN_TEST', data.test_x_df.reshape(
+    #     (data.test_x_df.shape[0], data.sequence_len_minutes, data.number_of_features)),
+    #                           data.test_y_df, y_pred, data.pred_horizon)
 
 def optimize():
     data = DataFrameSequence(False, 20, True, False)
@@ -89,12 +102,12 @@ def optimize():
     print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
 
 
-# minutes_sequence = int(sys.argv[1])
-# cams = int(sys.argv[2])
-# print('Minutes sequence: ' + str(minutes_sequence))
-# print('Cams: ' + str(cams))
-# ann_experiment(minutes_sequence, cams)
+minutes_sequence = int(sys.argv[1])
+cams = int(sys.argv[2])
+print('Minutes sequence: ' + str(minutes_sequence))
+print('Cams: ' + str(cams))
+ann_experiment(minutes_sequence, cams)
 # ann_test()
-optimize()
+# optimize()
 
 

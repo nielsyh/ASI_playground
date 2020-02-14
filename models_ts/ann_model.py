@@ -57,7 +57,7 @@ class ANN():
         model.add(Dense(256, activation='relu', kernel_regularizer=l2(0.01), bias_regularizer=l2(0.01)))
         model.add(Dense(124, activation='relu', kernel_regularizer=l2(0.01), bias_regularizer=l2(0.01)))
         model.add(Dense(1, activation='relu'))
-        opt = optimizers.Adam()
+        opt = optimizers.Adam(lr=0.001)
         model.compile(loss='mean_squared_error', optimizer=opt)
         self.model = model
 
