@@ -282,11 +282,11 @@ def file_to_day_error(file_name):  # returns errors per day
 
 
 def plot_months_error_day():
-    times, rmse, _, _ = file_to_day_error('ANN_BETA_SEQUENCE_1CAM_150Minutes_.txt')
-    times1, rmse1, _, _ = file_to_day_error('Persistence_b_horizon_20.txt')
-    times2, rmse2, _, _ = file_to_day_error('ANN_BETA_SEQUENCE_1CAM_60Minutes_.txt')
+    times, rmse, _, _ = file_to_day_error('SVR SEQUENCE PREM_1CAM_60Minutes__pred_hor_20.txt')
+    times1, rmse1, _, _ = file_to_day_error('results/Persistence_b_horizon_20.txt')
+    times2, rmse2, _, _ = file_to_day_error('results/ANN_BETA_SEQUENCE_1CAM_60Minutes_.txt')
 
-    names = ['Persistence', 'ANN 150', 'ANN 60']
+    names = ['Persistence', 'SVR', 'ANN 60']
     plot_with_months([rmse1, rmse, rmse2], [times1, times, times2],names, 'title', 'yl')
 
 # test_plot()
