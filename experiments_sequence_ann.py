@@ -29,11 +29,10 @@ def run_ann_multi_thread(minutes_sequence, cams):
 def ann_experiment(prediction_horizon, minutes_sequence, cams):
     data = DataFrameSequence(False, 20,True, False)
     data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], minutes_sequence, cams)
-    # data.load_prev_mega_df()
     data.normalize_mega_df()
     name_cam = str(cams) + 'CAM_'
     name_time = str(minutes_sequence) + 'Minutes_'
-    ann = ann_model.ANN(data, init_epochs, epochs, 'ANN_BETA_SEQUENCE_IMG_40EPOCH' + name_cam + name_time)
+    ann = ann_model.ANN(data, init_epochs, epochs, 'ANN_SEQUENCE_40epoch_pred' + str(prediction_horizon) + '_' + name_cam + name_time)
     ann.run_experiment()
 
 def ann_test():

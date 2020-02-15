@@ -99,7 +99,7 @@ class DataFrameSequence:
                 if cams == 2:
                     day_data_2 = get_df_csv_day_RP(m, d, start, end+1, 1, cam=2).astype(int)
 
-                if self.meteor_data:
+                if self.meteor_data:  # get metoer data for 1st location
                     PvLibPlayground.set_cam(1)
                     csi, azimuth, zenith, sun_earth_dis, ephemeris = \
                         PvLibPlayground.get_meteor_data(m, d, PvLibPlayground.get_times(2019,
@@ -107,7 +107,7 @@ class DataFrameSequence:
                                                                                        d,  # day
                                                                                        start,# start time
                                                                                        end))  # end time
-                    if cams == 2:
+                    if cams == 2:  # get metoer data for 2nd location
                         PvLibPlayground.set_cam(2)
                         csi2, azimuth2, zenith2, sun_earth_dis2, ephemeris2 = \
                             PvLibPlayground.get_meteor_data(m, d, PvLibPlayground.get_times(2019,
