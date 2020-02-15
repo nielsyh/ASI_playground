@@ -102,10 +102,12 @@ def optimize():
 
 
 minutes_sequence = int(sys.argv[1])
-cams = int(sys.argv[2])
+# cams = int(sys.argv[2])
+pred_horizon = int(sys.argv[2])
 print('Minutes sequence: ' + str(minutes_sequence))
-print('Cams: ' + str(cams))
-run_ann_multi_thread(minutes_sequence, cams)
+print('Prediction horizon: ' + str(pred_horizon))
+
+ann_experiment(minutes_sequence, pred_horizon)
 # ann_test()
 # optimize()
 
