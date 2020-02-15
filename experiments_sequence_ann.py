@@ -26,8 +26,9 @@ def run_ann_multi_thread(minutes_sequence, cams):
         x = threading.Thread(target=ann_experiment, args=(i,minutes_sequence,cams))
         x.start()
 
-def ann_experiment(prediction_horizon, minutes_sequence, cams):
-    data = DataFrameSequence(False, 20,True, False)
+def ann_experiment(prediction_horizon, minutes_sequence):
+    data = DataFrameSequence(False, 20, True, False)
+    cams = 1
     data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], minutes_sequence, cams)
     data.normalize_mega_df()
     name_cam = str(cams) + 'CAM_'
