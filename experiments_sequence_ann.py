@@ -105,7 +105,7 @@ minutes_sequence = int(sys.argv[1])
 cams = int(sys.argv[2])
 print('Minutes sequence: ' + str(minutes_sequence))
 print('Cams: ' + str(cams))
-ann_experiment(minutes_sequence, cams)
+run_ann_multi_thread(minutes_sequence, cams)
 # ann_test()
 # optimize()
 
