@@ -58,7 +58,7 @@ def optimize():
     data.split_data_set(11,15)
     data.flatten_data_set()
 
-    nodes = [(32,64,32),(64, 128, 64), (128, 256, 128)]
+    nodes = [(50,10),(60,20), (40,20)]
     activations = ['relu', 'sigmoid']
     opts = ['Adam', 'RMSprop']
     drop_out = [0, 0.1, 0.5]

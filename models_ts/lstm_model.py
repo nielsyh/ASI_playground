@@ -38,6 +38,7 @@ class TestCallback(Callback):
 class LSTM_predictor():
 
     model = 0
+    history = None
 
     def __init__(self, data, init_epochs, epochs, name):
         self.data = data
@@ -49,15 +50,40 @@ class LSTM_predictor():
     def get_model(self):
         model = Sequential()
         model.add(LSTM(50, activation='relu', input_shape=(self.data.train_x_df.shape[1], self.data.train_x_df.shape[2])))
-        model.add(Dense(5, activation='relu'))
+        model.add(LSTM(25, activation='relu'))
+        model.add(Dense(25, activation='relu'))
         model.add(Dense(1))
         opt = optimizers.Adam()
         model.compile(loss='mean_squared_error', optimizer=opt)
         self.model = model
 
+    def set_model(self, nodes, activation, opt):
+        model = keras.models.Sequential()
+        model.add(LSTM(nodes[0], activation=activation, input_shape=(self.data.train_x_df.shape[1], self.data.train_x_df.shape[2])))
+        model.add(LSTM(nodes[1], activation=activation))
+        model.add(Dense(nodes[2], activation=activation))
+        model.add(Dense(1, activation=activation))
+        model.compile(loss='mean_squared_error', optimizer=opt)
+        self.model = model
+
     def train(self,epochs=50, batch_size=128):
-        self.model.fit(self.data.train_x_df, self.data.train_y_df, epochs=epochs, batch_size=batch_size, validation_data=(self.data.val_x_df, self.data.val_y_df),
-                       callbacks=[TestCallback(self.data.test_x_df, self.data.test_y_df)])
+        self.history = self.model.fit(self.data.train_x_df, self.data.train_y_df, epochs=epochs, batch_size=batch_size,
+                                      validation_data=(self.data.val_x_df, self.data.val_y_df),
+                                      callbacks=[TestCallback(self.data.test_x_df, self.data.test_y_df)])
+        return self.history
+
+    def plot_history(self, settings, num):
+        axes = plt.gca()
+        # axes.set_xlim([xmin, xmax])
+        axes.set_ylim([0, 100000])
+        plt.plot(self.history.history['loss'])
+        plt.plot(self.history.history['val_loss'])
+        plt.title('model loss ' + str(settings))
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'validation'], loc='upper left')
+        plt.show()
+        plt.savefig(str(num) + '.png')
 
     def predict(self):
         y_pred =  self.model.predict(self.data.test_x_df)
@@ -79,7 +105,8 @@ class LSTM_predictor():
             for d in days:
                 self.day_month_to_predict.append((m, d))
 
-        self.day_month_to_predict = [(9, 27)]
+        prem = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
+        self.day_month_to_predict = prem
 
         for exp in self.day_month_to_predict:
             print('ANN SEQUENCE: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
