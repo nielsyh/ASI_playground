@@ -21,14 +21,12 @@ prediction_horizons = list(range(1, 21))
 #data 24 hours ago
 #
 
-def run_ann_multi_thread(minutes_sequence, cams):
+def run_ann_experiements(minutes_sequence, cams):
     for i in prediction_horizons:
-        x = threading.Thread(target=ann_experiment, args=(i,minutes_sequence,cams))
-        x.start()
+        ann_experiment(i, minutes_sequence, cams)
 
-def ann_experiment(prediction_horizon, minutes_sequence):
+def ann_experiment(prediction_horizon, minutes_sequence, cams):
     data = DataFrameSequence(False, 20, True, False)
-    cams = 1
     data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], minutes_sequence, cams)
     data.normalize_mega_df()
     name_cam = str(cams) + 'CAM_'
@@ -103,12 +101,12 @@ def optimize():
 
 
 minutes_sequence = int(sys.argv[1])
-# cams = int(sys.argv[2])
+cams = int(sys.argv[2])
 pred_horizon = int(sys.argv[2])
 print('Minutes sequence: ' + str(minutes_sequence))
 print('Prediction horizon: ' + str(pred_horizon))
 
-ann_experiment(minutes_sequence, pred_horizon)
+run_ann_experiements(minutes_sequence, cams)
 # ann_test()
 # optimize()
 
