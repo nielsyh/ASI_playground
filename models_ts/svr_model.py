@@ -4,6 +4,7 @@ from metrics import Metrics
 import pickle
 import calendar
 from sklearn.model_selection import GridSearchCV
+import sys
 
 
 class SVM_predictor:
@@ -33,7 +34,7 @@ class SVM_predictor:
         self.day_month_to_predict = prem
 
         for exp in self.day_month_to_predict:
-            print('SVM: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
+            sys.stdout.write('SVM: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
             self.data.split_data_set(exp[0], exp[1])
             self.data.flatten_data_set()
             self.train()
@@ -56,7 +57,7 @@ class SVM_predictor:
         print('SVM: Predicting..')
         y_pred = self.model.predict(self.data.test_x_df)
         rmse, mae, mape = Metrics.get_error(self.data.test_y_df, y_pred)
-        print(rmse)
+        sys.stdout.write(str(rmse))
         return y_pred, rmse, mae, mape
 
     def optimize(self):

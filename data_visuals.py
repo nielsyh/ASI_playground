@@ -152,6 +152,7 @@ def file_to_dates(file, month, day, offset):
     with open(file) as fp:
         for line in fp:
             l = line.split(',')
+            # print(l)
             if float(l[0]) == month and float(l[1]) == day:
                 month = int(float(l[0]))
                 day = int(float(l[1]))
@@ -215,6 +216,20 @@ def file_to_months(file, offset):
             times.append(a)
     return predicted, actual, times
 
+def plot_prem_day():
+    t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
+
+    for tup in t:
+        # pred0, actual0, times0 = file_to_dates('prem results/SVR SEQUENCE PREM_1CAM_60Minutes__pred_hor_20.txt', tup[0], tup[1],0)
+        pred1, actual1, times1 = file_to_dates('results/Persistence_b_horizon_20.txt', tup[0], tup[1], 0)
+        pred2, actual2, times2 = file_to_dates('prem results/LSTM_BETA_SEQUENCE_1CAM_30Minutes_pred20.txt', tup[0], tup[1], 0)
+        pred3, actual4, times3 = file_to_dates('prem results/ANN_SEQUENCE_40epoch_pred60_1CAM_20Minutes_.txt', tup[0], tup[1], 0)
+
+        names = ['true', 'persistence', 'lstm', 'ann']
+
+        plot_with_times([actual1, pred1, pred2, pred3],
+                        [times1, times1, times2, times3],
+                        names, 'GHI forecast ' + str(tup[1]) + '/' + str(tup[0]), 'GHI in W/m2', xl='Time of day')
 
 
 
