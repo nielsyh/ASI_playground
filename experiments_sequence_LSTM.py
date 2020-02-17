@@ -20,10 +20,10 @@ def LSTM_experiment(minutes_sequence, cams):
     prediction_horizon = 20
     data = DataFrameSequence(False, prediction_horizon, True, False)
     data.build_ts_df(start ,end, [7,8,9,10,11,12], minutes_sequence, cams)
-    name_cam = str(cams) + 'CAM_'
-    name_time = str(minutes_sequence) + 'Minutes_'
+    name_cam = 'CAM_' + str(cams)
+    name_time = '_sequence_' + str(minutes_sequence)
     name_pred = 'predhor_' + str(prediction_horizon)
-    lstm = lstm_model.LSTM_predictor(data, 100, 50, 'LSTM_BETA_SEQUENCE_' + str(name_cam) + str(name_time))
+    lstm = lstm_model.LSTM_predictor(data, 100, 50, 'LSTM_BETA_SEQUENCE_' + str(name_cam) + str(name_time) + name_pred )
     lstm.run_experiment()
 
 def LSTM_test():
