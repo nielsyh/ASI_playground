@@ -25,7 +25,7 @@ def LSTM_experiment(minutes_sequence, cams):
     lstm.run_experiment()
 
 def LSTM_test():
-    data = DataFrameSequence(True, 20)
+    data = DataFrameSequence(True, 20, True, False)
     data.build_ts_df(6, 12, [9], 60, 1)
     lstm = lstm_model.LSTM_predictor(data, 100, 50, 'LSTM_TEST')
     data.normalize_mega_df()
@@ -43,7 +43,7 @@ def optimize():
     data.split_data_set(11,15)
     data.flatten_data_set_to_3d()
 
-    nodes =  [(50,10,5),(60,20,10), (40,20,5)]
+    nodes =  [(50,25),(60,30),(80,40)]
     activations = ['relu', 'sigmoid']
     opts = ['Adam', 'RMSprop']
     learning_rate = [0.001, 0.01, 0.1]
@@ -91,3 +91,4 @@ def optimize():
 # LSTM_experiment(minutes_sequence, cams)
 optimize()
 
+# LSTM_test()

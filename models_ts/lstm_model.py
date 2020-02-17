@@ -50,7 +50,6 @@ class LSTM_predictor():
     def get_model(self):
         model = Sequential()
         model.add(LSTM(50, activation='relu', input_shape=(self.data.train_x_df.shape[1], self.data.train_x_df.shape[2])))
-        model.add(LSTM(25, activation='relu'))
         model.add(Dense(25, activation='relu'))
         model.add(Dense(1))
         opt = optimizers.Adam()
@@ -60,8 +59,7 @@ class LSTM_predictor():
     def set_model(self, nodes, activation, opt):
         model = keras.models.Sequential()
         model.add(LSTM(nodes[0], activation=activation, input_shape=(self.data.train_x_df.shape[1], self.data.train_x_df.shape[2])))
-        model.add(LSTM(nodes[1], activation=activation))
-        model.add(Dense(nodes[2], activation=activation))
+        model.add(Dense(nodes[1], activation=activation))
         model.add(Dense(1, activation=activation))
         model.compile(loss='mean_squared_error', optimizer=opt)
         self.model = model
