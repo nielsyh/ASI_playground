@@ -23,7 +23,7 @@ def LSTM_experiment(minutes_sequence, cams):
     name_cam = 'CAM_' + str(cams)
     name_time = '_sequence_' + str(minutes_sequence)
     name_pred = 'predhor_' + str(prediction_horizon)
-    lstm = lstm_model.LSTM_predictor(data, 100, 50, 'LSTM_BETA_SEQUENCE_' + str(name_cam) + str(name_time) + name_pred )
+    lstm = lstm_model.LSTM_predictor(data, 200, 200, 'LSTM_BETA_SEQUENCE_' + str(name_cam) + str(name_time) + name_pred )
     lstm.run_experiment()
 
 def LSTM_test():
