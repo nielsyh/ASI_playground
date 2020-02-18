@@ -28,13 +28,13 @@ def LSTM_experiment(minutes_sequence, cams):
 
 def LSTM_test():
     data = DataFrameSequence(True, 20, True, False)
-    data.build_ts_df(6, 12, [9], 60, 1)
+    data.build_ts_df(6, 12, [9], 10, 1)
     lstm = lstm_model.LSTM_predictor(data, 100, 50, 'LSTM_TEST')
     data.normalize_mega_df()
     data.split_data_set(9, 27)
     data.flatten_data_set_to_3d()
     lstm.get_model()
-    lstm.train(3)
+    lstm.train(400)
     y_pred, rmse, mae, mape = lstm.predict()
     Metrics.write_results_NN('LSTM_TEST', data.test_x_df, data.test_y_df, y_pred, data.pred_horizon)
 

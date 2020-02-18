@@ -49,7 +49,9 @@ class LSTM_predictor():
 
     def get_model(self):
         model = Sequential()
-        model.add(LSTM(50, activation='relu', input_shape=(self.data.train_x_df.shape[1], self.data.train_x_df.shape[2])))
+        print(self.data.train_x_df.shape)
+        model.add(LSTM(50, activation='relu', input_shape=(self.data.train_x_df.shape[1], self.data.train_x_df.shape[2]), return_sequences=True))
+        model.add(LSTM(25, activation='relu'))
         model.add(Dense(25, activation='relu'))
         model.add(Dense(1))
         opt = optimizers.Adam()
