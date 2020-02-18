@@ -101,13 +101,12 @@ def optimize():
 
 
 minutes_sequence = int(sys.argv[1])
-seq_length = int(sys.argv[2])
-cams = int(sys.argv[3])
+cams = int(sys.argv[2])
 
-print('Minutes sequence: ' + str(seq_length))
+print('Minutes sequence: ' + str(minutes_sequence))
 print('cams: ' + str(cams))
 
-run_ann_experiements(seq_length, cams)
+run_ann_experiements(minutes_sequence, cams)
 # ann_test()
 # optimize()
 

@@ -16,14 +16,18 @@ sets = []
 min_vals = []
 min_loss = []
 
-def LSTM_experiment(minutes_sequence, cams):
-    prediction_horizon = 20
+def run_lstm_experiments(minutes_sequence, cams):
+    for i in prediction_horizons:
+        LSTM_experiment(i, minutes_sequence, cams)
+
+def LSTM_experiment(prediction_horizon, minutes_sequence, cams):
     data = DataFrameSequence(False, prediction_horizon, True, False)
-    data.build_ts_df(start ,end, [7,8,9,10,11,12], minutes_sequence, cams)
+    data.build_ts_df(start, end, [7,8,9,10,11,12], minutes_sequence, cams)
     name_cam = 'CAM_' + str(cams)
     name_time = '_sequence_' + str(minutes_sequence)
     name_pred = 'predhor_' + str(prediction_horizon)
-    lstm = lstm_model.LSTM_predictor(data, 200, 200, 'LSTM_BETA_SEQUENCE_' + str(name_cam) + str(name_time) + name_pred )
+    name_epoch = 'epochs_' + str(epochs)
+    lstm = lstm_model.LSTM_predictor(data, epochs, epochs, 'LSTM_BETA_SEQUENCE_' + name_epoch + str(name_cam) + str(name_time) + name_pred)
     lstm.run_experiment()
 
 def LSTM_test():
@@ -93,11 +97,11 @@ def optimize():
     print('epoch: ')
     print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
 
-# minutes_sequence = int(sys.argv[1])
-# cams = int(sys.argv[2])
-# print('Minutes sequence: ' + str(minutes_sequence))
-# print('Cams: ' + str(cams))
-# LSTM_experiment(minutes_sequence, cams)
-optimize()
+minutes_sequence = int(sys.argv[1])
+cams = int(sys.argv[2])
+print('Minutes sequence: ' + str(minutes_sequence))
+print('Cams: ' + str(cams))
+run_lstm_experiments(minutes_sequence, cams)
 
+# optimize()
 # LSTM_test()

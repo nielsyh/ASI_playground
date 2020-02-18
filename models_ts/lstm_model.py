@@ -122,8 +122,8 @@ class LSTM_predictor():
             if self.init_train:
                 epochs = self.init_epochs
                 self.init_train = False
-
             self.train(epochs=epochs)
+
             y_pred, rmse, mae, mape = self.predict()
             Metrics.write_results_NN(str(self.name), self.data.test_x_df, self.data.test_y_df, y_pred, self.data.pred_horizon)
 
