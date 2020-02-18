@@ -45,32 +45,39 @@ def optimize():
     data.split_data_set(11,15)
     data.flatten_data_set_to_3d()
 
-    nodes =  [(50,25),(60,30),(80,40)]
+    seq_l = [3,5,10]
+    nodes =  [(50,25,10),(60,30,15),(80,40,20)]
     activations = ['relu', 'sigmoid']
     opts = ['Adam', 'RMSprop']
     learning_rate = [0.001, 0.01, 0.1]
 
     lstm = lstm_model.LSTM_predictor(data, 3, 3, 'LSTM_TEST')
     num = 0
-    for n in nodes:
-        for a in activations:
-            for o in opts:
-                for lr in learning_rate:
+    for s in seq_l:
+        data.build_ts_df(6, 18, [7, 8, 9, 10, 11, 12], s, 1)
+        data.normalize_mega_df()
+        data.split_data_set(11, 15)
+        data.flatten_data_set_to_3d()
+        for n in nodes:
+            for a in activations:
+                for o in opts:
+                    for lr in learning_rate:
 
-                    if o == 'Adam':
-                        opt = optimizers.Adam(lr=lr)
-                    else:
-                        opt = optimizers.RMSprop(lr=lr)
 
-                    lstm.set_model(n, a, opt)
-                    out = lstm.train(3)
-                    res.append(out)
-                    settings = 'nodes: ' + str(n) + ' activation: ' + str(a) + ' optimizer: ' + str(o) + ' lr: ' + str(lr)
-                    sets.append(settings)
-                    lstm.plot_history(settings, num)
-                    min_loss.append(min(out.history['loss']))
-                    min_vals.append(min(out.history['val_loss']))
-                    num = num + 1
+                        if o == 'Adam':
+                            opt = optimizers.Adam(lr=lr)
+                        else:
+                            opt = optimizers.RMSprop(lr=lr)
+
+                        lstm.set_model(n, a, opt)
+                        out = lstm.train(100)
+                        res.append(out)
+                        settings = 'nodes: ' + str(n) + ' activation: ' + str(a) + ' optimizer: ' + str(o) + ' lr: ' + str(lr) + " seq_l: " + str(s)
+                        sets.append(settings)
+                        lstm.plot_history(settings, num)
+                        min_loss.append(min(out.history['loss']))
+                        min_vals.append(min(out.history['val_loss']))
+                        num = num + 1
 
     best_val_loss = min_vals.index(min(min_vals))
     print('BEST VAL LOSS: ')
@@ -86,11 +93,11 @@ def optimize():
     print('epoch: ')
     print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
 
-minutes_sequence = int(sys.argv[1])
-cams = int(sys.argv[2])
-print('Minutes sequence: ' + str(minutes_sequence))
-print('Cams: ' + str(cams))
-LSTM_experiment(minutes_sequence, cams)
-# optimize()
+# minutes_sequence = int(sys.argv[1])
+# cams = int(sys.argv[2])
+# print('Minutes sequence: ' + str(minutes_sequence))
+# print('Cams: ' + str(cams))
+# LSTM_experiment(minutes_sequence, cams)
+optimize()
 
 # LSTM_test()
