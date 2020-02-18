@@ -29,9 +29,9 @@ def ann_experiment(prediction_horizon, minutes_sequence, cams):
     data = DataFrameSequence(False, 20, True, False)
     data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], minutes_sequence, cams)
     data.normalize_mega_df()
-    name_cam = str(cams) + 'CAM_'
-    name_time = str(minutes_sequence) + 'Minutes_'
-    ann = ann_model.ANN(data, init_epochs, epochs, 'ANN_SEQUENCE_40epoch_pred' + str(prediction_horizon) + '_' + name_cam + name_time)
+    name_cam = 'CAMs_' + str(cams)
+    name_time = 'sq_' + str(minutes_sequence)
+    ann = ann_model.ANN(data, init_epochs, epochs, 'ANN_SEQUENCE_' + str(epochs) +'epoch_pred' + str(prediction_horizon) + '_' + name_cam + name_time)
     ann.run_experiment()
 
 def ann_test():
@@ -101,12 +101,13 @@ def optimize():
 
 
 minutes_sequence = int(sys.argv[1])
-cams = int(sys.argv[2])
-pred_horizon = int(sys.argv[2])
-print('Minutes sequence: ' + str(minutes_sequence))
-print('Prediction horizon: ' + str(pred_horizon))
+seq_length = int(sys.argv[2])
+cams = int(sys.argv[3])
 
-run_ann_experiements(minutes_sequence, cams)
+print('Minutes sequence: ' + str(seq_length))
+print('cams: ' + str(cams))
+
+run_ann_experiements(seq_length, cams)
 # ann_test()
 # optimize()
 

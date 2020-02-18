@@ -222,15 +222,15 @@ def plot_prem_day():
     for tup in t:
         # pred0, actual0, times0 = file_to_dates('prem results/SVR SEQUENCE PREM_1CAM_60Minutes__pred_hor_20.txt', tup[0], tup[1],0)
         pred1, actual1, times1 = file_to_dates('results/Persistence_b_horizon_20.txt', tup[0], tup[1], 0)
-        pred2, actual2, times2 = file_to_dates('prem results/LSTM_BETA_SEQUENCE_1CAM_30Minutes_pred20.txt', tup[0], tup[1], 0)
-        pred3, actual4, times3 = file_to_dates('prem results/ANN_SEQUENCE_40epoch_pred60_1CAM_20Minutes_.txt', tup[0], tup[1], 0)
+        pred2, actual2, times2 = file_to_dates('prem results/ANN_SEQUENCE_40epoch_pred60_1CAM_20Minutes_.txt', tup[0], tup[1], 0)
+        pred3, actual3, times3 = file_to_dates('prem results/ANN_SEQUENCE_40epoch_pred20_1CAM_20Minutes_.txt', tup[0], tup[1], 0)
+        pred4, actual4, times4 = file_to_dates('prem results/ANN_SEQUENCE_40epoch_pred20_1CAM_120Minutes_.txt', tup[0], tup[1], 0)
 
-        names = ['true', 'persistence', 'lstm', 'ann']
+        names = ['true', 'persistence', 'ann 60', 'ann 20', 'ann 120']
 
-        plot_with_times([actual1, pred1, pred2, pred3],
-                        [times1, times1, times2, times3],
+        plot_with_times([actual1, pred1, pred2, pred3, pred4],
+                        [times1, times1, times2, times3, times4],
                         names, 'GHI forecast ' + str(tup[1]) + '/' + str(tup[0]), 'GHI in W/m2', xl='Time of day')
-
 
 
 def days_plot():
