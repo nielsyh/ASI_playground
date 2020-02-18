@@ -88,6 +88,7 @@ class LSTM_predictor():
         plt.legend(['train', 'validation'], loc='upper left')
         plt.show()
         plt.savefig(str(num) + '.png')
+        plt.clf()
 
     def predict(self):
         y_pred =  self.model.predict(self.data.test_x_df)

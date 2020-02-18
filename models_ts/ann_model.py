@@ -78,6 +78,7 @@ class ANN():
         plt.legend(['train', 'validation'], loc='upper left')
         plt.show()
         plt.savefig(str(num) + '.png')
+        plt.clf()
 
 
     def predict(self):
