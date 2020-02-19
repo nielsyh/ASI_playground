@@ -4,9 +4,10 @@ from models_ts import ann_model, lstm_model, svr_model
 import threading
 import sys
 from keras import optimizers
+from data import plot_history
 
-init_epochs = 100
-epochs = 50
+init_epochs = 20
+epochs = 20
 start = 6
 end = 20
 prediction_horizons = list(range(1, 21))
@@ -78,7 +79,7 @@ def optimize():
                         res.append(out)
                         settings = 'nodes: ' + str(n) + ' activation: ' + str(a) + ' optimizer: ' + str(o) + ' lr: ' + str(lr) + " seq_l: " + str(s)
                         sets.append(settings)
-                        lstm.plot_history(settings, num)
+                        plot_history(settings, num)
                         min_loss.append(min(out.history['loss']))
                         min_vals.append(min(out.history['val_loss']))
                         num = num + 1

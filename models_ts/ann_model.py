@@ -66,21 +66,6 @@ class ANN():
                        callbacks=[TestCallback(self.data.test_x_df, self.data.test_y_df)])
         return self.history
 
-    def plot_history(self, settings, num):
-        axes = plt.gca()
-        # axes.set_xlim([xmin, xmax])
-        axes.set_ylim([0, 100000])
-        plt.plot(self.history.history['loss'])
-        plt.plot(self.history.history['val_loss'])
-        plt.title('model loss ' + str(settings))
-        plt.ylabel('loss')
-        plt.xlabel('epoch')
-        plt.legend(['train', 'validation'], loc='upper left')
-        plt.show()
-        plt.savefig(str(num) + '.png')
-        plt.clf()
-
-
     def predict(self):
         y_pred =  self.model.predict(self.data.test_x_df)
         rmse, mae, mape = Metrics.get_error(self.data.test_y_df, y_pred)

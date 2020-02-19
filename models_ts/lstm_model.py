@@ -1,25 +1,8 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from keras.callbacks import Callback
-from keras.regularizers import l2
 from keras import optimizers, Sequential
-
-# from data_ts import *
-from metrics import Metrics
 from keras.layers import Input, Dense, concatenate, MaxPool2D, GlobalAveragePooling2D, Dropout, Conv2D, Flatten, LSTM
-import keras
-from keras.models import load_model
-import calendar
-
-import numpy as np
-import matplotlib.pyplot as plt
 from keras.callbacks import Callback
-from keras.regularizers import l2
 from keras import optimizers
-
-# from data_ts import *
 from metrics import Metrics
-from keras.layers import Input, Dense, concatenate, MaxPool2D, GlobalAveragePooling2D, Dropout, Conv2D, Flatten
 import keras
 from keras.models import load_model
 import calendar
@@ -54,7 +37,7 @@ class LSTM_predictor():
         model.add(LSTM(25, activation='relu'))
         model.add(Dense(25, activation='relu'))
         model.add(Dense(1))
-        opt = optimizers.Adam()
+        opt = optimizers.Adam(lr=0.001)
         model.compile(loss='mean_squared_error', optimizer=opt)
         self.model = model
 
@@ -76,19 +59,6 @@ class LSTM_predictor():
                                       callbacks=[TestCallback(self.data.test_x_df, self.data.test_y_df)])
         return self.history
 
-    def plot_history(self, settings, num):
-        axes = plt.gca()
-        # axes.set_xlim([xmin, xmax])
-        axes.set_ylim([0, 100000])
-        plt.plot(self.history.history['loss'])
-        plt.plot(self.history.history['val_loss'])
-        plt.title('model loss ' + str(settings))
-        plt.ylabel('loss')
-        plt.xlabel('epoch')
-        plt.legend(['train', 'validation'], loc='upper left')
-        plt.show()
-        plt.savefig(str(num) + '.png')
-        plt.clf()
 
     def predict(self):
         y_pred =  self.model.predict(self.data.test_x_df)

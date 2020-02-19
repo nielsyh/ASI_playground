@@ -1,6 +1,8 @@
 import datetime
 import ftplib
 import matplotlib
+
+import matplotlib.pyplot as plt
 from builtins import enumerate
 import os
 
@@ -9,13 +11,12 @@ import numpy as np
 from datetime import time
 from os import listdir, path
 import cv2
-from data_visuals import plot_time_avg, plot_freq, plot_2_models, plot_time_avg_multi
+import data_visuals
+# from data_visuals import plot_time_avg, plot_freq, plot_2_models, plot_time_avg_multi
 from metrics import Metrics
 from pvlib_playground import PvLibPlayground
 from features import get_image_by_date_time, int_to_str, extract_features, show_img
 from tqdm import tqdm
-from sklearn.preprocessing import *
-
 enable_print = True
 
 def printf(str):
@@ -245,8 +246,8 @@ def images_information():
     print(start_dict)
     print(stop_dict)
 
-    plot_freq(start_dict, 'Frequency start times')
-    plot_freq(stop_dict, 'Frequency stop times')
+    data_visuals.plot_freq(start_dict, 'Frequency start times')
+    data_visuals.plot_freq(stop_dict, 'Frequency stop times')
 
 
 def get_df_csv_month(month, start, end,
@@ -384,14 +385,14 @@ def plot_per_month(start, end, step):
     labels = ['August', 'September', 'October', 'November', 'December']
 
     # plot data
-    plot_time_avg_multi(tick_times0[0], times0, avg_temp0, labels, 'time', 'Temp. in Celsius', 'avg. Temp. in months')
-    plot_time_avg_multi(tick_times0[0], times0, var_temp0, labels,  'time', 'Variance temp. Celsius.', 'var. Temp. in months')
+    data_visuals.plot_time_avg_multi(tick_times0[0], times0, avg_temp0, labels, 'time', 'Temp. in Celsius', 'avg. Temp. in months')
+    data_visuals.plot_time_avg_multi(tick_times0[0], times0, var_temp0, labels,  'time', 'Variance temp. Celsius.', 'var. Temp. in months')
 
-    plot_time_avg_multi(tick_times0[0], times0, avg_ghi0, labels, 'time', 'GHI in W/m^2', 'avg. GHI in months')
-    plot_time_avg_multi(tick_times0[0], times0, var_ghi0, labels, 'time', 'Variance GHI', 'var. GHI in months')
+    data_visuals.plot_time_avg_multi(tick_times0[0], times0, avg_ghi0, labels, 'time', 'GHI in W/m^2', 'avg. GHI in months')
+    data_visuals.plot_time_avg_multi(tick_times0[0], times0, var_ghi0, labels, 'time', 'Variance GHI', 'var. GHI in months')
 
-    plot_time_avg_multi(tick_times0[0], times0, avg_hum0, labels,  'time', 'Humidity', 'avg. Humidity in months')
-    plot_time_avg_multi(tick_times0[0], times0, var_hum0, labels,  'time', 'Variance Humidity', 'var. Humidity in months')
+    data_visuals.plot_time_avg_multi(tick_times0[0], times0, avg_hum0, labels,  'time', 'Humidity', 'avg. Humidity in months')
+    data_visuals.plot_time_avg_multi(tick_times0[0], times0, var_hum0, labels,  'time', 'Variance Humidity', 'var. Humidity in months')
 
 def plot_day(day, month, start, end, step):
     df = get_df_csv_day_RP(month, day, start, end, step)
@@ -425,9 +426,9 @@ def plot_day(day, month, start, end, step):
                 ghi.append(old_ghi)
 
     # plot data
-    plot_time_avg(tick_times, times, temp, '', 'time', 'temp. in celsius',
+    data_visuals.plot_time_avg(tick_times, times, temp, '', 'time', 'temp. in celsius',
                   'temp. in day: ' + str(day) + ' month: ' + str(month))
-    plot_time_avg(tick_times, times, ghi, 'GHI measured', 'time', 'GHI in W/m^2',
+    data_visuals.plot_time_avg(tick_times, times, ghi, 'GHI measured', 'time', 'GHI in W/m^2',
                   'GHI in day: ' + str(day) + ' month: ' + str(month), ghi_clear_sky, 'Clear sky GHI')
 
 def plot_persistence_day(day, month, start, end, step):
@@ -465,8 +466,61 @@ def plot_persistence_day(day, month, start, end, step):
                 ghi_pred.append(ghi_pred_tmp)
 
     # plot data
-    plot_2_models(tick_times, times, ghi_truth, ghi_pred, 'time', 'GHI in W/m^2',
+    data_visuals.plot_2_models(tick_times, times, ghi_truth, ghi_pred, 'time', 'GHI in W/m^2',
                   'GHI at day: ' + str(day) + ' month: ' + str(month))
+
+def get_persistence_df(month, day, start, end, pred_hor):
+    df_truth = get_df_csv_day_RP(month, day, start, end, 1)
+    df_pred = get_df_csv_day_RP(month, day, start-1, end, 1)
+    copy = df_pred.copy()
+
+    for i in range(0, len(df_pred)):
+        if i < pred_hor:
+            continue
+        else:
+            df_pred[i][8] = copy[i - pred_hor][8]
+
+    df_pred = df_pred[60:]
+    hours = list(range(start, end))
+    minutes = list(range(0, 60, 1))
+    times, ghi_pred, ghi_truth = ([] for i in range(3))
+
+    for h in hours:
+        for m in minutes:
+            rows_truth = get_ghi_temp_by_minute(df_truth, h, m)
+            rows_pred = get_ghi_temp_by_minute(df_pred, h, m)
+
+            timestamp = datetime.datetime(year=2019, month=month , day=day, hour=h, minute=m)
+            matplotlib_timestamp = matplotlib.dates.date2num(timestamp)
+
+            if (len(rows_truth) > 0 and len(rows_pred) > 0):  # sometimes data is missing then skip.
+                ghi_truth_tmp = rows_truth[0][8]
+                ghi_pred_tmp = rows_pred[0][8]
+                times.append(matplotlib_timestamp)
+                ghi_truth.append(ghi_truth_tmp)
+                ghi_pred.append(ghi_pred_tmp)
+
+    return ghi_pred, ghi_truth, times
+
+
+
+def plot_history(self, settings, num):
+    plt.figure()
+    axes = plt.gca()
+
+    axes.set_ylim([0, 100000])
+
+    plt.plot(self.history.history['loss'])
+    plt.plot(self.history.history['val_loss'])
+    plt.title('model loss ' + str(settings))
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'validation'], loc='upper left')
+    plt.show()
+    plt.savefig(str(num) + '.png')
+
+    plt.clf()
+    plt.close()
 
 def get_error_month(month, start, end, step):
     y_observed = []

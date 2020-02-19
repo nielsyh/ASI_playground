@@ -4,6 +4,7 @@ from models_ts import ann_model
 import sys
 from keras import optimizers
 import threading
+from data import plot_history
 
 init_epochs = 40
 epochs = 40
@@ -43,7 +44,7 @@ def ann_test():
     data.flatten_data_set()
     ann.get_model()
     ann.train(100)
-    ann.plot_history('s1',1)
+    plot_history('s1',1)
     y_pred, rmse, mae, mape = ann.predict()
     # Metrics.write_results_NN('ANN_TEST', data.test_x_df.reshape(
     #     (data.test_x_df.shape[0], data.sequence_len_minutes, data.number_of_features)),
@@ -80,7 +81,7 @@ def optimize():
                         res.append(out)
                         settings = 'nodes: ' + str(n) + ' activation: ' + str(a) + ' optimizer: ' + str(o) + ' dropout: ' + str(d) + ' lr: ' + str(lr)
                         sets.append(settings)
-                        ann.plot_history(settings, num)
+                        plot_history(settings, num)
                         min_loss.append(min(out.history['loss']))
                         min_vals.append(min(out.history['val_loss']))
                         num = num + 1
