@@ -59,6 +59,7 @@ class DataFrameNormal:
         print('Flattening..')
 
         self.train_df = self.train_df.reshape((self.train_df.shape[0] * self.train_df.shape[1], -1))
+        self.val_df = self.val_df.reshape((self.val_df.shape[0] * self.val_df.shape[1], -1))
 
         self.x_train = self.train_df[:, 3: self.train_df.shape[1]]
         self.x_train = self.x_train.reshape((self.x_train.shape[0], 400, 400, 3))  # reshaping for tf

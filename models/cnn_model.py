@@ -34,7 +34,7 @@ class resnet50:
         self.model.compile(optimizer='adam', loss='mean_squared_error')
 
     def train(self, epochs=50, batch_size=128):
-        self.model.fit(self.data.x_train, self.data.y_train, epochs=epochs, batch_size=batch_size, validation_data=(self.data.val_x_df, self.data.val_y_df))
+        self.model.fit(self.data.x_train, self.data.y_train, epochs=epochs, batch_size=batch_size, validation_data=(self.data.x_val, self.data.y_val))
 
     def predict(self):
         y_pred =  self.model.predict(self.data.x_test)
@@ -53,12 +53,15 @@ class resnet50:
             weights  =np.load(str(name)+str(i)+'.npy')
             self.model.layers[i].set_weights(weights)
 
-    def build_models(self):
+    def build_prem_models(self):
         prem = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
+        prem = [(8,10)]
 
         for tup in tqdm(prem, total=len(prem), unit='Days to predict'):
             self.data.split_data_set(tup[0], tup[1])
             self.data.flatten_data_set_CNN()
+
+            self.get_model(400)
 
             epochs = self.epochs
             if self.init_train:
@@ -69,7 +72,6 @@ class resnet50:
             name = str(tup[0]) + str(tup[1])
             self.save_model(name)
             print('Done: ' + str(name))
-
 
     def run_experiment(self):
         self.day_month_to_predict = []
