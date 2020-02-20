@@ -312,7 +312,6 @@ class DataFrameSequence:
         print('loaded')
 
 
-
 #
 # data = DataFrameSequence(False, 20)
 # data.build_ts_df(10,13,[9,10],45,2)

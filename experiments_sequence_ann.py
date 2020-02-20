@@ -44,7 +44,7 @@ def ann_test():
     data.flatten_data_set()
     ann.get_model()
     ann.train(100)
-    plot_history('s1',1)
+    plot_history('s1',1, ann.history)
     y_pred, rmse, mae, mape = ann.predict()
     # Metrics.write_results_NN('ANN_TEST', data.test_x_df.reshape(
     #     (data.test_x_df.shape[0], data.sequence_len_minutes, data.number_of_features)),
@@ -58,7 +58,7 @@ def optimize():
     data.flatten_data_set()
 
     nodes = [(50,10),(60,20), (40,20)]
-    activations = ['relu', 'sigmoid']
+    activations = ['relu']
     opts = ['Adam', 'RMSprop']
     drop_out = [0, 0.1, 0.5]
     learning_rate = [0.001, 0.01, 0.1]

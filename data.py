@@ -504,14 +504,14 @@ def get_persistence_df(month, day, start, end, pred_hor):
 
 
 
-def plot_history(self, settings, num):
+def plot_history(settings, num, history):
     plt.figure()
     axes = plt.gca()
 
     axes.set_ylim([0, 100000])
 
-    plt.plot(self.history.history['loss'])
-    plt.plot(self.history.history['val_loss'])
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
     plt.title('model loss ' + str(settings))
     plt.ylabel('loss')
     plt.xlabel('epoch')

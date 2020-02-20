@@ -23,7 +23,7 @@ def SVR_experiment_thread(prediction_horizon, minutes_sequence, cams):
 
 def SVR_test():
     data = DataFrameSequence(True, 20, True, False)
-    data.build_ts_df(start, end, [9], 60, 1)
+    data.build_ts_df(start, end, [9], 1, 1)
     svr = svr_model.SVM_predictor(data, 'SVR SEQ TEST')
     data.normalize_mega_df()
     data.split_data_set(9, 27)
@@ -47,9 +47,9 @@ def optimize():
     svr = svr_model.SVM_predictor(data, 'SVR optimze')
     svr.optimize()
 
-minutes_sequence = int(sys.argv[1])
-cams = int(sys.argv[2])
-print('Minutes sequence: ' + str(minutes_sequence))
-print('Cams: ' + str(cams))
-run_svm_multi_thread(minutes_sequence, cams)
-# optimize()
+# minutes_sequence = int(sys.argv[1])
+# cams = int(sys.argv[2])
+# print('Minutes sequence: ' + str(minutes_sequence))
+# print('Cams: ' + str(cams))
+# run_svm_multi_thread(minutes_sequence, cams)
+# # optimize()

@@ -23,7 +23,7 @@ def get_full_image_by_date_time(month, day, hour, minute, seconds):
     for s in seconds_list:
         img_url = tmp_url + int_to_str(hour) + int_to_str(minute) + int_to_str(s) + '_11.jpg'
         total_url = base_url + img_url
-        print(total_url)
+        # print(total_url)
         if os.path.isfile(total_url):
             image = cv2.imread(total_url)
             if (image is None):

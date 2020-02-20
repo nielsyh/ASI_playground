@@ -1,9 +1,10 @@
 from keras.layers import Input, Dense, concatenate, MaxPool2D, GlobalAveragePooling2D, Dropout, Conv2D, Flatten
 from keras.models import Model
-from sklearn.externals import joblib
 import keras
 from keras.applications.resnet50 import ResNet50
 from keras.models import load_model
+from tqdm import tqdm
+
 from metrics import Metrics
 import calendar
 import numpy as np
@@ -19,11 +20,10 @@ class resnet50:
     def get_model(self, image_res):
         self.model = keras.models.Sequential()
         base = ResNet50(include_top=False, weights='imagenet',
-                              input_shape=(image_res, image_res, 3))
+                        input_shape=(image_res, image_res, 3))
         #freezeing all layers
         for layer in base.layers:
             layer.trainable = False
-        print(base.summary())
         self.model.add(base)
         # model.add(Conv2D(64, kernel_size=3, input_shape=(224,224,3)))
         self.model.add(Flatten())
@@ -34,7 +34,7 @@ class resnet50:
         self.model.compile(optimizer='adam', loss='mean_squared_error')
 
     def train(self, epochs=50, batch_size=128):
-        self.model.fit(self.data.x_train, self.data.y_train, epochs=epochs, batch_size=batch_size)
+        self.model.fit(self.data.x_train, self.data.y_train, epochs=epochs, batch_size=batch_size, validation_data=(self.data.val_x_df, self.data.val_y_df))
 
     def predict(self):
         y_pred =  self.model.predict(self.data.x_test)
@@ -52,6 +52,24 @@ class resnet50:
         for i in [2,3,4]:
             weights  =np.load(str(name)+str(i)+'.npy')
             self.model.layers[i].set_weights(weights)
+
+    def build_models(self):
+        prem = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
+
+        for tup in tqdm(prem, total=len(prem), unit='Days to predict'):
+            self.data.split_data_set(tup[0], tup[1])
+            self.data.flatten_data_set_CNN()
+
+            epochs = self.epochs
+            if self.init_train:
+                epochs = self.init_epochs
+                self.init_train = False
+
+            self.train(epochs=epochs)
+            name = str(tup[0]) + str(tup[1])
+            self.save_model(name)
+            print('Done: ' + str(name))
+
 
     def run_experiment(self):
         self.day_month_to_predict = []

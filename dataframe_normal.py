@@ -68,6 +68,11 @@ class DataFrameNormal:
         self.x_test = self.x_test.reshape((self.x_test.shape[0], 400, 400, 3))  # reshaping for tf
         self.y_test = self.test_df[:, 0]
 
+        self.x_val = self.val_df[:, 3: self.val_df.shape[1]]
+        self.x_val = self.x_val.reshape((self.x_val.shape[0], 400, 400, 3))  # reshaping for tf
+        self.y_val = self.val_df[:, 0]
+
+
     def flatten_data_set(self):  # this is needed to use it as input for models
         print('Flattening..')
 
@@ -297,6 +302,7 @@ class DataFrameNormal:
 
         self.train_df = self.mega_df[0:day_idx]
         self.test_df = self.mega_df[day_idx]
+        self.val_df = self.mega_df[day_idx+1: len(self.mega_df)]
 
         print('done')
 

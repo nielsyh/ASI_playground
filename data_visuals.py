@@ -222,13 +222,15 @@ def print_error_prem_day():
         # print(tup)
         pred1, actual1, times1 = data.get_persistence_df(tup[0], tup[1], 6, 20, 20)
         pred2, actual2, times2 = file_to_dates('prem results/ANN_SEQUENCE_40epoch_pred60_1CAM_20Minutes_.txt', tup[0], tup[1], 20)
-        pred3, actual3, times3 = file_to_dates('prem results/ANN_SEQUENCE_40epoch_pred20_1CAM_20Minutes_.txt', tup[0], tup[1], 20)
-        pred4, actual4, times4 = file_to_dates('prem results/ANN_SEQUENCE_40epoch_pred20_1CAM_120Minutes_.txt', tup[0], tup[1], 20)
+        pred3, actual3, times3 = file_to_dates('prem results/ANN PREM 20 min 1 cam/ANN_SEQUENCE_40epoch_pred20_1CAM_20Minutes_.txt', tup[0], tup[1], 20)
+        pred4, actual4, times4 = file_to_dates('prem results/ANN PREM 120min 1 cam/ANN_SEQUENCE_40epoch_pred20_1CAM_120Minutes_.txt', tup[0], tup[1], 20)
 
         pred5, actual5, times5 = file_to_dates('LSTM_BETA_SEQUENCE_CAM_1_sequence_10predhor_20.txt', tup[0], tup[1], 20)
         pred6, actual6, times6 = file_to_dates('LSTM_BETA_SEQUENCE_CAM_1_sequence_5predhor_20.txt', tup[0], tup[1], 20)
 
-        names = ['true', 'persistence', 'ann 60', 'ann 20', 'ann 120', 'lstm 10', 'lstm 5']
+        pred7, actual7, times7 = file_to_dates('prem results/ANN PREM 10min 1cam/ANN_SEQUENCE_40epoch_pred20_CAMs_1sq_10.txt', tup[0], tup[1], 20)
+
+        names = ['true', 'persistence', 'ann 60', 'ann 20', 'ann 120', 'lstm 10', 'lstm 5', 'ann 10']
 
         print('--------------------------------------------------------------------------------------------------')
         print(tup)
@@ -237,8 +239,20 @@ def print_error_prem_day():
         rmse, mae, mape = Metrics.get_error(actual1, pred1)
         print(rmse, mae, mape)
 
+        print('ann 120')
+        rmse, mae, mape = Metrics.get_error(actual4, pred4)
+        print(rmse, mae, mape)
+
         print('ann 60')
         rmse, mae, mape = Metrics.get_error(actual2, pred2)
+        print(rmse, mae, mape)
+
+        print('ann 20')
+        rmse, mae, mape = Metrics.get_error(actual3, pred3)
+        print(rmse, mae, mape)
+
+        print('ann 10')
+        rmse, mae, mape = Metrics.get_error(actual7, pred7)
         print(rmse, mae, mape)
 
         print('lstm 10')
@@ -260,16 +274,20 @@ def plot_prem_day():
 
         pred1, actual1, times1 = data.get_persistence_df(tup[0], tup[1], 6, 20, 20)
         pred2, actual2, times2 = file_to_dates('prem results/ANN_SEQUENCE_40epoch_pred60_1CAM_20Minutes_.txt', tup[0], tup[1], 20)
-        pred3, actual3, times3 = file_to_dates('prem results/ANN_SEQUENCE_40epoch_pred20_1CAM_20Minutes_.txt', tup[0], tup[1], 20)
-        pred4, actual4, times4 = file_to_dates('prem results/ANN_SEQUENCE_40epoch_pred20_1CAM_120Minutes_.txt', tup[0], tup[1], 20)
+        pred3, actual3, times3 = file_to_dates('prem results/ANN PREM 20 min 1 cam/ANN_SEQUENCE_40epoch_pred20_1CAM_20Minutes_.txt', tup[0], tup[1], 20)
+        pred4, actual4, times4 = file_to_dates('prem results/ANN PREM 120min 1 cam/ANN_SEQUENCE_40epoch_pred20_1CAM_120Minutes_.txt', tup[0], tup[1], 20)
 
         pred5, actual5, times5 = file_to_dates('LSTM_BETA_SEQUENCE_CAM_1_sequence_10predhor_20.txt', tup[0], tup[1], 20)
         pred6, actual6, times6 = file_to_dates('LSTM_BETA_SEQUENCE_CAM_1_sequence_5predhor_20.txt', tup[0], tup[1], 20)
 
-        names = ['true', 'persistence', 'ann 60', 'ann 20', 'ann 120', 'lstm 10', 'lstm 5']
+        pred7, actual7, times7 = file_to_dates('prem results/ANN PREM 10min 1cam/ANN_SEQUENCE_40epoch_pred20_CAMs_1sq_10.txt', tup[0], tup[1], 20)
 
-        plot_with_times([actual1, pred1, pred2, pred3, pred4, pred5, pred6],
-                        [times1, times1, times2, times3, times4,times5,times6],
+
+
+        names = ['true', 'persistence', 'ann 60', 'ann 20', 'ann 120', 'lstm 10', 'lstm 5', 'ANN 10']
+
+        plot_with_times([actual1, pred1, pred2, pred3, pred4, pred5, pred6, pred7],
+                        [times1, times1, times2, times3, times4,times5,times6, times7],
                         names, 'GHI forecast ' + str(tup[1]) + '/' + str(tup[0]), 'GHI in W/m2', xl='Time of day')
 
         # names = ['persist', 'true p', 'lstm', 'true l']
