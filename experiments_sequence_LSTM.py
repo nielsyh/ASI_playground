@@ -6,8 +6,8 @@ import sys
 from keras import optimizers
 from data import plot_history
 
-init_epochs = 20
-epochs = 20
+init_epochs = 40
+epochs = 40
 start = 6
 end = 20
 prediction_horizons = list(range(1, 21))
@@ -69,7 +69,6 @@ def optimize():
                 for o in opts:
                     for lr in learning_rate:
 
-
                         if o == 'Adam':
                             opt = optimizers.Adam(lr=lr)
                         else:
@@ -103,7 +102,7 @@ def optimize():
 # cams = int(sys.argv[2])
 # print('Minutes sequence: ' + str(minutes_sequence))
 # print('Cams: ' + str(cams))
-# run_lstm_experiments(minutes_sequence, cams)
+run_lstm_experiments(10, 1)
 
 # optimize()
-LSTM_test()
+# LSTM_test()

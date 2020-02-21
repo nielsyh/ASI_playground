@@ -35,7 +35,7 @@ class LSTM_predictor():
         print(self.data.train_x_df.shape)
         model.add(LSTM(50, activation='relu', input_shape=(self.data.train_x_df.shape[1], self.data.train_x_df.shape[2]), return_sequences=True))
         model.add(LSTM(25, activation='relu'))
-        model.add(Dense(25, activation='relu'))
+        model.add(Dense(10, activation='relu'))
         model.add(Dense(1))
         opt = optimizers.Adam(lr=0.001)
         model.compile(loss='mean_squared_error', optimizer=opt)
