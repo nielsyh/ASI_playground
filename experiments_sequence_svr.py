@@ -22,11 +22,11 @@ def SVR_experiment_thread(prediction_horizon, minutes_sequence, cams):
     print('Finish SVR: ' + str(prediction_horizon))
 
 def SVR_test():
-    data = DataFrameSequence(True, 20, True, False)
-    data.build_ts_df(start, end, [9], 1, 1)
+    data = DataFrameSequence(False, 20, True, False)
+    data.build_ts_df(start, end, [8,9], 5, 1)
     svr = svr_model.SVM_predictor(data, 'SVR SEQ TEST')
     data.normalize_mega_df()
-    data.split_data_set(9, 27)
+    data.split_data_set(9, 25)
     data.flatten_data_set()
     svr.train()
     y_pred, rmse, mae, mape = svr.predict()

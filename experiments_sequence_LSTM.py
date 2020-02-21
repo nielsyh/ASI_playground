@@ -9,7 +9,7 @@ from data import plot_history
 init_epochs = 40
 epochs = 40
 start = 6
-end = 20
+end = 19
 prediction_horizons = list(range(1, 21))
 
 res = []
@@ -22,8 +22,9 @@ def run_lstm_experiments(minutes_sequence, cams):
         LSTM_experiment(i, minutes_sequence, cams)
 
 def LSTM_experiment(prediction_horizon, minutes_sequence, cams):
-    data = DataFrameSequence(False, prediction_horizon, True, False)
+    data = DataFrameSequence(False, prediction_horizon, True, True)
     data.build_ts_df(start, end, [7,8,9,10,11,12], minutes_sequence, cams)
+    data.normalize_mega_df()
     name_cam = 'CAM_' + str(cams)
     name_time = '_sequence_' + str(minutes_sequence)
     name_pred = 'predhor_' + str(prediction_horizon)
@@ -32,8 +33,8 @@ def LSTM_experiment(prediction_horizon, minutes_sequence, cams):
     lstm.run_experiment()
 
 def LSTM_test():
-    data = DataFrameSequence(True, 20, True, False)
-    data.build_ts_df(6, 12, [9], 10, 1)
+    data = DataFrameSequence(True, 20, True, True)
+    data.build_ts_df(6, 19, [9], 10, 1)
     lstm = lstm_model.LSTM_predictor(data, 100, 50, 'LSTM_TEST')
     data.normalize_mega_df()
     data.split_data_set(9, 27)
@@ -102,7 +103,8 @@ def optimize():
 # cams = int(sys.argv[2])
 # print('Minutes sequence: ' + str(minutes_sequence))
 # print('Cams: ' + str(cams))
-run_lstm_experiments(10, 1)
+# run_lstm_experiments(10, 1)
 
 # optimize()
 # LSTM_test()
+LSTM_experiment(20, 10, 1)

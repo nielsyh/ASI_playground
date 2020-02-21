@@ -23,6 +23,8 @@ class DataFrameSequence:
     test_y_df = None
     val_y_df = None
 
+    features = None
+
     number_of_features = 9
     meteor_features = 9
     sequence_len_minutes = 60
@@ -42,10 +44,30 @@ class DataFrameSequence:
 
         if images:
             self.number_of_features = self.number_of_features + 4
+            self.load_features()
             print('DF with images')
 
         if images and self.cams == 2:
             raise ValueError('Cams 2 and images not possible')
+
+    def load_features(self):
+        self.features = np.load('x_22_d6to19_m7to12.npy')
+
+    def get_feature_data(self, month, day, start, end):
+        start_time_idx = (start - 6)*60
+        end_time_idx=  (end - 6)*60
+        previous_days = 0
+
+        month_list = list(range(7,month))
+        for i in month_list:
+            if i == 7:
+                previous_days += 6
+            else:
+                previous_days += calendar.monthrange(2019, month)[1]
+
+        day_idx = previous_days + day -1
+        return self.features[day_idx, start_time_idx:end_time_idx, 18:22]
+
 
     def build_ts_df(self, start, end, months, lenth_tm, cams):
         self.start = start
@@ -94,7 +116,8 @@ class DataFrameSequence:
                 # todo add sunrise/sundown for start end hour? half hour?
                 day_data = get_df_csv_day_RP(m, d, start, end+1, 1).astype(int)
                 if self.images:
-                    intensity, cloudpixels, corners, edges = get_features_by_day(m, d, start, end+1)
+                    # intensity, cloudpixels, corners, edges = get_features_by_day(m, d, start, end+1)
+                    f = self.get_feature_data(m ,d, start, end+1)
 
                 if cams == 2:
                     day_data_2 = get_df_csv_day_RP(m, d, start, end+1, 1, cam=2).astype(int)
@@ -152,13 +175,13 @@ class DataFrameSequence:
                             ts[0:minutes, v] = [item[v - 14] for item in ephemeris[i:i+minutes]]
 
                         elif v == self.index_img:
-                            ts[0:minutes, v] = intensity[i:i + minutes]
+                            ts[0:minutes, v] = f[i:i + minutes,0]
                         elif v == self.index_img+1:
-                            ts[0:minutes, v] = cloudpixels[i:i + minutes]
+                            ts[0:minutes, v] = f[i:i + minutes,1]
                         elif v == self.index_img+2:
-                            ts[0:minutes, v] = corners[i:i + minutes]
+                            ts[0:minutes, v] = f[i:i + minutes,2]
                         elif v == self.index_img+3:
-                            ts[0:minutes, v] = edges[i:i + minutes]
+                            ts[0:minutes, v] = f[i:i + minutes,3]
 
 
                         if cams == 2:

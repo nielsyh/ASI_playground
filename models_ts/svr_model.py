@@ -5,6 +5,7 @@ import pickle
 import calendar
 from sklearn.model_selection import GridSearchCV
 import sys
+from sklearn.svm import SVR
 
 
 class SVM_predictor:
@@ -49,7 +50,8 @@ class SVM_predictor:
 
     def train(self):
         print('SVM: Training..')
-        self.svclassifier = SVC(kernel='rbf', gamma='auto')
+        # self.svclassifier = SVC(kernel='rbf', gamma='auto')
+        self.svclassifier = SVR()
         self.model = self.svclassifier.fit(self.data.train_x_df, self.data.train_y_df)
         print('done..')
 
