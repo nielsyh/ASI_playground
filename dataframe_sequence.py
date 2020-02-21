@@ -55,18 +55,22 @@ class DataFrameSequence:
 
     def get_feature_data(self, month, day, start, end):
         start_time_idx = (start - 6)*60
-        end_time_idx=  (end - 6)*60
+        end_time_idx = (end - 6)*60
         previous_days = 0
 
-        month_list = list(range(7,month))
+        month_list = list(range(7,month+1))
         for i in month_list:
             if i == 7:
-                previous_days += 6
+                continue
+            if i == 8:
+                previous_days += 5
             else:
-                previous_days += calendar.monthrange(2019, month)[1]
-
-        day_idx = previous_days + day -1
-        return self.features[day_idx, start_time_idx:end_time_idx, 18:22]
+                previous_days += calendar.monthrange(2019, i-1)[1]
+        if month == 7:
+            day_idx = day - 26
+        else:
+            day_idx = previous_days + day
+        return self.features[day_idx, start_time_idx:end_time_idx]
 
 
     def build_ts_df(self, start, end, months, lenth_tm, cams):
