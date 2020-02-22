@@ -7,6 +7,7 @@ import matplotlib.pyplot
 import data
 style.use('seaborn-poster') #sets the size of the charts
 style.use('ggplot')
+from matplotlib.ticker import FuncFormatter, MaxNLocator
 
 
 
@@ -111,6 +112,21 @@ def plot_prediction_per_day(predicts, names, title, yl, xl = 'Days'):
     plt.show()
     plt.close()
 
+def plot_error_per_horizons(errors, horizons, names, title, xl, yl):
+    ax = plt.axes()
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+    # plt.setp(ax.get_xticklabels(), rotation=90, horizontalalignment='right', fontsize='x-small')
+
+    for idx, i in enumerate(errors):
+        plt.plot(horizons, i, linestyle='--', label=names[idx])
+
+    plt.legend()
+    plt.title(title)
+    plt.xlabel(xl)
+    plt.ylabel(yl)
+    plt.show()
+    plt.close()
+
 def plot_with_times(predicts, times, names, title, yl, xl = 'Days'):
     ax = plt.axes()
     ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter('%H:%M'))
@@ -144,6 +160,26 @@ def plot_with_months(predicts, times, names, title, yl, xl='Months'):
     plt.ylabel(yl)
     plt.show()
     plt.close()
+
+def get_all_TP(file):
+    predicted, actual = [], []
+    with open(file) as fp:
+        for line in fp:
+            l = line.split(',')
+
+            #TODO CONSIDER TIMES
+            month = int(float(l[0]))
+            day = int(float(l[1]))
+            hour = int(float(l[2]))
+            minute = int(float(l[3]))
+
+            true = float(l[5])
+            pred = float(l[6])
+
+            predicted.append(pred)
+            actual.append(true)
+
+    return actual, predicted
 
 
 def file_to_dates(file, month, day, offset):
@@ -215,6 +251,46 @@ def file_to_months(file, offset):
             actual.append(true)
             times.append(a)
     return predicted, actual, times
+
+def plot_err_hor():
+    t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
+
+    folders = ['persistence',
+               'prem results/lstm prem sq 10/LSTM_BETA_SEQUENCE_epochs_40CAM_1_sequence_10predhor_',
+               'prem results/ANN PREM 10min 1cam/ANN_SEQUENCE_40epoch_sq10_1cam_pred']
+
+    extension = '.txt'
+    predictions = list(range(1,21))
+    predictions = [1,2,5,10,15,20]
+
+    trmse, tmae, tmape = [],[],[]
+
+    for f in folders:
+        rmse, mae, mape = [],[],[]
+        for i in predictions:
+
+            if f == 'persistence':
+                actual, pred = data.get_persistence_dates(t, 6, 20, i)
+            else:
+                file = f + str(i) + extension
+                actual, pred = get_all_TP(file)
+
+            a, b, c = Metrics.get_error(actual, pred)
+            rmse.append(a)
+            mae.append(b)
+            mape.append(c)
+        trmse.append(rmse)
+        tmae.append(mae)
+        tmape.append(mape)
+
+    plot_error_per_horizons(trmse, predictions, ['Persistence','LSTM 10', 'ANN 10'],
+                            'RMSE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in RMSE')
+
+    plot_error_per_horizons(tmae, predictions, ['Persistence', 'LSTM 10', 'ANN 10'],
+                            'MAE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAE')
+
+    plot_error_per_horizons(trmse, predictions, ['Persistence', 'LSTM 10', 'ANN 10'],
+                            'MAPE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAPE')
 
 def print_error_prem_day():
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]

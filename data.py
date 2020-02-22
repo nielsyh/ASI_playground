@@ -502,6 +502,17 @@ def get_persistence_df(month, day, start, end, pred_hor):
 
     return ghi_pred, ghi_truth, times
 
+def get_persistence_dates(tups, start, end, pred_hor):
+    actual = []
+    pred = []
+    for tup in tups:
+        print(tup)
+        p, a, _ = get_persistence_df(tup[0], tup[1], start, end, pred_hor)
+        actual.extend(a)
+        pred.extend(p)
+
+    return actual, pred
+
 
 
 def plot_history(settings, num, history):

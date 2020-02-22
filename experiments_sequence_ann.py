@@ -30,9 +30,10 @@ def ann_experiment(prediction_horizon, minutes_sequence, cams):
     data = DataFrameSequence(False, 20, True, False)
     data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], minutes_sequence, cams)
     data.normalize_mega_df()
-    name_cam = 'CAMs_' + str(cams)
-    name_time = 'sq_' + str(minutes_sequence)
-    ann = ann_model.ANN(data, init_epochs, epochs, 'ANN_SEQUENCE_' + str(epochs) +'epoch_pred' + str(prediction_horizon) + '_' + name_cam + name_time)
+    name_cam = '_CAMs' + str(cams)
+    name_time = '_sq' + str(minutes_sequence)
+    name_pred = '_pred_' + str(prediction_horizon)
+    ann = ann_model.ANN(data, init_epochs, epochs, 'ANN_SEQUENCE_' + str(epochs) +'epoch' +  name_cam + name_time + name_pred)
     ann.run_experiment()
 
 def ann_test():
