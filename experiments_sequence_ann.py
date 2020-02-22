@@ -9,7 +9,7 @@ from data import plot_history
 init_epochs = 40
 epochs = 40
 start = 6
-end = 20
+end = 19
 
 res = []
 sets = []
