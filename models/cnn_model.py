@@ -55,7 +55,6 @@ class resnet50:
 
     def build_prem_models(self):
         prem = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
-        prem = [(8,10)]
 
         for tup in tqdm(prem, total=len(prem), unit='Days to predict'):
             self.data.split_data_set(tup[0], tup[1])

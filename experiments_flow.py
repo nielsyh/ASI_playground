@@ -28,12 +28,13 @@ def experiment(prediction_horizon):
 
 def train():
     data = DataFrameNormal()
-    data.build_df_for_cnn(10, 11, 1, [8])
-    cnn = cnn_model.resnet50(data, 1, 1)
+    data.build_df_for_cnn(10, 11, 1, [7,8,9,10,11,12])
+    cnn = cnn_model.resnet50(data, 200, 200)
     cnn.build_prem_models()
 
-prediction_horizons = list(range(1,21))
-for i in prediction_horizons:
-    experiment(i)
-    print('done: ' + str(i))
+# prediction_horizons = list(range(1,21))
+# for i in prediction_horizons:
+#     experiment(i)
+#     print('done: ' + str(i))
 
+train()
