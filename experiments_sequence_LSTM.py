@@ -99,12 +99,9 @@ def optimize():
     print('epoch: ')
     print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
 
-# minutes_sequence = int(sys.argv[1])
-# cams = int(sys.argv[2])
-# print('Minutes sequence: ' + str(minutes_sequence))
-# print('Cams: ' + str(cams))
-# run_lstm_experiments(10, 1)
+minutes_sequence = int(sys.argv[1])
+cams = int(sys.argv[2])
+print('Minutes sequence: ' + str(minutes_sequence))
+print('Cams: ' + str(cams))
+run_lstm_experiments(minutes_sequence, cams)
 
-# optimize()
-# LSTM_test()
-LSTM_experiment(20, 10, 1)
