@@ -22,18 +22,20 @@ prediction_horizons = list(range(1, 21))
 #data 24 hours ago
 #
 
-def run_ann_experiements(minutes_sequence, cams):
+def run_ann_experiements(minutes_sequence, cams, img):
     for i in prediction_horizons:
-        ann_experiment(i, minutes_sequence, cams)
+        ann_experiment(i, minutes_sequence, cams, img)
 
-def ann_experiment(prediction_horizon, minutes_sequence, cams):
-    data = DataFrameSequence(False, 20, True, False)
+def ann_experiment(prediction_horizon, minutes_sequence, cams, img):
+    data = DataFrameSequence(False, 20, True, img)
     data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], minutes_sequence, cams)
     data.normalize_mega_df()
-    name_cam = '_CAMs' + str(cams)
-    name_time = '_sq' + str(minutes_sequence)
-    name_pred = '_pred_' + str(prediction_horizon)
-    ann = ann_model.ANN(data, init_epochs, epochs, 'ANN_SEQUENCE_' + str(epochs) +'epoch' +  name_cam + name_time + name_pred)
+    name_epoch = 'epochs_' + str(epochs)
+    name_time = '_sequence_' + str(minutes_sequence)
+    name_cam = 'CAM_' + str(cams)
+    name_img = '_img_' + str(img)
+    name_pred = 'predhor_' + str(prediction_horizon)
+    ann = ann_model.ANN(data, init_epochs, epochs, 'ANN_SEQUENCE_' + name_epoch + name_time + name_cam + name_img + name_pred)
     ann.run_experiment()
 
 def ann_test():
@@ -104,11 +106,19 @@ def optimize():
 
 minutes_sequence = int(sys.argv[1])
 cams = int(sys.argv[2])
+img = int(sys.argv[3])
+
+if img == 1:
+    img = True
+else:
+    img = False
 
 print('Minutes sequence: ' + str(minutes_sequence))
 print('cams: ' + str(cams))
+print('IMG: ' + str(img))
 
-run_ann_experiements(minutes_sequence, cams)
+
+run_ann_experiements(minutes_sequence, cams, img)
 # ann_test()
 # optimize()
 
