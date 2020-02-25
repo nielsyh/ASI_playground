@@ -25,11 +25,17 @@ def Reg_experiment_thread(prediction_horizon, minutes_sequence, cams,img):
 
 def REG_test():
     data = DataFrameSequence(False, 20, True, True)
-    data.build_ts_df(start, end, [8,9], 5, 1)
+    data.build_ts_df(7, 11, [8,9], 5, 1)
     reg = regression_model.Regression_predictor(data, 'REG SEQUENCE TEST')
     reg.data.normalize_mega_df()
     reg.data.split_data_set(9, 11)
-    reg.data.flatten_data_set()
+    # reg.data.flatten_data_set()
+    data.flatten_data_set_to_3d()
+
+    data.train_x_df = data.train_x_df.reshape(data.train_x_df.shape[0], data.train_x_df.shape[1] * data.train_x_df.shape[2])
+    data.test_x_df = data.test_x_df.reshape(data.test_x_df.shape[0], data.test_x_df.shape[1] * data.test_x_df.shape[2])
+    data.val_x_df= data.val_x_df.reshape(data.val_x_df.shape[0], data.val_x_df.shape[1] * data.val_x_df.shape[2])
+
     reg.train()
     y_pred, rmse, mae, mape = reg.predict()
     print(rmse)

@@ -50,7 +50,7 @@ class Regression_predictor():
 
     def train(self):
         print('REG: Training..')
-        self.logisticRegr = LogisticRegression(max_iter=100)
+        self.logisticRegr = LogisticRegression(n_jobs=20)
         self.logisticRegr.fit(self.data.train_x_df, self.data.train_y_df)
         print('done..')
 

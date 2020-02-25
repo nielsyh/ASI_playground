@@ -1,3 +1,4 @@
+import calendar
 import datetime
 import ftplib
 import matplotlib
@@ -560,3 +561,43 @@ def get_error_month(month, start, end, step):
     print(Metrics.mae(y_observed, y_predicted))
     print('MAPE')
     print(Metrics.mape(y_observed, y_predicted))
+
+
+def search_weather_circ_days():
+# sunny > 75
+# coudy < 25
+# p.cloude > 25 < 75
+    months = [8,9,10,11,12]
+
+    sunny_days = [(8, 1), (8, 2), (8, 3), (8, 4), (8, 5), (8, 6), (8, 7), (8, 8), (8, 9), (8, 10), (8, 13), (8, 14), (8, 15), (8, 16), (8, 17), (8, 18), (8, 19), (8, 20), (8, 21), (8, 22), (8, 23), (8, 24), (8, 25), (8, 26), (8, 27), (8, 28), (8, 29), (8, 30), (8, 31), (9, 1), (9, 2), (9, 3), (9, 4), (9, 6), (9, 10), (9, 14), (9, 15), (9, 16), (9, 17), (9, 18), (9, 19), (9, 22), (9, 23), (9, 24), (9, 25), (9, 26), (9, 27), (9, 28), (9, 29), (9, 30), (10, 1), (10, 2), (10, 3), (10, 4), (10, 5), (10, 6), (10, 7), (10, 8), (10, 9), (10, 10), (10, 11), (10, 12), (10, 13), (10, 14), (10, 15), (10, 16), (10, 17), (10, 18), (10, 19), (10, 23), (10, 24), (10, 25), (10, 26), (10, 27), (10, 28), (10, 29), (10, 30), (10, 31), (11, 3), (11, 4), (11, 5), (11, 6), (11, 7), (11, 8), (11, 9), (11, 12), (11, 13), (11, 15), (11, 16), (11, 18), (11, 19), (11, 20), (11, 23), (11, 24), (11, 26), (11, 27), (11, 28), (11, 29), (11, 30), (12, 1), (12, 4), (12, 6), (12, 7), (12, 8), (12, 9), (12, 10), (12, 11), (12, 14), (12, 15), (12, 17), (12, 18), (12, 21), (12, 22), (12, 23), (12, 24), (12, 25), (12, 26), (12, 27), (12, 28), (12, 29), (12, 30)]
+    pcloudy_days = [(8, 11), (8, 12), (9, 5), (9, 7), (9, 8), (9, 9), (9, 12), (9, 13), (9, 20), (9, 21), (10, 20), (10, 21), (11, 1), (11, 2), (11, 10), (11, 11), (11, 14), (11, 17), (11, 21), (11, 22), (11, 25), (12, 2), (12, 5), (12, 12), (12, 13), (12, 16), (12, 19), (12, 20), (12, 31)]
+    cloudy_days = [(9, 11), (10, 22), (12, 3)]
+
+    # ALREADY CALCULATED
+    # for m in months:
+    #     days = list(range(1, calendar.monthrange(2019, m)[1] + 1))
+    #     for d in days:
+    #         ghi = get_df_csv_day_RP(m, d, 11, 15, 1)[:,8]
+    #         ghi_clr = PvLibPlayground.get_clear_sky_irradiance( PvLibPlayground.get_times(2019,
+    #                                                                                    m,  # month
+    #                                                                                    d,  # day
+    #                                                                                    11,# start time
+    #                                                                                    15))  # end time)
+    #         csi = PvLibPlayground.calc_clear_sky(ghi, ghi_clr).mean()
+    #         if csi > 0.75:
+    #             sunny_days.append((m,d))
+    #         elif csi > 0.25 and csi < 0.75:
+    #             pcloudy_days.append((m,d))
+    #         elif csi < 0.25:
+    #             cloudy_days.append((m,d))
+
+
+    print('sunny days: ' + str(len(sunny_days)))
+    print(sunny_days)
+
+    print('pcloudy days: ' + str(len(pcloudy_days)))
+    print(pcloudy_days)
+
+    print('Cloudy days: ' + str(len(cloudy_days)))
+    print(cloudy_days)
+
