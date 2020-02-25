@@ -25,7 +25,7 @@ def Reg_experiment_thread(prediction_horizon, minutes_sequence, cams,img):
 
 def REG_test():
     data = DataFrameSequence(False, 20, True, True)
-    data.build_ts_df(7, 11, [8,9], 5, 1)
+    data.build_ts_df(7, 19, [8,9], 5, 1)
     reg = regression_model.Regression_predictor(data, 'REG SEQUENCE TEST')
     reg.data.normalize_mega_df()
     reg.data.split_data_set(9, 11)
