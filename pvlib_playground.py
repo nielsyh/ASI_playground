@@ -6,7 +6,7 @@ import pvlib
 from pvlib import clearsky, atmosphere, solarposition
 from pvlib.location import Location
 from pvlib.iotools import read_tmy3
-
+import math
 
 class PvLibPlayground:
 
@@ -84,8 +84,24 @@ class PvLibPlayground:
         pass
 
     @staticmethod
+    def get_mean_sun_earth_distance():
+        # year = PvLibPlayground.get_year_df()
+        # df = PvLibPlayground.get_sun_earth_distance(year)
+        # calculated already, now its a constant for 2019
+        return 1.000201913026663
+
+    @staticmethod
     def get_sun_earth_distance(times):
         return pvlib.solarposition.pyephem_earthsun_distance(times).values.tolist()
+
+    @staticmethod
+    def csi_to_ghi(csi, month, day, hour, minute):
+        current_time = PvLibPlayground.get_pd_time(month, day, hour, minute)
+        next_time = PvLibPlayground.get_pd_time(month, day, hour, minute + 1)
+        times =  PvLibPlayground.get_df_times(current_time, next_time)
+        return csi * PvLibPlayground.get_dni_extra(times)[0] \
+               * (PvLibPlayground.get_mean_sun_earth_distance() / PvLibPlayground.get_sun_earth_distance(times)[0]) \
+               * math.cos(PvLibPlayground.get_solar_zenith_angle(month, day, times)[0])
 
     @staticmethod
     def get_solar_zenith_angle(month, day, times):
@@ -106,6 +122,12 @@ class PvLibPlayground:
         else:
             e = pd.Timestamp(year=year, month=month, day=day, hour=(end_time - 1), minute=59)
         return PvLibPlayground.get_df_times(s, e)
+
+    @staticmethod
+    def get_year_df():
+        start = pd.Timestamp(year=2019, month=1, day=1)
+        end = pd.Timestamp(year=2019, month=12, day=31)
+        return pd.date_range(start=start, end=end, freq='W', tz='UTC', name=None)
 
 
     @staticmethod

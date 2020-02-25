@@ -280,7 +280,7 @@ class DataFrameSequence:
         print('done')
 
 
-    def normalize_mega_df(self, ctn = [6,7,8], metoer_to_normalize= [9,12,16]):
+    def normalize_mega_df(self, ctn = [6,7,8], metoer_to_normalize= [9,13,17]):
         colums_to_normalize = ctn
         if (self.meteor_data):
             colums_to_normalize.extend(metoer_to_normalize)
