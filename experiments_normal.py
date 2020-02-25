@@ -24,8 +24,7 @@ def SVM_experiment_thread(prediction_horizon):
     print("Thread %s: starting", prediction_horizon)
 
     data = DataFrameSequence(meteor_data=True, images=True, debug=False)
-    # data.build_df(10, 17, 1, months=[7,8,9,10,11,12])
-    data.load_prev_mega_df('mega_df_32_True_True_.npy')
+    data.build_df(10, 17, 1, months=[7,8,9,10,11,12])
     data.set_prediction_horizon(prediction_horizon)
     svm = svm_model.SVM_predictor(data, model_name='SVM norm: default + images + metoer')
     svm.run_experiment()
@@ -36,47 +35,17 @@ def run_svm_multi_thread():
         x = threading.Thread(target=SVM_experiment_thread, args=(i,))
         x.start()
 
-def persistence_b_thread(prediction_horizon):
-    logging.info("PERSISTENCE b Thread %s: starting", prediction_horizon)
-    data = DataFrameNormal(meteor_data=False, images=False, debug=False)
-    data.build_df(9, 18, 1, months=[9, 10, 11, 12])
-    data.set_prediction_horizon(prediction_horizon)
-    persistence_b = persistence_model.Persistence_predictor_b(data)
-    persistence_b.run_experiment()
-
-    logging.info("Thread %s: finishing", prediction_horizon)
-
-def run_persistenceB_multi_thread():
-    prediction_horizons = [20]
-    for i in prediction_horizons:
-        x = threading.Thread(target=persistence_b_thread, args=(i,))
-        x.start()
-
-def train_cnn(prediction_horizon, months = [7,8,9,10,11,12]):
-    data = DataFrameSequence(meteor_data=False, images=False, debug=False)
-    data.build_df_for_cnn(12, 13, 1, months=months)
-    # data.save_df_cnn()
-    # data.set_prediction_horizon(prediction_horizon)
-    cnn = cnn_model.resnet50(data, init_epochs=3, epochs=3)
-    cnn.get_model(400)
-    cnn.run_experiment()
-
-def train_ann(prediction_horizon, months = [7,8,9,10,11,12]):
-    print(months)
-    data = DataFrameSequence(meteor_data=True, images=True, debug=False)
-    # data.build_df(9, 17, 1, months=months)
-    data.load_prev_mega_df('mega_df_32_True_True_.npy')
-    data.set_prediction_horizon(prediction_horizon)
-    ann = ann_model.ANN_Predictor(data, init_epochs=200, epochs=200)
-    ann.get_model()
-    ann.run_experiment()
-
-# run_persistenceB_multi_thread()
-
 data = DataFrameNormal(meteor_data=False, images=False, debug=False)
-data.build_df(8, 19, 1, months=[9, 10, 11, 12])
+data.build_df(10, 14, 1, months=[8,9])
 data.set_prediction_horizon(20)
-persistence_b = persistence_model.Persistence_predictor_b(data)
-persistence_b.run_experiment()
+svm = svm_model.SVM_predictor(data, model_name='test')
+
+svm.data.split_data_set(9, 15)
+svm.data.flatten_data_set()
+svm.data.normalize_data_sets()
+svm.train()
+y_pred, rmse, mae, mape = svm.predict()
+print(rmse)
+print(y_pred)
 
 

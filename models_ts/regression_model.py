@@ -1,14 +1,13 @@
-from sklearn.svm import SVC
-from dataframe_sequence import DataFrameSequence
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LogisticRegression
 from metrics import Metrics
+from models.model_template import Predictor_template
 import pickle
 import calendar
-from sklearn.model_selection import GridSearchCV
 import sys
-from sklearn.svm import SVR
 
-
-class SVM_predictor:
+class Regression_predictor():
     day_month_to_predict = []
 
     def __init__(self, data, name):
@@ -35,7 +34,7 @@ class SVM_predictor:
         self.day_month_to_predict = prem
 
         for exp in self.day_month_to_predict:
-            sys.stdout.write('SVM: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
+            sys.stdout.write('REG: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
             self.data.split_data_set(exp[0], exp[1])
             self.data.flatten_data_set()
             self.train()
@@ -48,41 +47,24 @@ class SVM_predictor:
                                       self.data.test_y_df, y_pred,
                                       self.data.pred_horizon)
 
+
     def train(self):
-        print('SVM: Training..')
-        self.svclassifier = SVC(kernel='rbf', gamma='auto')
-        # self.svclassifier = SVR(kernel='rbf', C=1e3, gamma=0.1)
-        self.model = self.svclassifier.fit(self.data.train_x_df, self.data.train_y_df)
+        print('REG: Training..')
+        self.logisticRegr = LogisticRegression(max_iter=100)
+        self.logisticRegr.fit(self.data.train_x_df, self.data.train_y_df)
         print('done..')
 
     def predict(self):
-        print('SVM: Predicting..')
-        y_pred = self.model.predict(self.data.test_x_df)
+        print('REG: Predicting..')
+        y_pred = self.logisticRegr.predict(self.data.test_x_df)
         rmse, mae, mape = Metrics.get_error(self.data.test_y_df, y_pred)
         sys.stdout.write(str(rmse))
         return y_pred, rmse, mae, mape
 
-    def optimize(self):
-        # defining parameter range
-        param_grid = {'C': [0.1, 1, 10, 100, 1000],
-                      'gamma': [1, 0.1, 0.01, 0.001, 0.0001],
-                      'kernel': ['rbf']}
 
-        grid = GridSearchCV(SVC(), param_grid, refit=True, verbose=3)
-        # fitting the model for grid search
-        grid.fit(self.data.train_x_df, self.data.train_y_df)
+# a = Regression_predictor()
+# a.train()
+# a.predict()
 
-        # print best parameter after tuning
-        print(grid.best_params_)
-        # print how our model looks after hyper-parameter tuning
-        print(grid.best_estimator_)
-
-    def save(self, name):
-        with open(name, 'wb') as file:
-            pickle.dump(self.model, file)
-
-    def load(self, name):
-        with open(name, 'rb') as file:
-            self.model = pickle.load(file)
 
 

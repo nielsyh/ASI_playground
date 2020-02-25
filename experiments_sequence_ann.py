@@ -40,11 +40,11 @@ def ann_experiment(prediction_horizon, minutes_sequence, cams, img):
 
 def ann_test():
     data = DataFrameSequence(False, 20, True, False)
-    data.build_ts_df(5, 20, [7,8,9], 100, 1)
+    data.build_ts_df(7, 17, [7,8,9], 20, 1)
     data.normalize_mega_df()
     ann = ann_model.ANN(data, 3, 3, 'ANN_BETA_SEQUENCE_TEST')
     data.split_data_set(9, 20)
-    data.flatten_data_set()
+    data.flatten_data_set_to_3d()
     ann.get_model()
     ann.train(100)
     plot_history('s1',1, ann.history)
@@ -116,7 +116,6 @@ else:
 print('Minutes sequence: ' + str(minutes_sequence))
 print('cams: ' + str(cams))
 print('IMG: ' + str(img))
-
 
 run_ann_experiements(minutes_sequence, cams, img)
 # ann_test()

@@ -49,16 +49,16 @@ class Regression_predictor(Predictor_template):
             Metrics.write_results('Regression predictor' + str(name), self.data.x_test, self.data.y_test, y_pred, self.data.pred_horizon)
 
 
-    def train(self):
+    def train(self,x, y):
         print('REG: Training..')
         self.logisticRegr = LogisticRegression(max_iter=1000)
-        self.logisticRegr.fit(self.data.x_train, self.data.y_train)
+        self.logisticRegr.fit(x, y)
         print('done..')
 
-    def predict(self):
+    def predict(self, x, y):
         print('REG: Predicting..')
-        y_pred = self.logisticRegr.predict(self.data.x_test)
-        rmse, mae, mape = Metrics.get_error(self.data.y_test, y_pred)
+        y_pred = self.logisticRegr.predict(x)
+        rmse, mae, mape = Metrics.get_error(y, y_pred)
         print(rmse)
         return y_pred, rmse, mae, mape
 

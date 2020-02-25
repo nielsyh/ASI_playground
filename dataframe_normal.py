@@ -78,6 +78,7 @@ class DataFrameNormal:
         print('Flattening..')
 
         self.train_df = self.train_df.reshape((self.train_df.shape[0] * self.train_df.shape[1], -1))
+        self.val_df = self.val_df.reshape((self.val_df.shape[0] * self.val_df.shape[1], -1))
         # self.test_df = self.test_df.reshape((self.test_df.shape[0] * self.test_df.shape[1], -1))
         # self.val_df = self.val_df.reshape((self.val_df.shape[0] * self.val_df.shape[1], -1))
 
@@ -87,8 +88,8 @@ class DataFrameNormal:
         self.x_test = self.test_df[:, 0:self.test_df.shape[1] - 1]
         self.y_test = self.test_df[:, -1]
 
-        # self.x_val = self.val_df[:, 0:self.val_df.shape[1] - 1]
-        # self.y_val = self.val_df[:, -1]
+        self.x_val = self.val_df[:, 0:self.val_df.shape[1] - 1]
+        self.y_val = self.val_df[:, -1]
 
         # self.x_train = np.concatenate((self.x_train, self.x_val))
         # self.y_train = np.concatenate((self.y_train, self.y_val))

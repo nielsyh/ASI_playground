@@ -73,7 +73,7 @@ class DataFrameSequence:
         return self.features[day_idx, start_time_idx:end_time_idx]
 
 
-    def build_ts_df(self, start, end, months, lenth_tm, cams):
+    def build_ts_df(self, start, end, months, lenth_tm, cams, clear_sky_label = False):
         self.start = start
         self.end = end
         self.months = months
@@ -133,7 +133,7 @@ class DataFrameSequence:
                                                                                        m,  # month
                                                                                        d,  # day
                                                                                        start,# start time
-                                                                                       end))  # end time
+                                                                                       end+1))  # end time
                     if cams == 2:  # get metoer data for 2nd location
                         PvLibPlayground.set_cam(2)
                         csi2, azimuth2, zenith2, sun_earth_dis2, ephemeris2 = \
@@ -141,7 +141,7 @@ class DataFrameSequence:
                                                                                             m,  # month
                                                                                             d,  # day
                                                                                             start,  # start time
-                                                                                            end))  # end time
+                                                                                            end+1))  # end time
 
                 day_index += 1
 
@@ -214,12 +214,18 @@ class DataFrameSequence:
 
                     self.mega_df_x_1[day_index, i] = ts
                     pred = i + (minutes-1) + self.pred_horizon
-                    self.mega_df_y_1[day_index, i] = day_data[pred, 8]
+
+                    if not clear_sky_label:
+                        self.mega_df_y_1[day_index, i] = day_data[pred, 8]
+                    else:
+                        self.mega_df_y_1[day_index, i] = PvLibPlayground.calc_clear_sky(day_data[pred, 8],csi[pred])
 
                     if cams == 2:
                         self.mega_df_x_2[day_index, i] = ts2
-                        self.mega_df_y_2[day_index, i] = day_data_2[pred, 8]
-
+                        if not clear_sky_label:
+                            self.mega_df_y_2[day_index, i] = day_data_2[pred, 8]
+                        else:
+                            self.mega_df_y_2[day_index, i] = PvLibPlayground.calc_clear_sky(day_data_2[pred, 8], csi2[pred])
 
     def label_df(self):
         pass
@@ -297,18 +303,12 @@ class DataFrameSequence:
         print('Flattening..')
 
         self.train_x_df = self.train_x_df.reshape(self.train_x_df.shape[0] * self.train_x_df.shape[1], self.sequence_len_minutes, self.number_of_features)
-        # self.train_x_df = self.train_x_df.reshape(self.train_x_df.shape[0], 60*17)
-
-        # self.test_x_df = self.test_x_df.reshape(self.test_x_df.shape[0] * self.test_x_df.shape[1], 60, 17)
-        # self.test_x_df = self.test_x_df.reshape(self.test_x_df.shape[0], 60 * 17)
 
         self.val_x_df = self.val_x_df.reshape(self.val_x_df.shape[0] * self.val_x_df.shape[1], self.sequence_len_minutes, self.number_of_features)
-        # self.val_x_df = self.val_x_df.reshape(self.val_x_df.shape[0], 60 * 17)
 
         self.train_y_df.reshape(self.train_y_df.shape[0] * self.train_y_df.shape[1])
         self.train_y_df = self.train_y_df.reshape(self.train_y_df.shape[0]* self.train_y_df.shape[1])
 
-        # self.test_y_df.reshape(self.test_y_df.shape[0] * self.test_y_df.shape[1])
         self.val_y_df.reshape(self.val_y_df.shape[0] * self.val_y_df.shape[1])
         self.val_y_df = self.val_y_df.reshape(self.val_y_df.shape[0]* self.val_y_df.shape[1])
 

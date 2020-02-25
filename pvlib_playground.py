@@ -115,6 +115,14 @@ class PvLibPlayground:
         return ghic['ghi'].values.tolist()
 
     @staticmethod
+    def get_dni_extra(times):
+        return pvlib.irradiance.get_extra_radiation(times, epoch_year=2019)
+
+    @staticmethod
+    def calc_clear_sky(ghi, ghi_clr):
+        return pvlib.irradiance.clearsky_index(ghi, ghi_clr, max_clearsky_index=2.0)
+
+    @staticmethod
     def get_ephemeris_data(times):
         #apparent_elevation : apparent sun elevation accounting for atmospheric refraction.
         #elevation : actual elevation (not accounting for refraction) of the sun in decimal degrees, 0 = on horizon. The complement of the zenith angle.

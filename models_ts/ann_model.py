@@ -92,7 +92,12 @@ class ANN():
         for exp in self.day_month_to_predict:
             print('ANN SEQUENCE: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
             self.data.split_data_set(exp[0], exp[1])
-            self.data.flatten_data_set()
+
+            self.data.flatten_data_set_to_3d()
+            self.data.test_x_df = self.data.test_x_df.reshape(self.data.test_x_df.shape[0], self.data.test_x_df.shape[1]*self.data.test_x_df.shape[2])
+            self.data.train_x_df = self.data.train_x_df.reshape(self.data.train_x_df.shape[0], self.data.train_x_df.shape[1]*self.data.train_x_df.shape[2])
+            self.data.val_x_df = self.data.val_x_df.reshape(self.data.val_x_df.shape[0], self.data.val_x_df.shape[1]*self.data.val_x_df.shape[2])
+
             self.get_model()
 
             epochs = self.epochs
