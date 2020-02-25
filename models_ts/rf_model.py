@@ -1,13 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.linear_model import LogisticRegression
 from metrics import Metrics
-from models.model_template import Predictor_template
+from sklearn.ensemble import RandomForestRegressor
 import pickle
 import calendar
 import sys
 
-class Regression_predictor():
+class RF_predictor():
     day_month_to_predict = []
 
     def __init__(self, data, name):
@@ -34,7 +33,7 @@ class Regression_predictor():
         self.day_month_to_predict = prem
 
         for exp in self.day_month_to_predict:
-            sys.stdout.write('REG: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
+            sys.stdout.write('RF: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
             self.data.split_data_set(exp[0], exp[1])
             self.data.flatten_data_set()
             self.train()
@@ -49,14 +48,14 @@ class Regression_predictor():
 
 
     def train(self):
-        print('REG: Training..')
-        self.logisticRegr = LogisticRegression(n_jobs=-1, solver='lbfgs', max_iter=1000, dual=False, verbose=1)
-        self.logisticRegr.fit(self.data.train_x_df, self.data.train_y_df)
+        print('RF: Training..')
+        self.model = RandomForestRegressor(n_estimators = 100, random_state = 0, n_jobs=-1)
+        self.model.fit(self.data.train_x_df, self.data.train_y_df)
         print('done..')
 
     def predict(self):
-        print('REG: Predicting..')
-        y_pred = self.logisticRegr.predict(self.data.test_x_df)
+        print('RF: Predicting..')
+        y_pred = self.model.predict(self.data.test_x_df)
         rmse, mae, mape = Metrics.get_error(self.data.test_y_df, y_pred)
         sys.stdout.write(str(rmse))
         return y_pred, rmse, mae, mape
