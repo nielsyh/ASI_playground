@@ -17,14 +17,14 @@ prediction_horizons = list(range(1, 21))
 def rf_experiment(minutes_sequence, cams,img):
     for i in prediction_horizons:
         print('start rf: ' + str(i))
-        data = DataFrameSequence(False,i, True, img)
+        data = DataFrameSequence(False,i, False, img)
         data.build_ts_df(start,end,[7,8,9,10,11,12],minutes_sequence, cams)
         data.normalize_mega_df()
         name_time = '_sequence_' + str(minutes_sequence)
         name_cam = 'CAM_' + str(cams)
         name_img = '_img_' + str(img)
         name_pred = 'predhor_' + str(i)
-        rf = rf_model.RF_predictor(data, 'RF SEQUENCE PREM_' + name_time + name_cam + name_img + name_pred)
+        rf = rf_model.RF_predictor(data, 'RF SEQUENCE PREM_ NO METOER' + name_time + name_cam + name_img + name_pred)
         rf.run_experiment()
         print('Finish rf: ' + str(i))
 

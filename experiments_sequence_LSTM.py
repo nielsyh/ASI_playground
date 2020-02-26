@@ -30,13 +30,13 @@ def LSTM_experiment(prediction_horizon, minutes_sequence, cams, img):
     name_cam = 'CAM_' + str(cams)
     name_img = '_img_' + str(img)
     name_pred = 'predhor_' + str(prediction_horizon)
-    lstm = lstm_model.LSTM_predictor(data, epochs, epochs, 'LSTM_SEQUENCE_' + name_epoch + name_time + name_cam + name_img + name_pred)
+    lstm = lstm_model.LSTM_predictor(data, epochs, epochs, 'LSTM_SEQUENCE_NO_METOER' + name_epoch + name_time + name_cam + name_img + name_pred)
     lstm.run_experiment()
 
 def LSTM_test():
-    data = DataFrameSequence(False, 20, True, True)
-    data.build_ts_df(7, 19, [8,9], 10, 1, clear_sky_label=True)
-    lstm = lstm_model.LSTM_predictor(data, 100, 50, 'LSTM_TEST', pred_csi=True)
+    data = DataFrameSequence(False, 20, False, False)
+    data.build_ts_df(7, 19, [8,9], 10, 1)
+    lstm = lstm_model.LSTM_predictor(data, 100, 50, 'LSTM_TEST')
     data.normalize_mega_df()
     data.split_data_set(9, 15)
     data.flatten_data_set_to_3d()
@@ -101,19 +101,19 @@ def optimize():
     print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
 
 
-LSTM_test()
-# minutes_sequence = int(sys.argv[1])
-# cams = int(sys.argv[2])
-# img = int(sys.argv[3])
-#
-# if img == 1:
-#     img = True
-# else:
-#     img = False
-#
-#
-# print('Minutes sequence: ' + str(minutes_sequence))
-# print('Cams: ' + str(cams))
-# print('IMG: ' + str(img))
-# run_lstm_experiments(minutes_sequence, cams, img)
+# LSTM_test()
+minutes_sequence = int(sys.argv[1])
+cams = int(sys.argv[2])
+img = int(sys.argv[3])
+
+if img == 1:
+    img = True
+else:
+    img = False
+
+
+print('Minutes sequence: ' + str(minutes_sequence))
+print('Cams: ' + str(cams))
+print('IMG: ' + str(img))
+run_lstm_experiments(minutes_sequence, cams, img)
 

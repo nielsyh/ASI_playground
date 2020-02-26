@@ -27,7 +27,7 @@ def run_ann_experiements(minutes_sequence, cams, img):
         ann_experiment(i, minutes_sequence, cams, img)
 
 def ann_experiment(prediction_horizon, minutes_sequence, cams, img):
-    data = DataFrameSequence(False, 20, True, img)
+    data = DataFrameSequence(False, 20, False, img)
     data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], minutes_sequence, cams)
     data.normalize_mega_df()
     name_epoch = 'epochs_' + str(epochs)
@@ -35,7 +35,7 @@ def ann_experiment(prediction_horizon, minutes_sequence, cams, img):
     name_cam = 'CAM_' + str(cams)
     name_img = '_img_' + str(img)
     name_pred = 'predhor_' + str(prediction_horizon)
-    ann = ann_model.ANN(data, init_epochs, epochs, 'ANN_SEQUENCE_' + name_epoch + name_time + name_cam + name_img + name_pred)
+    ann = ann_model.ANN(data, init_epochs, epochs, 'ANN_SEQUENCE_NOMETEOR' + name_epoch + name_time + name_cam + name_img + name_pred)
     ann.run_experiment()
 
 def ann_test():
@@ -54,7 +54,7 @@ def ann_test():
     #                           data.test_y_df, y_pred, data.pred_horizon)
 
 def optimize():
-    data = DataFrameSequence(False, 20, True, False)
+    data = DataFrameSequence(False, 20, False, False)
     data.build_ts_df(6, 18, [7,8,9,10,11,12], 60, 1)
     data.normalize_mega_df()
     data.split_data_set(11,15)
