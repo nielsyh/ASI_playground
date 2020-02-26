@@ -28,17 +28,33 @@ def rf_experiment(minutes_sequence, cams,img):
         rf.run_experiment()
         print('Finish rf: ' + str(i))
 
-minutes_sequence = int(sys.argv[1])
-cams = int(sys.argv[2])
-img = int(sys.argv[3])
+def rd_search_grid():
+    data = DataFrameSequence(False, 20, True, True)
+    data.build_ts_df(6, 19, [7, 8, 9, 10, 11, 12], 60, 1)
+    data.normalize_mega_df()
 
-if img == 1:
-    img = True
-else:
-    img = False
+    rfr = RandomForestRegressor(bootstrap=True, random_state=0, n_jobs=-1, verbose=1)
+    param_grid = dict(n_estimators=[50, 100, 200],
+                      max_depth=[50,100,200],
+                      min_samples_leaf=[1, 2, 4, 12, 24, 64])
 
-print('Minutes sequence: ' + str(minutes_sequence))
-print('cams: ' + str(cams))
-print('IMG: ' + str(img))
+    grid = GridSearchCV(rfr, param_grid, cv=10, scoring='neg_mean_squared_error')
+    grid.fit(data.test_x_df, data.test_y_df)
+    print("grid.best_params_ {}".format(grid.best_params_))
 
-rf_experiment(minutes_sequence, cams, img)
+
+rd_search_grid()
+# minutes_sequence = int(sys.argv[1])
+# cams = int(sys.argv[2])
+# img = int(sys.argv[3])
+#
+# if img == 1:
+#     img = True
+# else:
+#     img = False
+#
+# print('Minutes sequence: ' + str(minutes_sequence))
+# print('cams: ' + str(cams))
+# print('IMG: ' + str(img))
+#
+# rf_experiment(minutes_sequence, cams, img)
