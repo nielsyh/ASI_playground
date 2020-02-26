@@ -94,21 +94,25 @@ class PvLibPlayground:
     def get_sun_earth_distance(times):
         return pvlib.solarposition.pyephem_earthsun_distance(times).values.tolist()
 
-    @staticmethod
-    def csi_to_ghi(csi, month, day, hour, minute):
-        current_time = PvLibPlayground.get_pd_time(month, day, hour, minute)
-        next_time = PvLibPlayground.get_pd_time(month, day, hour, minute + 1)
-        times =  PvLibPlayground.get_df_times(current_time, next_time)
-        return csi * PvLibPlayground.get_dni_extra(times)[0] \
-               * (PvLibPlayground.get_mean_sun_earth_distance() / PvLibPlayground.get_sun_earth_distance(times)[0]) \
-               * math.cos(PvLibPlayground.get_solar_zenith_angle(month, day, times)[0])
 
     @staticmethod
-    def get_solar_zenith_angle(month, day, times):
-        doy = PvLibPlayground.get_day_of_year(month, day)
-        return pvlib.solarposition.solar_zenith_analytical(PvLibPlayground.get_latitude(),
-                                                    PvLibPlayground.get_hour_angle(doy, times),
-                                                    PvLibPlayground.get_declation_angle(month, day))
+    def csi_to_ghi(csi, month, day, hour, minute):
+        current_time = PvLibPlayground.get_pd_time(month = month, day=day, hour=hour, minute=minute)
+        next_time = PvLibPlayground.get_pd_time(month = month, day=day, hour=hour, minute=minute)
+        times =  PvLibPlayground.get_df_times(current_time, next_time)
+        dni_extra = PvLibPlayground.get_dni_extra(times)[0]
+        sun_earth_dist = PvLibPlayground.get_sun_earth_distance(times)[0]
+        zsa = math.cos(PvLibPlayground.get_solar_zenith_angle(times)[0])
+
+        print(month, day, hour, minute)
+        print(PvLibPlayground.get_solar_zenith_angle(times)[0])
+        print(zsa)
+
+        return csi * abs(dni_extra * math.pow( (PvLibPlayground.get_mean_sun_earth_distance() / sun_earth_dist), 2) * zsa)
+
+    @staticmethod
+    def get_solar_zenith_angle(times):
+        return pvlib.solarposition.ephemeris(times, PvLibPlayground.get_latitude(), PvLibPlayground.get_longitude(), pressure=101325, temperature=12)['zenith'].values
 
     @staticmethod
     def get_pd_time(month, day, hour, minute):

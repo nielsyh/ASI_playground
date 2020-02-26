@@ -34,17 +34,17 @@ def LSTM_experiment(prediction_horizon, minutes_sequence, cams, img):
     lstm.run_experiment()
 
 def LSTM_test():
-    data = DataFrameSequence(True, 20, True, True)
-    data.build_ts_df(6, 19, [9], 10, 1)
-    lstm = lstm_model.LSTM_predictor(data, 100, 50, 'LSTM_TEST')
+    data = DataFrameSequence(False, 20, True, True)
+    data.build_ts_df(7, 19, [8,9], 10, 1, clear_sky_label=True)
+    lstm = lstm_model.LSTM_predictor(data, 100, 50, 'LSTM_TEST', pred_csi=True)
     data.normalize_mega_df()
-    data.split_data_set(9, 27)
+    data.split_data_set(9, 15)
     data.flatten_data_set_to_3d()
     lstm.get_model()
-    lstm.train(10)
+    lstm.train(40)
     y_pred, rmse, mae, mape = lstm.predict()
     plot_history('s1', 1, lstm.history)
-    Metrics.write_results_NN('LSTM_TEST', data.test_x_df, data.test_y_df, y_pred, data.pred_horizon)
+    Metrics.write_results_SVR('LSTM_TEST 915', data.test_x_df, data.test_y_df, y_pred, data.pred_horizon)
 
 def optimize():
     data = DataFrameSequence(False, 20, True, False)
@@ -100,18 +100,20 @@ def optimize():
     print('epoch: ')
     print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
 
-minutes_sequence = int(sys.argv[1])
-cams = int(sys.argv[2])
-img = int(sys.argv[3])
 
-if img == 1:
-    img = True
-else:
-    img = False
-
-
-print('Minutes sequence: ' + str(minutes_sequence))
-print('Cams: ' + str(cams))
-print('IMG: ' + str(img))
-run_lstm_experiments(minutes_sequence, cams, img)
+LSTM_test()
+# minutes_sequence = int(sys.argv[1])
+# cams = int(sys.argv[2])
+# img = int(sys.argv[3])
+#
+# if img == 1:
+#     img = True
+# else:
+#     img = False
+#
+#
+# print('Minutes sequence: ' + str(minutes_sequence))
+# print('Cams: ' + str(cams))
+# print('IMG: ' + str(img))
+# run_lstm_experiments(minutes_sequence, cams, img)
 

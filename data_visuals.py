@@ -574,6 +574,18 @@ def days_plot():
                         [times2, times, times2, times4, times5, times52 ],
                         names, 'GHI forecast ' + str(i) + '/' + str(m), 'GHI in W/m2', xl='Time of day')
 
+def plot_day(m, d):
+    files = ['prem results/LSTM 10 IMG/LSTM_SEQUENCE_epochs_40_sequence_10CAM_1_img_Truepredhor_20.txt',
+             'LSTM_TEST 915.txt']
+    names = ['true', 'lstm 10', 'lstm 10 CSI']
+    predicted, actual, times = file_to_dates(files[0], m, d, 10)
+    predicted2, actual2, times2 = file_to_dates(files[1], m, d, 10)
+
+    plot_with_times([actual, predicted, predicted2],
+                    [times, times, times2],
+                    names, 'GHI forecast ' + str(d) + '/' + str(m), 'GHI in W/m2', xl='Time of day')
+
+
 def file_to_day_error(file_name):  # returns errors per day
     total_rmse, total_mae, total_mape = [], [], []
     times = []

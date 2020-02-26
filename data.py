@@ -520,7 +520,7 @@ def plot_history(settings, num, history):
     plt.figure()
     axes = plt.gca()
 
-    axes.set_ylim([0, 100000])
+    # axes.set_ylim([0, 100000])
 
     plt.plot(history.history['loss'])
     plt.plot(history.history['val_loss'])

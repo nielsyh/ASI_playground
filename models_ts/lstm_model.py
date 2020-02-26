@@ -6,6 +6,7 @@ from metrics import Metrics
 import keras
 from keras.models import load_model
 import calendar
+import pvlib_playground
 
 
 class TestCallback(Callback):
@@ -23,12 +24,13 @@ class LSTM_predictor():
     model = 0
     history = None
 
-    def __init__(self, data, init_epochs, epochs, name):
+    def __init__(self, data, init_epochs, epochs, name, pred_csi = False):
         self.data = data
         self.init_train = True
         self.init_epochs = init_epochs
         self.epochs = epochs
         self.name = name
+        self.pred_csi = pred_csi
 
     def get_model(self):
         model = Sequential()
@@ -63,6 +65,21 @@ class LSTM_predictor():
     def predict(self):
         y_pred =  self.model.predict(self.data.test_x_df)
         rmse, mae, mape = Metrics.get_error(self.data.test_y_df, y_pred)
+
+        if self.pred_csi:
+            # translate back to ghi
+            pred_ghi  = []
+            for idx, i in enumerate(y_pred):
+                print('csi: ' + str(i))
+                # print(int(self.data.test_x_df[idx][-1][4]))
+
+                ghi  = pvlib_playground.PvLibPlayground.csi_to_ghi(i, int(self.data.test_x_df[idx][-1][1]),
+                                                                   int(self.data.test_x_df[idx][-1][2]), int(self.data.test_x_df[idx][-1][3]),
+                                                                   int(self.data.test_x_df[idx][-1][4]))
+                print('ghi' + str(ghi))
+                pred_ghi.append(ghi)
+            return pred_ghi, rmse, mae, mape
+
         return y_pred, rmse, mae, mape
 
     def run_experiment(self):
