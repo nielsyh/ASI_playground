@@ -32,6 +32,8 @@ def rd_search_grid():
     data = DataFrameSequence(False, 20, True, True)
     data.build_ts_df(6, 19, [7, 8, 9, 10, 11, 12], 60, 1)
     data.normalize_mega_df()
+    data.split_data_set(10, 15)
+    data.flatten_data_set()
 
     rfr = RandomForestRegressor(bootstrap=True, random_state=0, n_jobs=-1, verbose=1)
     param_grid = dict(n_estimators=[50, 100, 200],
