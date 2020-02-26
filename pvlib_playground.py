@@ -102,11 +102,11 @@ class PvLibPlayground:
         times =  PvLibPlayground.get_df_times(current_time, next_time)
         dni_extra = PvLibPlayground.get_dni_extra(times)[0]
         sun_earth_dist = PvLibPlayground.get_sun_earth_distance(times)[0]
-        zsa = math.cos(PvLibPlayground.get_solar_zenith_angle(times)[0])
-
-        print(month, day, hour, minute)
-        print(PvLibPlayground.get_solar_zenith_angle(times)[0])
-        print(zsa)
+        zsa = math.cos(math.radians(PvLibPlayground.get_solar_zenith_angle(times)[0]))
+        #
+        # print(month, day, hour, minute)
+        # print(PvLibPlayground.get_solar_zenith_angle(times)[0])
+        # print(zsa)
 
         return csi * abs(dni_extra * math.pow( (PvLibPlayground.get_mean_sun_earth_distance() / sun_earth_dist), 2) * zsa)
 
@@ -164,7 +164,7 @@ class PvLibPlayground:
     def get_meteor_data(month, day, times):  # todo add more
         csi = PvLibPlayground.get_clear_sky_irradiance(times)
         azimuth = PvLibPlayground.get_azimuth(month, day, times)
-        zenith = PvLibPlayground.get_solar_zenith_angle(month, day, times)
+        zenith = PvLibPlayground.get_solar_zenith_angle(times)
         sun_earth_dist = PvLibPlayground.get_sun_earth_distance(times)
         ephemeris = PvLibPlayground.get_ephemeris_data(times)
         return csi, azimuth, zenith, sun_earth_dist, ephemeris

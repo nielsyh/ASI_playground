@@ -578,7 +578,7 @@ def plot_day(m, d):
     files = ['prem results/LSTM 10 IMG/LSTM_SEQUENCE_epochs_40_sequence_10CAM_1_img_Truepredhor_20.txt',
              'LSTM_TEST 915.txt']
     names = ['true', 'lstm 10', 'lstm 10 CSI']
-    predicted, actual, times = file_to_dates(files[0], m, d, 10)
+    predicted, actual, times = data.get_persistence_df(m, d, 6, 19, 20)
     predicted2, actual2, times2 = file_to_dates(files[1], m, d, 10)
 
     plot_with_times([actual, predicted, predicted2],
