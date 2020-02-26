@@ -261,11 +261,12 @@ def plot_err_hor_ANN():
                'prem results/ann prem 20 img/ANN_SEQUENCE_epochs_40_sequence_20CAM_1_img_Truepredhor_',
                'prem results/ann Prem 20 noimg/ANN_SEQUENCE_epochs_40_sequence_20CAM_1_img_Falsepredhor_',
                'prem results/ANN 10 img/ANN_SEQUENCE_epochs_40_sequence_10CAM_1_img_Truepredhor_',
-               'prem results/ANN 5 noimg/ANN_SEQUENCE_epochs_40_sequence_5CAM_1_img_Falsepredhor_']
+               'prem results/ANN 5 noimg/ANN_SEQUENCE_epochs_40_sequence_5CAM_1_img_Falsepredhor_',
+               'prem results/ANN 10 epchs 40 img/ANN_SEQUENCE_epochs_40_sequence_10CAM_1_img_Truepredhor_']
 
     # 'Persistence',
     names = ['ANN 10 no img', 'ANN 20 img',
-             'ANN 20 noimg', 'ANN 10 IMG', 'ANN 5 NOIMG']
+             'ANN 20 noimg', 'ANN 10 IMG', 'ANN 5 NOIMG', 'ANN 10 IMG new']
 
     extension = '.txt'
     predictions = list(range(1, 21))
@@ -306,13 +307,19 @@ def plot_err_hor_ANN():
     plot_error_per_horizons(trmse, predictions, names,
                             'MAPE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAPE')
 
-
-def plot_err_hor_LSTM():
+def plot_err_hor_RF():
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
     # 'persistence',
-    folders = ['prem results/lstm prem sq 10 noimg/LSTM_BETA_SEQUENCE_epochs_40CAM_1_sequence_10predhor_',
-               'prem results/LSTM 5 IMG/LSTM_SEQUENCE_epochs_40_sequence_5CAM_1_img_Truepredhor_',
-               'prem results/LSTM 10 IMG/LSTM_SEQUENCE_epochs_40_sequence_10CAM_1_img_Truepredhor_']
+    folders = ['prem results/RF 5 IMG/RF SEQUENCE PREM__sequence_5CAM_1_img_Truepredhor_',
+               'prem results/RF 5 NOIMG/RF SEQUENCE PREM__sequence_5CAM_1_img_Falsepredhor_',
+               'prem results/RF 10 IMG/RF SEQUENCE PREM__sequence_10CAM_1_img_Truepredhor_',
+               'prem results/RF 10 NOIMG/RF SEQUENCE PREM__sequence_10CAM_1_img_Falsepredhor_',
+               'prem results/RF 20 IMG/RF SEQUENCE PREM__sequence_20CAM_1_img_Truepredhor_',
+               'prem results/RF 20 NOIMG/RF SEQUENCE PREM__sequence_20CAM_1_img_Falsepredhor_',
+               'prem results/RF 30 IMG/RF SEQUENCE PREM__sequence_30CAM_1_img_Truepredhor_',
+               'prem results/RF 30 NOIMG/RF SEQUENCE PREM__sequence_30CAM_1_img_Falsepredhor_',
+               'prem results/RF 60 IMG/RF SEQUENCE PREM__sequence_60CAM_1_img_Truepredhor_',
+               'prem results/RF 60 NOIMG/RF SEQUENCE PREM__sequence_60CAM_1_img_Falsepredhor_']
 
     extension = '.txt'
     predictions = list(range(1,21))
@@ -339,7 +346,7 @@ def plot_err_hor_LSTM():
         tmape.append(mape)
 
     # 'Persistence',
-    names = ['LSTM 10', 'LSTM 5 img', 'LSTM 10 IMG']
+    names = ['RF 5 IMG', 'RF 5 NOIMG', 'RF 10 IMG', ' RF 10 NOIMG', 'RF 20 IMG', 'RF 20 NOIMG', 'RF 30 IMG', 'RF 30 NOIMG', 'RF 60 IMG', 'RF 60 NOIMG']
 
     plot_error_per_horizons(trmse, predictions, names,
                             'RMSE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in RMSE')
@@ -349,6 +356,97 @@ def plot_err_hor_LSTM():
 
     plot_error_per_horizons(trmse, predictions, names,
                             'MAPE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAPE')
+
+def plot_err_hor_LSTM():
+    t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
+    # 'persistence',
+    folders = ['prem results/lstm prem sq 10 noimg/LSTM_BETA_SEQUENCE_epochs_40CAM_1_sequence_10predhor_',
+               'prem results/LSTM 5 IMG/LSTM_SEQUENCE_epochs_40_sequence_5CAM_1_img_Truepredhor_',
+               'prem results/LSTM 10 IMG/LSTM_SEQUENCE_epochs_40_sequence_10CAM_1_img_Truepredhor_',
+               'prem results/LSTM 20 IMG/LSTM_SEQUENCE_epochs_40_sequence_20CAM_1_img_Truepredhor_',
+               'prem results/LSTM 20 NOIMG/LSTM_SEQUENCE_epochs_40_sequence_20CAM_1_img_Falsepredhor_']
+
+    extension = '.txt'
+    predictions = list(range(1,21))
+    # predictions = [1,2,5,10,15,20]
+
+    trmse, tmae, tmape = [],[],[]
+
+    for f in folders:
+        rmse, mae, mape = [],[],[]
+        for i in predictions:
+
+            if f == 'persistence':
+                actual, pred = data.get_persistence_dates(t, 6, 20, i)
+            else:
+                file = f + str(i) + extension
+                actual, pred = get_all_TP(file)
+
+            a, b, c = Metrics.get_error(actual, pred)
+            rmse.append(a)
+            mae.append(b)
+            mape.append(c)
+        trmse.append(rmse)
+        tmae.append(mae)
+        tmape.append(mape)
+
+    # 'Persistence',
+    names = ['LSTM 10', 'LSTM 5 img', 'LSTM 10 IMG', 'LSTM 20 IMG', 'LSTM 20 NOIMG']
+
+    plot_error_per_horizons(trmse, predictions, names,
+                            'RMSE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in RMSE')
+
+    plot_error_per_horizons(tmae, predictions, names,
+                            'MAE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAE')
+
+    plot_error_per_horizons(trmse, predictions, names,
+                            'MAPE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAPE')
+
+def plot_best_error_hor():
+    t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
+    folders = ['prem results/LSTM 10 IMG/LSTM_SEQUENCE_epochs_40_sequence_10CAM_1_img_Truepredhor_',
+              'prem results/lstm prem sq 10 noimg/LSTM_BETA_SEQUENCE_epochs_40CAM_1_sequence_10predhor_',
+              'prem results/RF 60 IMG/RF SEQUENCE PREM__sequence_60CAM_1_img_Truepredhor_',
+              'prem results/RF 60 NOIMG/RF SEQUENCE PREM__sequence_60CAM_1_img_Falsepredhor_',
+              'persistence'
+              ]
+
+    extension = '.txt'
+    predictions = list(range(1, 21))
+    # predictions = [1,2,5,10,15,20]
+
+    trmse, tmae, tmape = [], [], []
+
+    for f in folders:
+        rmse, mae, mape = [], [], []
+        for i in predictions:
+
+            if f == 'persistence':
+                actual, pred = data.get_persistence_dates(t, 6, 20, i)
+            else:
+                file = f + str(i) + extension
+                actual, pred = get_all_TP(file)
+
+            a, b, c = Metrics.get_error(actual, pred)
+            rmse.append(a)
+            mae.append(b)
+            mape.append(c)
+        trmse.append(rmse)
+        tmae.append(mae)
+        tmape.append(mape)
+
+    # 'Persistence',
+    names = ['LSTM 10 IMG', 'LSTM 10 NOIMG', 'RF 60 IMG', 'RF 60 NOIMG', 'Persistence']
+
+    plot_error_per_horizons(trmse, predictions, names,
+                            'RMSE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in RMSE')
+
+    plot_error_per_horizons(tmae, predictions, names,
+                            'MAE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAE')
+
+    plot_error_per_horizons(trmse, predictions, names,
+                            'MAPE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAPE')
+
 
 def print_error_prem_day():
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
