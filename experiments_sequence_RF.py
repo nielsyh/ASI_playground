@@ -33,7 +33,7 @@ def rf_experiment():
                 # name_img = '_img_' + str(img)
                 name_stage = 'stg_' + str(st)
                 name_pred = 'ph_' + str(i)
-                rf = rf_model.RF_predictor(data, 'RF SEQUENCE' + name_time + name_cam + name_img + name_stage + name_pred)
+                rf = rf_model.RF_predictor(data, 'RF SEQUENCE' + name_time + name_cam + name_stage + name_pred)
                 rf.set_days(data.get_thesis_test_days())
                 rf.run_experiment()
                 print('Finish rf: ' + str(i))

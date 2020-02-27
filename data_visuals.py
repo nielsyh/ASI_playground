@@ -184,6 +184,34 @@ def get_all_TP(file):
 
     return actual, predicted
 
+def file_to_values(file):
+    predicted, actual = [],[]
+    times = []
+    with open(file) as fp:
+        for line in fp:
+            l = line.split(',')
+
+            month = int(float(l[0]))
+            day = int(float(l[1]))
+            hour = int(float(l[2]))
+            minute = int(float(l[3]))
+
+            if l[5][0] == '[':
+                true = float(l[5][1:-2])
+            else:
+                true = float(l[5])
+            if l[6][0] == '[':
+                pred = float(l[6][1:-2])
+            else:
+                pred = float(l[6])
+
+            if int(true) == 0 or int(pred) == 0:
+                continue
+            else:
+                predicted.append(pred)
+                actual.append(true)
+    return predicted, actual
+
 
 def file_to_dates(file, month, day, offset):
     predicted, actual = [],[]

@@ -509,8 +509,12 @@ def get_persistence_dates(tups, start, end, pred_hor):
     for tup in tups:
         print(tup)
         p, a, _ = get_persistence_df(tup[0], tup[1], start, end, pred_hor)
-        actual.extend(a)
-        pred.extend(p)
+
+        if p == 0 or a == 0:
+            continue
+        else:
+            actual.extend(a)
+            pred.extend(p)
 
     return actual, pred
 
