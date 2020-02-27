@@ -17,20 +17,29 @@ sets = []
 min_vals = []
 min_loss = []
 
-def run_lstm_experiments(minutes_sequence, cams, img):
-    for i in prediction_horizons:
-        LSTM_experiment(i, minutes_sequence, cams, img)
+def run_lstm_experiments():
+    sqs = [5, 10, 20]
+    stages = [1,2]
+    for st in stages:
+        for s in sqs:
+            for i in prediction_horizons:
+                LSTM_experiment(i, s, 1, st)
 
-def LSTM_experiment(prediction_horizon, minutes_sequence, cams, img):
-    data = DataFrameSequence(False, prediction_horizon, False, img)
+def LSTM_experiment(prediction_horizon, minutes_sequence, cams, st):
+    if st == 1:
+        data = DataFrameSequence(False, prediction_horizon, False, True)
+    if st == 2:
+        data = DataFrameSequence(False, prediction_horizon, True, True)
+
     data.build_ts_df(start, end, [7,8,9,10,11,12], minutes_sequence, cams)
     data.normalize_mega_df()
     name_epoch = 'epochs_' + str(epochs)
-    name_time = '_sequence_' + str(minutes_sequence)
+    name_time = '_sqnc_' + str(minutes_sequence)
     name_cam = 'CAM_' + str(cams)
-    name_img = '_img_' + str(img)
-    name_pred = 'predhor_' + str(prediction_horizon)
-    lstm = lstm_model.LSTM_predictor(data, epochs, epochs, 'LSTM_SEQUENCE_NO_METOER' + name_epoch + name_time + name_cam + name_img + name_pred)
+    name_stage = 'stg_' + str(st)
+    name_pred = 'ph_' + str(prediction_horizon)
+    lstm = lstm_model.LSTM_predictor(data, epochs, epochs, 'LSTM_SEQUENCE' + name_epoch + name_time + name_cam  + name_stage + name_pred)
+    lstm.set_days(data.get_thesis_test_days())
     lstm.run_experiment()
 
 def LSTM_test():
@@ -102,19 +111,19 @@ def optimize():
 
 
 
-# LSTM_test()
-minutes_sequence = int(sys.argv[1])
-cams = int(sys.argv[2])
-img = int(sys.argv[3])
-
-if img == 1:
-    img = True
-else:
-    img = False
-
-
-print('Minutes sequence: ' + str(minutes_sequence))
-print('Cams: ' + str(cams))
-print('IMG: ' + str(img))
-run_lstm_experiments(minutes_sequence, cams, img)
+# # LSTM_test()
+# minutes_sequence = int(sys.argv[1])
+# cams = int(sys.argv[2])
+# img = int(sys.argv[3])
+#
+# if img == 1:
+#     img = True
+# else:
+#     img = False
+#
+#
+# print('Minutes sequence: ' + str(minutes_sequence))
+# print('Cams: ' + str(cams))
+# print('IMG: ' + str(img))
+run_lstm_experiments()
 

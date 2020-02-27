@@ -73,7 +73,7 @@ class DataFrameSequence:
         return self.features[day_idx, start_time_idx:end_time_idx]
 
 
-    def build_ts_df(self, start, end, months, lenth_tm, cams, clear_sky_label = False):
+    def build_ts_df(self, start, end, months, lenth_tm, cams, clear_sky_label = False, step=1):
         self.start = start
         self.end = end
         self.months = months
@@ -85,7 +85,8 @@ class DataFrameSequence:
               + ' lenght: ' + str(lenth_tm) + ' cams: ' + str(cams))
 
         # time_steps = int((((end - start) / lenth_tm) * 60) - self.sequence_len_minutes)
-        time_steps = int((end-start)*60 - lenth_tm) + 1
+        # time_steps = int((end-start)*60 - lenth_tm) + 1
+        time_steps = int(((end - start) * 60 - lenth_tm) /step)
         days = 0
         day_index = -1
 
@@ -229,6 +230,32 @@ class DataFrameSequence:
 
     def label_df(self):
         pass
+
+    def get_prem_days(self):  # prem test days
+        return [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
+
+    def get_all_test_days(self):  # copernicus test days
+        total = []
+        s = [24, 29, 30]
+        o = [1, 5, 6, 7, 8, 10, 12, 17, 18, 20, 23, 26, 29, 30 ]
+        n = [1, 6, 7, 8, 14, 18, 19, 20, 21, 26, 28]
+
+        for i in s:
+            total.append(9,i)
+        for j in o:
+            total.append(10,j)
+        for k in n:
+            total.append(11, k)
+
+        return total
+
+    def get_thesis_test_days(self):  # test days personal research
+        sunny = [(9, 15), (10, 15), (11, 15), (12, 15)]
+        pcloudy = [(10, 20), (11, 17), (12, 16)]
+        cloudy = [(10, 22), (12, 3)]
+        total = []
+        total.extend(sunny.extend(pcloudy.extend(cloudy)))
+        return total
 
     def split_data_set(self, m, d):
         print('Splitting with train until month: ' + str(m) + ', day: ' + str(d) + '...')

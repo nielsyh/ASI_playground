@@ -14,24 +14,10 @@ class RF_predictor():
         self.model = 0
         self.name = name
 
+    def set_days(self, days):
+        self.day_month_to_predict = days
+
     def run_experiment(self):
-        self.day_month_to_predict = []
-
-        for m in self.data.months:
-            last_day = calendar.monthrange(2019, m)[1]
-            if m < 9:
-                continue
-            elif m == 9:
-                days = list(range(11, last_day + 1)) #  Predict from 11 september
-            else:
-                days = list(range(1, last_day + 1))
-
-            for d in days:
-                self.day_month_to_predict.append((m, d))
-
-        prem = [(10,5), (10,6), (10,7), (10,8), (10,20)]
-        self.day_month_to_predict = prem
-
         for exp in self.day_month_to_predict:
             sys.stdout.write('RF: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
             self.data.split_data_set(exp[0], exp[1])
@@ -49,7 +35,7 @@ class RF_predictor():
 
     def train(self):
         print('RF: Training..')
-        self.model = RandomForestRegressor(n_estimators = 100, random_state = 0, n_jobs=-1)
+        self.model = RandomForestRegressor(n_estimators = 200,max_depth=100, min_samples_leaf=1, random_state = 0, n_jobs=-1)
         self.model.fit(self.data.train_x_df, self.data.train_y_df)
         print('done..')
 

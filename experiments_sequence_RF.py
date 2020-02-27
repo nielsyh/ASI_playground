@@ -15,18 +15,42 @@ prediction_horizons = list(range(1, 21))
 
 
 def rf_experiment(minutes_sequence, cams,img):
-    for i in prediction_horizons:
-        print('start rf: ' + str(i))
-        data = DataFrameSequence(False,i, False, img)
-        data.build_ts_df(start,end,[7,8,9,10,11,12],minutes_sequence, cams)
-        data.normalize_mega_df()
-        name_time = '_sequence_' + str(minutes_sequence)
-        name_cam = 'CAM_' + str(cams)
-        name_img = '_img_' + str(img)
-        name_pred = 'predhor_' + str(i)
-        rf = rf_model.RF_predictor(data, 'RF SEQUENCE PREM_ NO METOER' + name_time + name_cam + name_img + name_pred)
-        rf.run_experiment()
-        print('Finish rf: ' + str(i))
+
+    sqs = [30, 60, 120]
+    stages = [1,2]
+    for st in stages:
+        for s in sqs:
+            for i in prediction_horizons:
+                print('start rf: ' + str(i))
+                if st == 1:
+                    data = DataFrameSequence(False,i, False, True)
+                if st == 2:
+                    data = DataFrameSequence(False, i, True, True)
+                data.build_ts_df(start,end,[7,8,9,10,11,12],s, cams)
+                data.normalize_mega_df()
+                name_time = '_sqnc_' + str(minutes_sequence)
+                name_cam = 'CAM_' + str(cams)
+                name_img = '_img_' + str(img)
+                name_stage = 'stg_' + str(st)
+                name_pred = 'ph_' + str(i)
+                rf = rf_model.RF_predictor(data, 'RF SEQUENCE' + name_time + name_cam + name_img + name_stage + name_pred)
+                rf.set_days(data.get_thesis_test_days())
+                rf.run_experiment()
+                print('Finish rf: ' + str(i))
+
+def rf_test():
+    data = DataFrameSequence(False, 20, True, True)
+    data.build_ts_df(start, end, [8,9], 5, 1, step=1)
+    data.normalize_mega_df()
+    rf = rf_model.RF_predictor(data, 'RF SEQUENCE PREM_ NO METOER')
+
+    data.split_data_set(9, 15)
+    data.flatten_data_set()
+    rf.train()
+    y_pred, rmse, mae, mape = rf.predict()
+
+    print(rmse)
+    print(y_pred)
 
 def rd_search_grid():
     data = DataFrameSequence(False, 20, True, True)
@@ -45,7 +69,8 @@ def rd_search_grid():
     print("grid.best_params_ {}".format(grid.best_params_))
 
 
-rd_search_grid()
+rf_experiment()
+# rd_search_grid()
 # minutes_sequence = int(sys.argv[1])
 # cams = int(sys.argv[2])
 # img = int(sys.argv[3])

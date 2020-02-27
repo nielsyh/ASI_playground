@@ -23,6 +23,7 @@ class LSTM_predictor():
 
     model = 0
     history = None
+    day_month_to_predict = []
 
     def __init__(self, data, init_epochs, epochs, name, pred_csi = False):
         self.data = data
@@ -31,6 +32,9 @@ class LSTM_predictor():
         self.epochs = epochs
         self.name = name
         self.pred_csi = pred_csi
+
+    def set_days(self, days):
+        self.day_month_to_predict = days
 
     def get_model(self):
         model = Sequential()
@@ -83,23 +87,6 @@ class LSTM_predictor():
         return y_pred, rmse, mae, mape
 
     def run_experiment(self):
-        self.day_month_to_predict = []
-
-        for m in self.data.months:
-            last_day = calendar.monthrange(2019, m)[1]
-            if m < 9:
-                continue
-            elif m == 9:
-                days = list(range(11, last_day + 1)) #  Predict from 11 september
-            else:
-                days = list(range(1, last_day + 1))
-
-            for d in days:
-                self.day_month_to_predict.append((m, d))
-
-        prem = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
-        self.day_month_to_predict = prem
-
         for exp in self.day_month_to_predict:
             print('LSTM SEQUENCE: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
             self.data.split_data_set(exp[0], exp[1])

@@ -22,20 +22,32 @@ prediction_horizons = list(range(1, 21))
 #data 24 hours ago
 #
 
-def run_ann_experiements(minutes_sequence, cams, img):
-    for i in prediction_horizons:
-        ann_experiment(i, minutes_sequence, cams, img)
+def run_ann_experiements():
+    sqs = [20, 40, 60]
+    stages = [1,2]
+    for st in stages:
+        for s in sqs:
+            for i in prediction_horizons:
+                ann_experiment(i, s, 1, st)
 
-def ann_experiment(prediction_horizon, minutes_sequence, cams, img):
-    data = DataFrameSequence(False, 20, False, img)
+def ann_experiment(prediction_horizon, minutes_sequence, cams, st):
+
+    if st == 1:
+        data = DataFrameSequence(False, prediction_horizon, False, True)
+    if st == 2:
+        data = DataFrameSequence(False, prediction_horizon, True, True)
+
     data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], minutes_sequence, cams)
     data.normalize_mega_df()
+
     name_epoch = 'epochs_' + str(epochs)
-    name_time = '_sequence_' + str(minutes_sequence)
+    name_time = '_sqnc_' + str(minutes_sequence)
     name_cam = 'CAM_' + str(cams)
-    name_img = '_img_' + str(img)
-    name_pred = 'predhor_' + str(prediction_horizon)
-    ann = ann_model.ANN(data, init_epochs, epochs, 'ANN_SEQUENCE_NOMETEOR' + name_epoch + name_time + name_cam + name_img + name_pred)
+    name_stage = 'stg_' + str(st)
+    name_pred = 'ph_' + str(prediction_horizon)
+
+    ann = ann_model.ANN(data, init_epochs, epochs, 'ANN_SEQUENCE_' + name_epoch + name_time + name_cam + name_stage + name_pred)
+    ann.set_days(data.get_thesis_test_days())
     ann.run_experiment()
 
 def ann_test():
@@ -104,20 +116,20 @@ def optimize():
     print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
 
 
-minutes_sequence = int(sys.argv[1])
-cams = int(sys.argv[2])
-img = int(sys.argv[3])
+# minutes_sequence = int(sys.argv[1])
+# cams = int(sys.argv[2])
+# img = int(sys.argv[3])
+#
+# if img == 1:
+#     img = True
+# else:
+#     img = False
+#
+# print('Minutes sequence: ' + str(minutes_sequence))
+# print('cams: ' + str(cams))
+# print('IMG: ' + str(img))
 
-if img == 1:
-    img = True
-else:
-    img = False
-
-print('Minutes sequence: ' + str(minutes_sequence))
-print('cams: ' + str(cams))
-print('IMG: ' + str(img))
-
-run_ann_experiements(minutes_sequence, cams, img)
+run_ann_experiements()
 # ann_test()
 # optimize()
 
