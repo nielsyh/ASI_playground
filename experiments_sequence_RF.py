@@ -14,7 +14,7 @@ end = 19
 prediction_horizons = list(range(1, 21))
 
 
-def rf_experiment(minutes_sequence, cams,img):
+def rf_experiment():
 
     sqs = [30, 60, 120]
     stages = [1,2]
@@ -26,11 +26,11 @@ def rf_experiment(minutes_sequence, cams,img):
                     data = DataFrameSequence(False,i, False, True)
                 if st == 2:
                     data = DataFrameSequence(False, i, True, True)
-                data.build_ts_df(start,end,[7,8,9,10,11,12],s, cams)
+                data.build_ts_df(start,end,[7,8,9,10,11,12],s, 1)
                 data.normalize_mega_df()
-                name_time = '_sqnc_' + str(minutes_sequence)
-                name_cam = 'CAM_' + str(cams)
-                name_img = '_img_' + str(img)
+                name_time = '_sqnc_' + str(i)
+                name_cam = 'CAM_' + str(1)
+                # name_img = '_img_' + str(img)
                 name_stage = 'stg_' + str(st)
                 name_pred = 'ph_' + str(i)
                 rf = rf_model.RF_predictor(data, 'RF SEQUENCE' + name_time + name_cam + name_img + name_stage + name_pred)
