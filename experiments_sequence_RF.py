@@ -39,8 +39,9 @@ def rf_experiment(minutes_sequence, cams,img):
                 print('Finish rf: ' + str(i))
 
 def rf_test():
-    data = DataFrameSequence(False, 20, True, True)
-    data.build_ts_df(start, end, [8,9], 5, 1, step=1)
+    data = DataFrameSequence(True, 20, True, True)
+    a = data.get_thesis_test_days()
+    data.build_ts_df(7, 10, [8,9], 5, 1, step=1)
     data.normalize_mega_df()
     rf = rf_model.RF_predictor(data, 'RF SEQUENCE PREM_ NO METOER')
 
@@ -70,6 +71,7 @@ def rd_search_grid():
 
 
 rf_experiment()
+# rf_test()
 # rd_search_grid()
 # minutes_sequence = int(sys.argv[1])
 # cams = int(sys.argv[2])

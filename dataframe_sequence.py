@@ -254,7 +254,9 @@ class DataFrameSequence:
         pcloudy = [(10, 20), (11, 17), (12, 16)]
         cloudy = [(10, 22), (12, 3)]
         total = []
-        total.extend(sunny.extend(pcloudy.extend(cloudy)))
+        total.extend(sunny)
+        total.extend(pcloudy)
+        total.extend(cloudy)
         return total
 
     def split_data_set(self, m, d):
