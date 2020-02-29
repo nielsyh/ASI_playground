@@ -1,10 +1,8 @@
-from dataframe_sequence import DataFrameSequence
+from data.dataframe_sequence import DataFrameSequence
 from metrics import Metrics
-from models_ts import ann_model, lstm_model, svr_model
-import threading
-import sys
+from models.models_ts import ann_model, lstm_model, svr_model
 from keras import optimizers
-from data import plot_history
+from data.data import plot_history
 
 init_epochs = 40
 epochs = 40

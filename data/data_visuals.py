@@ -4,7 +4,7 @@ from metrics import *
 from datetime import time, timedelta
 import datetime
 import matplotlib.pyplot
-import data
+import data.data
 style.use('seaborn-poster') #sets the size of the charts
 style.use('ggplot')
 from matplotlib.ticker import FuncFormatter, MaxNLocator
@@ -117,8 +117,10 @@ def plot_error_per_horizons(errors, horizons, names, title, xl, yl):
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
     # plt.setp(ax.get_xticklabels(), rotation=90, horizontalalignment='right', fontsize='x-small')
 
+    lines = ['-','-','-','-','-','-','-','--','--','--','--','--','--','--']
+
     for idx, i in enumerate(errors):
-        plt.plot(horizons, i, linestyle='--', label=names[idx])
+        plt.plot(horizons, i, linestyle=lines[idx], label=names[idx])
 
     plt.legend()
     plt.title(title)
@@ -285,24 +287,27 @@ def file_to_months(file, offset):
 
 def plot_err_hor_ANN():
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
-    folders = ['prem results/ANN PREM 10min 1cam/ANN_SEQUENCE_40epoch_sq10_1cam_pred',
-               'prem results/ann prem 20 img/ANN_SEQUENCE_epochs_40_sequence_20CAM_1_img_Truepredhor_',
-               'prem results/ann Prem 20 noimg/ANN_SEQUENCE_epochs_40_sequence_20CAM_1_img_Falsepredhor_',
-               'prem results/ANN 10 img/ANN_SEQUENCE_epochs_40_sequence_10CAM_1_img_Truepredhor_',
-               'prem results/ANN 5 noimg/ANN_SEQUENCE_epochs_40_sequence_5CAM_1_img_Falsepredhor_',
-               'prem results/ANN 10 epchs 40 img/ANN_SEQUENCE_epochs_40_sequence_10CAM_1_img_Truepredhor_']
+    folders = ['persistence',
+               'prem results/ANN 5 IMG/ANN_SEQUENCE_epochs_40_sequence_5CAM_1_img_Truepredhor_',
+           'prem results/ANN 5 NOIMG/ANN_SEQUENCE_epochs_40_sequence_5CAM_1_img_Falsepredhor_',
+           'prem results/ANN 10 IMG/ANN_SEQUENCE_epochs_40_sequence_10CAM_1_img_Truepredhor_',
+           'prem results/ANN 20 IMG/ANN_SEQUENCE_epochs_40_sequence_20CAM_1_img_Truepredhor_',
+           'prem results/ANN 20 NOIMG/ANN_SEQUENCE_epochs_40_sequence_20CAM_1_img_Falsepredhor_',
+           'prem results/ANN 50 IMG/ANN_SEQUENCE_epochs_40_sequence_50CAM_1_img_Truepredhor_',
+           'prem results/ANN 60 NOIMG NOMETEOR/ANN_SEQUENCE_NOMETEORepochs_40_sequence_60CAM_1_img_Falsepredhor_'
+               ]
 
     # 'Persistence',
-    names = ['ANN 10 no img', 'ANN 20 img',
-             'ANN 20 noimg', 'ANN 10 IMG', 'ANN 5 NOIMG', 'ANN 10 IMG new']
+    names = ['Persistence']
 
     extension = '.txt'
     predictions = list(range(1, 21))
     # predictions = [1,2,5,10,15,20]
-
     trmse, tmae, tmape = [], [], []
 
     for f in folders:
+        if f != 'persistence':
+            names.append(f[f.find('/') + 1:-1][0:(f[f.find('/') + 1:-1]).find('/')])
         rmse, mae, mape = [], [], []
         for i in predictions:
 
@@ -332,13 +337,14 @@ def plot_err_hor_ANN():
     plot_error_per_horizons(tmae, predictions, names,
                             'MAE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAE')
 
-    plot_error_per_horizons(trmse, predictions, names,
+    plot_error_per_horizons(tmape, predictions, names,
                             'MAPE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAPE')
 
 def plot_err_hor_RF():
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
-    # 'persistence',
-    folders = ['prem results/RF 5 IMG/RF SEQUENCE PREM__sequence_5CAM_1_img_Truepredhor_',
+    names = ['Persistence']
+    folders = ['persistence',
+               'prem results/RF 5 IMG/RF SEQUENCE PREM__sequence_5CAM_1_img_Truepredhor_',
                'prem results/RF 5 NOIMG/RF SEQUENCE PREM__sequence_5CAM_1_img_Falsepredhor_',
                'prem results/RF 10 IMG/RF SEQUENCE PREM__sequence_10CAM_1_img_Truepredhor_',
                'prem results/RF 10 NOIMG/RF SEQUENCE PREM__sequence_10CAM_1_img_Falsepredhor_',
@@ -347,7 +353,9 @@ def plot_err_hor_RF():
                'prem results/RF 30 IMG/RF SEQUENCE PREM__sequence_30CAM_1_img_Truepredhor_',
                'prem results/RF 30 NOIMG/RF SEQUENCE PREM__sequence_30CAM_1_img_Falsepredhor_',
                'prem results/RF 60 IMG/RF SEQUENCE PREM__sequence_60CAM_1_img_Truepredhor_',
-               'prem results/RF 60 NOIMG/RF SEQUENCE PREM__sequence_60CAM_1_img_Falsepredhor_']
+               'prem results/RF 60 NOIMG/RF SEQUENCE PREM__sequence_60CAM_1_img_Falsepredhor_',
+               'prem results/RF 120 IMG/RF SEQUENCE PREM__sequence_120CAM_1_img_Truepredhor_',
+               'prem results/RF 120 NOIMG/RF SEQUENCE PREM__sequence_120CAM_1_img_Falsepredhor_']
 
     extension = '.txt'
     predictions = list(range(1,21))
@@ -356,6 +364,8 @@ def plot_err_hor_RF():
     trmse, tmae, tmape = [],[],[]
 
     for f in folders:
+        if f != 'persistence':
+            names.append(f[f.find('/') + 1:-1][0:(f[f.find('/') + 1:-1]).find('/')])
         rmse, mae, mape = [],[],[]
         for i in predictions:
 
@@ -373,35 +383,34 @@ def plot_err_hor_RF():
         tmae.append(mae)
         tmape.append(mape)
 
-    # 'Persistence',
-    names = ['RF 5 IMG', 'RF 5 NOIMG', 'RF 10 IMG', ' RF 10 NOIMG', 'RF 20 IMG', 'RF 20 NOIMG', 'RF 30 IMG', 'RF 30 NOIMG', 'RF 60 IMG', 'RF 60 NOIMG']
-
     plot_error_per_horizons(trmse, predictions, names,
                             'RMSE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in RMSE')
 
     plot_error_per_horizons(tmae, predictions, names,
                             'MAE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAE')
 
-    plot_error_per_horizons(trmse, predictions, names,
+    plot_error_per_horizons(tmape, predictions, names,
                             'MAPE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAPE')
 
 def plot_err_hor_LSTM():
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
+    names = ['Persistence']
     # 'persistence',
-    folders = ['prem results/lstm prem sq 10 noimg/LSTM_BETA_SEQUENCE_epochs_40CAM_1_sequence_10predhor_',
+    folders = ['persistence',
                'prem results/LSTM 5 IMG/LSTM_SEQUENCE_epochs_40_sequence_5CAM_1_img_Truepredhor_',
                'prem results/LSTM 10 IMG/LSTM_SEQUENCE_epochs_40_sequence_10CAM_1_img_Truepredhor_',
+               'prem results/LSTM 10 NOIMG/LSTM_BETA_SEQUENCE_epochs_40CAM_1_sequence_10predhor_',
                'prem results/LSTM 20 IMG/LSTM_SEQUENCE_epochs_40_sequence_20CAM_1_img_Truepredhor_',
                'prem results/LSTM 20 NOIMG/LSTM_SEQUENCE_epochs_40_sequence_20CAM_1_img_Falsepredhor_']
 
     extension = '.txt'
     predictions = list(range(1,21))
-    # predictions = [1,2,5,10,15,20]
-
     trmse, tmae, tmape = [],[],[]
 
     for f in folders:
         rmse, mae, mape = [],[],[]
+        if f != 'persistence':
+            names.append(f[f.find('/') + 1:-1][0:(f[f.find('/') + 1:-1]).find('/')])
         for i in predictions:
 
             if f == 'persistence':
@@ -418,34 +427,37 @@ def plot_err_hor_LSTM():
         tmae.append(mae)
         tmape.append(mape)
 
-    # 'Persistence',
-    names = ['LSTM 10', 'LSTM 5 img', 'LSTM 10 IMG', 'LSTM 20 IMG', 'LSTM 20 NOIMG']
-
     plot_error_per_horizons(trmse, predictions, names,
                             'RMSE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in RMSE')
 
     plot_error_per_horizons(tmae, predictions, names,
                             'MAE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAE')
 
-    plot_error_per_horizons(trmse, predictions, names,
+    plot_error_per_horizons(tmape, predictions, names,
                             'MAPE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAPE')
 
 def plot_best_error_hor():
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
-    folders = ['prem results/LSTM 10 IMG/LSTM_SEQUENCE_epochs_40_sequence_10CAM_1_img_Truepredhor_',
-              'prem results/lstm prem sq 10 noimg/LSTM_BETA_SEQUENCE_epochs_40CAM_1_sequence_10predhor_',
-              'prem results/RF 60 IMG/RF SEQUENCE PREM__sequence_60CAM_1_img_Truepredhor_',
-              'prem results/RF 60 NOIMG/RF SEQUENCE PREM__sequence_60CAM_1_img_Falsepredhor_',
-              'persistence'
-              ]
+    folders = ['persistence',
+               'prem results/LSTM 5 IMG/LSTM_SEQUENCE_epochs_40_sequence_5CAM_1_img_Truepredhor_',
+               'prem results/LSTM 10 IMG/LSTM_SEQUENCE_epochs_40_sequence_10CAM_1_img_Truepredhor_',
+               'prem results/LSTM 10 NOIMG/LSTM_BETA_SEQUENCE_epochs_40CAM_1_sequence_10predhor_',
+               'prem results/RF 60 IMG/RF SEQUENCE PREM__sequence_60CAM_1_img_Truepredhor_',
+               'prem results/RF 60 NOIMG/RF SEQUENCE PREM__sequence_60CAM_1_img_Falsepredhor_',
+               'prem results/RF 120 IMG/RF SEQUENCE PREM__sequence_120CAM_1_img_Truepredhor_',
+               'prem results/RF 120 NOIMG/RF SEQUENCE PREM__sequence_120CAM_1_img_Falsepredhor_'
+               ]
 
     extension = '.txt'
     predictions = list(range(1, 21))
     # predictions = [1,2,5,10,15,20]
+    names = ['Persistence']
 
     trmse, tmae, tmape = [], [], []
 
     for f in folders:
+        if f != 'persistence':
+            names.append(f[f.find('/') + 1:-1][0:(f[f.find('/') + 1:-1]).find('/')])
         rmse, mae, mape = [], [], []
         for i in predictions:
 
@@ -464,7 +476,6 @@ def plot_best_error_hor():
         tmape.append(mape)
 
     # 'Persistence',
-    names = ['LSTM 10 IMG', 'LSTM 10 NOIMG', 'RF 60 IMG', 'RF 60 NOIMG', 'Persistence']
 
     plot_error_per_horizons(trmse, predictions, names,
                             'RMSE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in RMSE')
@@ -472,7 +483,7 @@ def plot_best_error_hor():
     plot_error_per_horizons(tmae, predictions, names,
                             'MAE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAE')
 
-    plot_error_per_horizons(trmse, predictions, names,
+    plot_error_per_horizons(tmape, predictions, names,
                             'MAPE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAPE')
 
 

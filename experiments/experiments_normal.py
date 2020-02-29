@@ -1,14 +1,7 @@
-from dataframe_normal import DataFrameNormal
-from dataframe_sequence import DataFrameSequence
+from data.dataframe_normal import DataFrameNormal
+from data.dataframe_sequence import DataFrameSequence
 from models import persistence_model, regression_model, svm_model, cnn_model, ann_model
-from models_ts import ann_model as aans
-import time
-from data_visuals import plot_error
-from tqdm import tqdm
-import numpy as np
-import logging
 import threading
-import time
 import sys
 
 arg = sys.argv

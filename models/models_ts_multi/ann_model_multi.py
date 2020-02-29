@@ -10,7 +10,6 @@ from keras.models import load_model
 import calendar
 
 
-
 class TestCallback(Callback):
     def __init__(self, xtest, ytest):
         self.xtest = xtest
@@ -21,7 +20,7 @@ class TestCallback(Callback):
         loss = self.model.evaluate(x, y, verbose=0)
         print('\nTesting loss: {}\n'.format(loss))
 
-class ANN():
+class ANN_Multi():
 
     model = 0
     history = None
@@ -60,7 +59,7 @@ class ANN():
         model.add(Dense(124, input_dim=(self.data.train_x_df.shape[1]), kernel_initializer='normal', activation='relu'))
         model.add(Dense(256, activation='relu', kernel_regularizer=l2(0.01), bias_regularizer=l2(0.01)))
         model.add(Dense(124, activation='relu', kernel_regularizer=l2(0.01), bias_regularizer=l2(0.01)))
-        model.add(Dense(1, activation='relu'))
+        model.add(Dense(20, activation='linear'))
         opt = optimizers.Adam(lr=0.001)
         model.compile(loss='mean_squared_error', optimizer=opt)
         self.model = model

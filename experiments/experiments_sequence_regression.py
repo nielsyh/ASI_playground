@@ -1,6 +1,5 @@
-from dataframe_sequence import DataFrameSequence
-from metrics import Metrics
-from models_ts import regression_model
+from data.dataframe_sequence import DataFrameSequence
+from models.models_ts import regression_model
 import threading
 import sys
 

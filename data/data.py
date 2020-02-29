@@ -1,4 +1,3 @@
-import calendar
 import datetime
 import ftplib
 import matplotlib
@@ -12,7 +11,7 @@ import numpy as np
 from datetime import time
 from os import listdir, path
 import cv2
-import data_visuals
+import data.data_visuals
 # from data_visuals import plot_time_avg, plot_freq, plot_2_models, plot_time_avg_multi
 from metrics import Metrics
 from pvlib_playground import PvLibPlayground
@@ -537,6 +536,9 @@ def plot_history(settings, num, history):
 
     plt.clf()
     plt.close()
+
+
+
 
 def get_error_month(month, start, end, step):
     y_observed = []

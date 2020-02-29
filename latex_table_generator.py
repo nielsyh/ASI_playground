@@ -2,6 +2,24 @@ import data
 import data_visuals
 import metrics
 
+def avg_res(res):
+    return list(map(sum, zip(*res)))
+
+def round_list(ls):
+    avgls = [n/20 for n in ls]
+    l = []
+    for i in avgls:
+        l.append(round(i, 4))
+    return l
+def calc_ss(res):
+    result = ['NA']
+    for i in range(1, len(res)):
+        result.append(round(1 - (res[i] / res[0]),4))
+
+    return result
+
+
+
 
 def print_table(model_names, rmse, mae, mape, ss_rmse, ss_mae, ss_mape, caption, label):
     print('\\begin{table}[]')
@@ -103,3 +121,7 @@ for i in prediction_horizons:
     ass_rmse.append(ss_rmse)
     ass_mae.append(ss_mae)
     ass_mape.append(ss_mape)
+
+    print_table( model_names, round_list(avg_res(armse)), round_list(avg_res(amae)),
+                 round_list(avg_res(amape)), calc_ss(avg_res(armse)), calc_ss(avg_res(amae)),
+                 calc_ss(avg_res(amape)), 'Average performance evaluation Prem. days', 'prem.avg')

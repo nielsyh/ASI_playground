@@ -1,12 +1,7 @@
-from dataframe_sequence import DataFrameSequence
-from metrics import Metrics
-from models_ts import rf_model
-import threading
-import sys
-
+from data.dataframe_sequence import DataFrameSequence
+from models.models_ts import rf_model
 from sklearn.model_selection import cross_val_score, GridSearchCV
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.preprocessing import MinMaxScaler
 
 
 start = 6

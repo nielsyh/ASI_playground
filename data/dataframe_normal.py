@@ -1,15 +1,11 @@
-import ftplib
 from builtins import enumerate
-
-from data_visuals import *
+from data.data_visuals import *
 from metrics import Metrics
-from pvlib_playground import PvLibPlayground
 from features import get_image_by_date_time, int_to_str, extract_features, show_img
 import calendar
-from datetime import date
 from tqdm import tqdm
 from sklearn.preprocessing import *
-from data import month_to_year, PvLibPlayground, int_to_str, process_csv, get_df_csv_day_RP
+from data.data import month_to_year, PvLibPlayground, int_to_str, process_csv, get_df_csv_day_RP
 
 
 class DataFrameNormal:

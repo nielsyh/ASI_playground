@@ -1,7 +1,7 @@
 from keras.models import load_model
 import metrics
-from data_frame_asi import DataFrameIMG
-from dataframe_normal import DataFrameNormal
+from data.data_frame_asi import DataFrameIMG
+from data.dataframe_normal import DataFrameNormal
 from tqdm import tqdm
 from models import cnn_model
 
