@@ -35,10 +35,12 @@ def rf_experiment():
 
 def rf_test():
     data = DataFrameSequence(True, 20, True, True)
-    a = data.get_thesis_test_days()
+    a = data.get_prem_days()
     data.build_ts_df(7, 10, [8,9], 5, 1, step=1)
     data.normalize_mega_df()
     rf = rf_model.RF_predictor(data, 'RF SEQUENCE PREM_ NO METOER')
+
+    rf.set_days(a)
 
     data.split_data_set(9, 15)
     data.flatten_data_set()
@@ -65,8 +67,9 @@ def rd_search_grid():
     print("grid.best_params_ {}".format(grid.best_params_))
 
 
-rf_experiment()
-# rf_test()
+# rf_experiment()
+rf_test()
+
 # rd_search_grid()
 # minutes_sequence = int(sys.argv[1])
 # cams = int(sys.argv[2])

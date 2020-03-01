@@ -14,7 +14,3 @@ module load userspace/all userspace/custom opt/all
 module load anaconda3/2019.10
 module load CUDA/10.1
 module load CUDA/DNN10.1
-
-python experiments_sequence_ann.py $1 $2 $3
-
-

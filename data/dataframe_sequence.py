@@ -51,7 +51,7 @@ class DataFrameSequence:
             raise ValueError('Cams 2 and images not possible')
 
     def load_features(self):
-        self.features = np.load('x_22_d6to19_m7to12.npy')
+        self.features = np.load('../x_22_d6to19_m7to12.npy')
 
     def get_feature_data(self, month, day, start, end):
         start_time_idx = (start - 6)*60

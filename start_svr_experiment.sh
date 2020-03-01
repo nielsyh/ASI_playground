@@ -13,7 +13,6 @@ module load userspace/all userspace/custom opt/all
 module load anaconda3/2019.10
 module load CUDA/10.1
 module load CUDA/DNN10.1
-
-python experiments/experiments_sequence_svr.py $1 $2
+python experiments_sequence_svr.py $1 $2
 
 
