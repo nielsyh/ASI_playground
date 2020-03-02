@@ -22,7 +22,7 @@ prediction_horizons = list(range(1, 21))
 #data 24 hours ago
 #
 
-def run_ann_experiements():
+def run_ann_experiments():
     sqs = [20, 40, 60]
     permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
     permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
@@ -40,27 +40,6 @@ def run_ann_experiements():
                                             'ANN_SEQUENCE_MULTI' + name_epoch + name_time + name_data)
             ann.set_days(data.get_prem_days())
             ann.run_experiment()
-
-
-def ann_experiment(prediction_horizon, minutes_sequence, cams, st):
-
-    if st == 1:
-        data = DataFrameSequenceMulti(False, prediction_horizon, False, True)
-    if st == 2:
-        data = DataFrameSequenceMulti(False, prediction_horizon, True, True)
-
-    data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], minutes_sequence, cams)
-    data.normalize_mega_df()
-
-    name_epoch = 'epochs_' + str(epochs)
-    name_time = '_sqnc_' + str(minutes_sequence)
-    name_cam = 'CAM_' + str(cams)
-    name_stage = 'stg_' + str(st)
-    name_pred = 'ph_' + str(prediction_horizon)
-
-    ann = ann_model_multi.ANN_Multi(data, init_epochs, epochs, 'ANN_SEQUENCE_' + name_epoch + name_time + name_cam + name_stage + name_pred)
-    ann.set_days(data.get_thesis_test_days())
-    ann.run_experiment()
 
 def ann_test():
     data = DataFrameSequenceMulti(False, True, True, True)
@@ -147,8 +126,8 @@ def optimize():
 # print('cams: ' + str(cams))
 # print('IMG: ' + str(img))
 
-# run_ann_experiements()
-ann_test()
+run_ann_experiments()
+# ann_test()
 # optimize()
 
 
