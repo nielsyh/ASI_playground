@@ -65,21 +65,7 @@ def rd_search_grid():
     print("grid.best_params_ {}".format(grid.best_params_))
 
 
-# rf_experiment()
-rf_test()
+
 
 # rd_search_grid()
-# minutes_sequence = int(sys.argv[1])
-# cams = int(sys.argv[2])
-# img = int(sys.argv[3])
-#
-# if img == 1:
-#     img = True
-# else:
-#     img = False
-#
-# print('Minutes sequence: ' + str(minutes_sequence))
-# print('cams: ' + str(cams))
-# print('IMG: ' + str(img))
-#
-# rf_experiment(minutes_sequence, cams, img)
+rf_experiment()
