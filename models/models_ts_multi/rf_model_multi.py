@@ -19,7 +19,7 @@ class RF_predictor():
 
     def run_experiment(self):
         for exp in self.day_month_to_predict:
-            sys.stdout.write('RF: ' + str(exp) + ', horizon: ' + str(self.data.pred_horizon))
+            sys.stdout.write('RF: ' + str(exp))
             self.data.split_data_set(exp[0], exp[1])
             self.data.flatten_data_set()
             self.train()

@@ -10,7 +10,6 @@ init_epochs = 40
 epochs = 40
 start = 6
 end = 19
-prediction_horizons = list(range(1, 21))
 
 res = []
 sets = []
