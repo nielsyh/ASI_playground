@@ -6,8 +6,6 @@ from metrics import Metrics
 
 start = 6
 end = 19
-prediction_horizons = list(range(1, 21))
-
 
 def rf_experiment():
     permutations = [(True, True, True),(True, False, False), (False, True, False), (False, False, True)]

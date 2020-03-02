@@ -42,7 +42,7 @@ def rf_test():
 
     rf.set_days(a)
 
-    data.split_data_set(9, 15)
+    data.split_data_set(9, 27)
     data.flatten_data_set()
     rf.train()
     y_pred, rmse, mae, mape = rf.predict()

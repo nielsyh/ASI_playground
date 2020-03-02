@@ -17,10 +17,6 @@ min_vals = []
 min_loss = []
 prediction_horizons = list(range(1, 21))
 
-#BONUSSES/TODO
-#forecast metoeor data
-#data 24 hours ago
-#
 
 def run_ann_experiments():
     sqs = [20, 40, 60]

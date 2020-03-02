@@ -1,5 +1,6 @@
 import numpy as np
-from data.data_helper import month_to_year, PvLibPlayground, int_to_str, process_csv, get_df_csv_day_RP
+from data.data_helper import month_to_year, get_df_csv_day_RP
+import pvlib_playground
 import calendar
 from tqdm import tqdm
 import pandas as pd
@@ -51,7 +52,7 @@ class DataFrameSequence:
             raise ValueError('Cams 2 and images not possible')
 
     def load_features(self):
-        self.features = np.load('../x_22_d6to19_m7to12.npy')
+        self.features = np.load('x_22_d6to19_m7to12.npy')
 
     def get_feature_data(self, month, day, start, end):
         start_time_idx = (start - 6)*60
@@ -128,17 +129,17 @@ class DataFrameSequence:
                     day_data_2 = get_df_csv_day_RP(m, d, start, end+1, 1, cam=2).astype(int)
 
                 if self.meteor_data:  # get metoer data for 1st location
-                    PvLibPlayground.set_cam(1)
+                    pvlib_playground.PvLibPlayground.set_cam(1)
                     csi, azimuth, zenith, sun_earth_dis, ephemeris = \
-                        PvLibPlayground.get_meteor_data(m, d, PvLibPlayground.get_times(2019,
+                        pvlib_playground.PvLibPlayground.get_meteor_data(m, d, pvlib_playground.PvLibPlayground.get_times(2019,
                                                                                        m,  # month
                                                                                        d,  # day
                                                                                        start,# start time
                                                                                        end+1))  # end time
                     if cams == 2:  # get metoer data for 2nd location
-                        PvLibPlayground.set_cam(2)
+                        pvlib_playground.PvLibPlayground.set_cam(2)
                         csi2, azimuth2, zenith2, sun_earth_dis2, ephemeris2 = \
-                            PvLibPlayground.get_meteor_data(m, d, PvLibPlayground.get_times(2019,
+                            pvlib_playground.PvLibPlayground.get_meteor_data(m, d, pvlib_playground.PvLibPlayground.get_times(2019,
                                                                                             m,  # month
                                                                                             d,  # day
                                                                                             start,  # start time
@@ -219,14 +220,14 @@ class DataFrameSequence:
                     if not clear_sky_label:
                         self.mega_df_y_1[day_index, i] = day_data[pred, 8]
                     else:
-                        self.mega_df_y_1[day_index, i] = PvLibPlayground.calc_clear_sky(day_data[pred, 8],csi[pred])
+                        self.mega_df_y_1[day_index, i] = pvlib_playground.PvLibPlayground.calc_clear_sky(day_data[pred, 8],csi[pred])
 
                     if cams == 2:
                         self.mega_df_x_2[day_index, i] = ts2
                         if not clear_sky_label:
                             self.mega_df_y_2[day_index, i] = day_data_2[pred, 8]
                         else:
-                            self.mega_df_y_2[day_index, i] = PvLibPlayground.calc_clear_sky(day_data_2[pred, 8], csi2[pred])
+                            self.mega_df_y_2[day_index, i] = pvlib_playground.PvLibPlayground.calc_clear_sky(day_data_2[pred, 8], csi2[pred])
 
     def label_df(self):
         pass
