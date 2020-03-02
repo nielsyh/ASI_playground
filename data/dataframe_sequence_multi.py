@@ -299,9 +299,9 @@ class DataFrameSequenceMulti:
         print('done')
 
     def normalize_mega_df(self):
-        norm_onsite = [6, 7, 8]
+        norm_onsite = [1, 2, 3, 4, 5, 6, 7, 8]
         if self.meteor_data:
-            norm_metoer = [self.meteor_idx, self.meteor_idx + 4, self.meteor_idx + 8] #[9, 13, 17]
+            norm_metoer = [self.meteor_idx,self.meteor_idx+1, self.meteor_idx + 4, self.meteor_idx + 5, self.meteor_idx + 6, self.meteor_idx + 7, self.meteor_idx + 8] #[9, 13, 17]
         if self.img_data:
             norm_img = [self.img_idx, self.img_idx +1 , self.img_idx+ 2, self.img_idx + 3]
 

@@ -6,8 +6,7 @@ import sys
 from keras import optimizers
 from data.data_helper import plot_history
 
-init_epochs = 40
-epochs = 40
+epochs = 5it 0
 start = 6
 end = 19
 
@@ -37,14 +36,14 @@ def run_lstm_experiment():
 
 
 def LSTM_test():
-    data = DataFrameSequenceMulti(True,True, True, True)
-    data.build_ts_df(7, 19, [8], 10, 1)
+    data = DataFrameSequenceMulti(False, True, True, True)
+    data.build_ts_df(6, 19, [8,9,10], 10, 1)
     lstm = lstm_model_multi.LSTM_predictor(data, 100, 'LSTM_TEST')
     data.normalize_mega_df()
-    data.split_data_set(8, 27)
+    data.split_data_set(9, 15)
     data.flatten_data_set_to_3d()
     lstm.get_model()
-    lstm.train(10)
+    lstm.train(50)
     y_pred, rmse, mae, mape = lstm.predict()
     plot_history('s1', 1, lstm.history)
     Metrics.write_results_multi('LSTM_TEST_MULTI', data.test_x_df.reshape(
@@ -111,8 +110,8 @@ def optimize():
     print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
 
 
-run_lstm_experiment()
-# LSTM_test()
+# run_lstm_experiment()
+LSTM_test()
 # minutes_sequence = int(sys.argv[1])
 # cams = int(sys.argv[2])
 # img = int(sys.argv[3])
