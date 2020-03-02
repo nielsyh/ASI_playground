@@ -9,13 +9,11 @@
 #SBATCH -e job.%N.%j.err  # STDERR
 
 
-echo what model: rf, ann, lstm, flow
-read -p 'model: ' model
-echo set $model
+echo what model: 1 rf, 2 ann, 3 lstm, 4 flow
+echo $1
 
 echo Single 0 or Multi 1 output model?
-read -p 'Multi or Single : ' output
-echo set $output
+echo $2
 
 module purge
 module load userspace/all userspace/custom opt/all
@@ -24,9 +22,9 @@ module load CUDA/10.1
 module load CUDA/DNN10.1
 
 
-if [[ $model = "rf" ]]
+if [[ $1 = "1" ]]
 then
-   if [[ $output = "0" ]]
+   if [[ $2 = "0" ]]
     then
         echo single rf
         #SBATCH -J RF s
@@ -38,9 +36,9 @@ then
     fi
 fi
 
-if [[ $model = "ann" ]]
+if [[ $1 = "2" ]]
 then
-   if [[ $output = "0" ]]
+   if [[ $2 = "0" ]]
     then
         echo single ann
         #SBATCH -J ANN s
@@ -52,9 +50,9 @@ then
     fi
 fi
 
-if [[ $model = "lstm" ]]
+if [[ $1 = "4" ]]
 then
-   if [[ $output = "0" ]]
+   if [[ $2 = "0" ]]
     then
         echo single lstm
         #SBATCH -J LSTMs
@@ -66,7 +64,7 @@ then
     fi
 fi
 
-if [[ $model = "flow" ]]
+if [[ $1 = "4" ]]
 then
     echo flow
     #SBATCH -J flow
