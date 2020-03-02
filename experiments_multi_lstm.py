@@ -110,8 +110,8 @@ def optimize():
     print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
 
 
-# run_lstm_experiment()
-LSTM_test()
+run_lstm_experiment()
+# LSTM_test()
 # minutes_sequence = int(sys.argv[1])
 # cams = int(sys.argv[2])
 # img = int(sys.argv[3])
