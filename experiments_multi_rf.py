@@ -19,7 +19,7 @@ def rf_experiment():
             data.build_ts_df(start,end,[7,8,9,10,11,12],s)
             data.normalize_mega_df()
 
-            name_time = '_sqnc_' + str(sqs)
+            name_time = '_sqnc_' + str(s)
             name_data = 'data_' + permutations_names[pidx]
 
             rf = rf_model_multi.RF_predictor(data, 'RF SEQUENCE multi' + name_time + name_data)

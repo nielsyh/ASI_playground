@@ -50,7 +50,7 @@ then
     fi
 fi
 
-if [[ $1 = "4" ]]
+if [[ $1 = "3" ]]
 then
    if [[ $2 = "0" ]]
     then

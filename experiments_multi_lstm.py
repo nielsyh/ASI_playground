@@ -26,7 +26,7 @@ def run_lstm_experiment():
             data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], s)
             data.normalize_mega_df()
 
-            name_time = '_sqnc_' + str(sqs)
+            name_time = '_sqnc_' + str(s)
             name_data = 'data_' + permutations_names[pidx]
             name_epoch = 'epochs_' + str(epochs)
 
