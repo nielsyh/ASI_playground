@@ -1,8 +1,10 @@
-from data.dataframe_sequence import DataFrameSequence
+from data.dataframe_sequence_multi import DataFrameSequenceMulti
 from metrics import Metrics
-from models.models_ts import ann_model, lstm_model, svr_model
+from models.models_ts_multi import lstm_model_multi
+import threading
+import sys
 from keras import optimizers
-from data.data import plot_history
+from data.data_helper import plot_history
 
 init_epochs = 40
 epochs = 40
@@ -17,44 +19,46 @@ min_loss = []
 
 def run_lstm_experiments():
     sqs = [5, 10, 20]
-    stages = [1,2]
-    for st in stages:
+    permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
+    permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
+    for pidx, p in enumerate(permutations):
         for s in sqs:
-            for i in prediction_horizons:
-                LSTM_experiment(i, s, 1, st)
+            data = DataFrameSequenceMulti(False, p[0], p[1], p[2])
+            data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], s)
+            data.normalize_mega_df()
 
-def LSTM_experiment(prediction_horizon, minutes_sequence, cams, st):
-    if st == 1:
-        data = DataFrameSequence(False, prediction_horizon, False, True)
-    if st == 2:
-        data = DataFrameSequence(False, prediction_horizon, True, True)
+            name_time = '_sqnc_' + str(sqs)
+            name_data = 'data_' + permutations_names[pidx]
+            name_epoch = 'epochs_' + str(epochs)
 
-    data.build_ts_df(start, end, [7,8,9,10,11,12], minutes_sequence, cams)
-    data.normalize_mega_df()
-    name_epoch = 'epochs_' + str(epochs)
-    name_time = '_sqnc_' + str(minutes_sequence)
-    name_cam = 'CAM_' + str(cams)
-    name_stage = 'stg_' + str(st)
-    name_pred = 'ph_' + str(prediction_horizon)
-    lstm = lstm_model.LSTM_predictor(data, epochs, epochs, 'LSTM_SEQUENCE' + name_epoch + name_time + name_cam  + name_stage + name_pred)
-    lstm.set_days(data.get_thesis_test_days())
-    lstm.run_experiment()
+            lstm = lstm_model_multi.LSTM_predictor(data, init_epochs, epochs,
+                                            'LSTM_SEQUENCE_MULTI' + name_epoch + name_time + name_data)
+            lstm.set_days(data.get_prem_days())
+            lstm.run_experiment()
+
 
 def LSTM_test():
-    data = DataFrameSequence(False, 20, True, True)
-    data.build_ts_df(7, 19, [8,9], 10, 1, clear_sky_label=True)
-    lstm = lstm_model.LSTM_predictor(data, 100, 50, 'LSTM_TEST', pred_csi=True)
+    data = DataFrameSequenceMulti(False,True, True, True)
+    data.build_ts_df(7, 19, [8,9,10], 10, 1)
+    lstm = lstm_model_multi.LSTM_predictor(data, 100, 50, 'LSTM_TEST')
     data.normalize_mega_df()
-    data.split_data_set(9, 15)
+    data.split_data_set(10, 15)
     data.flatten_data_set_to_3d()
     lstm.get_model()
-    lstm.train(40)
+    lstm.train(100)
     y_pred, rmse, mae, mape = lstm.predict()
     plot_history('s1', 1, lstm.history)
-    Metrics.write_results_SVR('LSTM_TEST 915', data.test_x_df, data.test_y_df, y_pred, data.pred_horizon)
+    Metrics.write_results_multi('LSTM_TEST_MULTI', data.test_x_df.reshape(
+        (data.test_x_df.shape[0],
+         data.sequence_len_minutes,
+         data.number_of_features)),
+                                data.test_y_df, y_pred)
+
+    print(rmse)
+
 
 def optimize():
-    data = DataFrameSequence(False, 20, True, False)
+    data = lstm_model_multi(False, 20, True, False)
     data.build_ts_df(6, 18, [7,8,9,10,11,12], 60, 1)
     data.normalize_mega_df()
     data.split_data_set(11,15)
@@ -66,7 +70,7 @@ def optimize():
     opts = ['Adam', 'RMSprop']
     learning_rate = [0.001, 0.01, 0.1]
 
-    lstm = lstm_model.LSTM_predictor(data, 3, 3, 'LSTM_TEST')
+    lstm = lstm_model_multi.LSTM_predictor(data, 3, 3, 'LSTM_TEST')
     num = 0
     for s in seq_l:
         data.build_ts_df(6, 18, [7, 8, 9, 10, 11, 12], s, 1)
@@ -109,7 +113,7 @@ def optimize():
 
 
 
-# # LSTM_test()
+LSTM_test()
 # minutes_sequence = int(sys.argv[1])
 # cams = int(sys.argv[2])
 # img = int(sys.argv[3])
@@ -123,5 +127,5 @@ def optimize():
 # print('Minutes sequence: ' + str(minutes_sequence))
 # print('Cams: ' + str(cams))
 # print('IMG: ' + str(img))
-run_lstm_experiments()
+# run_lstm_experiments()
 

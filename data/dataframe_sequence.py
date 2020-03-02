@@ -1,5 +1,5 @@
 import numpy as np
-from data.data import month_to_year, PvLibPlayground, int_to_str, process_csv, get_df_csv_day_RP
+from data.data_helper import month_to_year, PvLibPlayground, int_to_str, process_csv, get_df_csv_day_RP
 import calendar
 from tqdm import tqdm
 import pandas as pd
@@ -180,13 +180,13 @@ class DataFrameSequence:
                             ts[0:minutes, v] = [item[v - 14] for item in ephemeris[i:i+minutes]]
 
                         elif v == self.index_img:
-                            ts[0:minutes, v] = f[i:i + minutes,0]
+                            ts[0:minutes, v] = f[i:i + minutes,18]
                         elif v == self.index_img+1:
-                            ts[0:minutes, v] = f[i:i + minutes,1]
+                            ts[0:minutes, v] = f[i:i + minutes,19]
                         elif v == self.index_img+2:
-                            ts[0:minutes, v] = f[i:i + minutes,2]
+                            ts[0:minutes, v] = f[i:i + minutes,20]
                         elif v == self.index_img+3:
-                            ts[0:minutes, v] = f[i:i + minutes,3]
+                            ts[0:minutes, v] = f[i:i + minutes,21]
 
 
                         if cams == 2:

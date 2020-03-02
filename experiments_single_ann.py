@@ -2,7 +2,7 @@ from data.dataframe_sequence import DataFrameSequence
 from metrics import Metrics
 from models.models_ts import ann_model
 from keras import optimizers
-from data.data import plot_history
+from data.data_helper import plot_history
 
 init_epochs = 40
 epochs = 40

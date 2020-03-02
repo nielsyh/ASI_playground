@@ -4,7 +4,7 @@ from metrics import *
 from datetime import time, timedelta
 import datetime
 import matplotlib.pyplot
-import data.data
+import data.data_helper
 style.use('seaborn-poster') #sets the size of the charts
 style.use('ggplot')
 from matplotlib.ticker import FuncFormatter, MaxNLocator

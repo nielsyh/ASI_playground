@@ -1,10 +1,10 @@
-from data.dataframe_sequence_multi_output import DataFrameSequenceMulti
+from data.dataframe_sequence_multi import DataFrameSequenceMulti
 from metrics import Metrics
 from models.models_ts_multi import ann_model_multi
 import sys
 from keras import optimizers
 import threading
-from data.data import plot_history
+from data.data_helper import plot_history
 
 init_epochs = 40
 epochs = 40
@@ -24,11 +24,23 @@ prediction_horizons = list(range(1, 21))
 
 def run_ann_experiements():
     sqs = [20, 40, 60]
-    stages = [1,2]
-    for st in stages:
+    permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
+    permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
+    for pidx, p in enumerate(permutations):
         for s in sqs:
-            for i in prediction_horizons:
-                ann_experiment(i, s, 1, st)
+            data = DataFrameSequenceMulti(False, p[0], p[1], p[2])
+            data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], s)
+            data.normalize_mega_df()
+
+            name_time = '_sqnc_' + str(sqs)
+            name_data = 'data_' + permutations_names[pidx]
+            name_epoch = 'epochs_' + str(epochs)
+
+            ann = ann_model_multi.ANN_Multi(data, init_epochs, epochs,
+                                            'ANN_SEQUENCE_MULTI' + name_epoch + name_time + name_data)
+            ann.set_days(data.get_prem_days())
+            ann.run_experiment()
+
 
 def ann_experiment(prediction_horizon, minutes_sequence, cams, st):
 
@@ -51,22 +63,25 @@ def ann_experiment(prediction_horizon, minutes_sequence, cams, st):
     ann.run_experiment()
 
 def ann_test():
-    data = DataFrameSequenceMulti(False, True, True)
-    data.build_ts_df(6, 19, [7,8,9,10,11,12], 20, 1)
+    data = DataFrameSequenceMulti(False, True, True, True)
+    data.build_ts_df(6, 19, [8,9], 20)
     data.normalize_mega_df()
-    ann = ann_model_multi.ANN_Multi(data, 3, 3, 'ANN_BETA_SEQUENCE_TEST')
-    data.split_data_set(10, 15)
+    ann = ann_model_multi.ANN_Multi(data, 3, 3, 'ANN_BETA_SEQUENCE_MUTLI_TEST')
+    data.split_data_set(9, 27)
     data.flatten_data_set()
     ann.get_model()
-    ann.train(40)
+    ann.train(50)
 
     plot_history('s1',1, ann.history)
-
     y_pred, rmse, mae, mape = ann.predict()
 
-    Metrics.write_results_NN('ANN_TEST', data.test_x_df.reshape(
-        (data.test_x_df.shape[0], data.sequence_len_minutes, data.number_of_features)),
-                              data.test_y_df, y_pred, 20)
+    Metrics.write_results_multi('ANN_TEST_MULTI', data.test_x_df.reshape(
+        (data.test_x_df.shape[0],
+         data.sequence_len_minutes,
+         data.number_of_features)),
+                                data.test_y_df, y_pred)
+
+    print(rmse)
 
 def optimize():
     data = ann_model_multi(False, 20, False, False)

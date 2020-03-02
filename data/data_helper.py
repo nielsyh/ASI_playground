@@ -11,11 +11,11 @@ import numpy as np
 from datetime import time
 from os import listdir, path
 import cv2
-import data.data_visuals
-# from data_visuals import plot_time_avg, plot_freq, plot_2_models, plot_time_avg_multi
-from metrics import Metrics
-from pvlib_playground import PvLibPlayground
-from features import get_image_by_date_time, int_to_str, extract_features, show_img
+import data
+import metrics
+import pvlib_playground
+import features
+# from features import get_image_by_date_time, int_to_str, extract_features, show_img
 from tqdm import tqdm
 enable_print = True
 
@@ -26,8 +26,8 @@ def printf(str):
 def get_df_csv_day_RP(month, day, start, end,
                       step):  # replaces missing values with value of 15 seconds later.
 
-    path = 'asi_16124/2019' + int_to_str(month) + int_to_str(day) + '/'
-    file_name = 'peridata_16124_' + month_to_year(month) + int_to_str(month) + int_to_str(
+    path = 'asi_16124/2019' + features.int_to_str(month) + features.int_to_str(day) + '/'
+    file_name = 'peridata_16124_' + month_to_year(month) + features.int_to_str(month) + features.int_to_str(
         day) + '.csv'  # todo make 2020 ready
     index = 0
 
@@ -246,8 +246,9 @@ def images_information():
     print(start_dict)
     print(stop_dict)
 
-    data_visuals.plot_freq(start_dict, 'Frequency start times')
-    data_visuals.plot_freq(stop_dict, 'Frequency stop times')
+
+    data.data_visuals.plot_freq(start_dict, 'Frequency start times')
+    data.data_visuals.plot_freq(stop_dict, 'Frequency stop times')
 
 
 def get_df_csv_month(month, start, end,
@@ -296,12 +297,12 @@ def get_df_csv_day_RP(month, day, start, end,
                       step, cam=1):  # replaces missing values with value of 15 seconds later.
 
     if cam == 1:
-        path = '../asi_16124/2019' + int_to_str(month) + int_to_str(day) + '/'
-        file_name = 'peridata_16124_' + month_to_year(month) + int_to_str(month) + int_to_str(day) + '.csv'
+        path = 'asi_16124/2019' + features.int_to_str(month) + features.int_to_str(day) + '/'
+        file_name = 'peridata_16124_' + month_to_year(month) + features.int_to_str(month) + features.int_to_str(day) + '.csv'
     elif cam == 2:
         # print('CAM 2 DATA')
-        path = '../asi_16133/2019' + int_to_str(month) + int_to_str(day) + '/'
-        file_name = 'peridata_16133_' + month_to_year(month) + int_to_str(month) + int_to_str(day) + '.csv'
+        path = 'asi_16133/2019' + features.int_to_str(month) + features.int_to_str(day) + '/'
+        file_name = 'peridata_16133_' + month_to_year(month) + features.int_to_str(month) + features.int_to_str(day) + '.csv'
 
     index = 0
 
@@ -337,7 +338,7 @@ def plot_metoer_per_month(start, end , step):
     months = [8,9]
 
     for mon in months:
-        df = PvLibPlayground.get_meteor_data()
+        df = pvlib_playground.PvLibPlayground.get_meteor_data()
 
 def plot_per_month(start, end, step):
     times0, avg_temp0, var_temp0, avg_ghi0, var_ghi0, var_ghi0, avg_hum0, var_hum0, tick_times0 = ([] for i in range(9))
@@ -385,14 +386,14 @@ def plot_per_month(start, end, step):
     labels = ['August', 'September', 'October', 'November', 'December']
 
     # plot data
-    data_visuals.plot_time_avg_multi(tick_times0[0], times0, avg_temp0, labels, 'time', 'Temp. in Celsius', 'avg. Temp. in months')
-    data_visuals.plot_time_avg_multi(tick_times0[0], times0, var_temp0, labels,  'time', 'Variance temp. Celsius.', 'var. Temp. in months')
+    data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, avg_temp0, labels, 'time', 'Temp. in Celsius', 'avg. Temp. in months')
+    data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, var_temp0, labels,  'time', 'Variance temp. Celsius.', 'var. Temp. in months')
 
-    data_visuals.plot_time_avg_multi(tick_times0[0], times0, avg_ghi0, labels, 'time', 'GHI in W/m^2', 'avg. GHI in months')
-    data_visuals.plot_time_avg_multi(tick_times0[0], times0, var_ghi0, labels, 'time', 'Variance GHI', 'var. GHI in months')
+    data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, avg_ghi0, labels, 'time', 'GHI in W/m^2', 'avg. GHI in months')
+    data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, var_ghi0, labels, 'time', 'Variance GHI', 'var. GHI in months')
 
-    data_visuals.plot_time_avg_multi(tick_times0[0], times0, avg_hum0, labels,  'time', 'Humidity', 'avg. Humidity in months')
-    data_visuals.plot_time_avg_multi(tick_times0[0], times0, var_hum0, labels,  'time', 'Variance Humidity', 'var. Humidity in months')
+    data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, avg_hum0, labels,  'time', 'Humidity', 'avg. Humidity in months')
+    data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, var_hum0, labels,  'time', 'Variance Humidity', 'var. Humidity in months')
 
 def plot_day(day, month, start, end, step):
     df = get_df_csv_day_RP(month, day, start, end, step)
@@ -400,7 +401,7 @@ def plot_day(day, month, start, end, step):
     minutes = list(range(0, 60, step))
     times, temp, ghi, tick_times = ([] for i in range(4))
 
-    ghi_clear_sky = PvLibPlayground.get_clear_sky_irradiance(PvLibPlayground.get_times(2019,
+    ghi_clear_sky = pvlib_playground.PvLibPlayground.get_clear_sky_irradiance(pvlib_playground.PvLibPlayground.get_times(2019,
                                                                                        int(month),
                                                                                        int(day),
                                                                                        start,
@@ -426,9 +427,9 @@ def plot_day(day, month, start, end, step):
                 ghi.append(old_ghi)
 
     # plot data
-    data_visuals.plot_time_avg(tick_times, times, temp, '', 'time', 'temp. in celsius',
+    data.data_visuals.plot_time_avg(tick_times, times, temp, '', 'time', 'temp. in celsius',
                   'temp. in day: ' + str(day) + ' month: ' + str(month))
-    data_visuals.plot_time_avg(tick_times, times, ghi, 'GHI measured', 'time', 'GHI in W/m^2',
+    data.data_visuals.plot_time_avg(tick_times, times, ghi, 'GHI measured', 'time', 'GHI in W/m^2',
                   'GHI in day: ' + str(day) + ' month: ' + str(month), ghi_clear_sky, 'Clear sky GHI')
 
 def plot_persistence_day(day, month, start, end, step):
@@ -466,7 +467,7 @@ def plot_persistence_day(day, month, start, end, step):
                 ghi_pred.append(ghi_pred_tmp)
 
     # plot data
-    data_visuals.plot_2_models(tick_times, times, ghi_truth, ghi_pred, 'time', 'GHI in W/m^2',
+    data.data_visuals.plot_2_models(tick_times, times, ghi_truth, ghi_pred, 'time', 'GHI in W/m^2',
                   'GHI at day: ' + str(day) + ' month: ' + str(month))
 
 def get_persistence_df(month, day, start, end, pred_hor):
@@ -562,11 +563,11 @@ def get_error_month(month, start, end, step):
             y_predicted.append(df_pred[idx][8])
 
     print('RMSE')
-    print(Metrics.rmse(y_observed, y_predicted))
+    print(metrics.Metrics.rmse(y_observed, y_predicted))
     print('MAE')
-    print(Metrics.mae(y_observed, y_predicted))
+    print(metrics.Metrics.mae(y_observed, y_predicted))
     print('MAPE')
-    print(Metrics.mape(y_observed, y_predicted))
+    print(metrics.Metrics.mape(y_observed, y_predicted))
 
 
 def search_weather_circ_days():

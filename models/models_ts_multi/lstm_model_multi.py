@@ -25,10 +25,8 @@ class LSTM_predictor():
     history = None
     day_month_to_predict = []
 
-    def __init__(self, data, init_epochs, epochs, name, pred_csi = False):
+    def __init__(self, data, epochs, name, pred_csi = False):
         self.data = data
-        self.init_train = True
-        self.init_epochs = init_epochs
         self.epochs = epochs
         self.name = name
         self.pred_csi = pred_csi
@@ -41,7 +39,7 @@ class LSTM_predictor():
         print(self.data.train_x_df.shape)
         model.add(LSTM(70, activation='relu', input_shape=(self.data.train_x_df.shape[1], self.data.train_x_df.shape[2]), return_sequences=True))
         model.add(LSTM(35, activation='relu'))
-        model.add(Dense(20, activation='relu'))
+        model.add(Dense(50, activation='relu'))
         model.add(Dense(20))
         opt = optimizers.Adam(lr=0.001)
         model.compile(loss='mean_squared_error', optimizer=opt)
@@ -93,13 +91,14 @@ class LSTM_predictor():
             self.get_model()
 
             epochs = self.epochs
-            if self.init_train:
-                epochs = self.init_epochs
-                self.init_train = False
             self.train(epochs=epochs)
 
             y_pred, rmse, mae, mape = self.predict()
-            Metrics.write_results_NN(str(self.name), self.data.test_x_df, self.data.test_y_df, y_pred, self.data.pred_horizon)
+            Metrics.write_results_multi(str(self.name), self.data.test_x_df.reshape(
+                (self.data.test_x_df.shape[0],
+                 self.data.sequence_len_minutes,
+                 self.data.number_of_features)),
+                                      self.data.test_y_df, y_pred)
 
     def save_model(self):
         name = 'LSTM_' + str(self.data.month_split) + '_' + str(self.data.day_split) + '_' + str(self.data.pred_horizon)

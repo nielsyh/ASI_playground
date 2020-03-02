@@ -26,10 +26,8 @@ class ANN_Multi():
     history = None
     day_month_to_predict = []
 
-    def __init__(self, data, init_epochs, epochs, name):
+    def __init__(self, data, epochs, name):
         self.data = data
-        self.init_train = True
-        self.init_epochs = init_epochs
         self.epochs = epochs
         self.name = name
 
@@ -87,14 +85,16 @@ class ANN_Multi():
             self.get_model()
 
             epochs = self.epochs
-            if self.init_train:
-                epochs = self.init_epochs
-                self.init_train = False
-
             self.train(epochs=epochs)
             # self.plot_history()
             y_pred, rmse, mae, mape = self.predict()
-            Metrics.write_results_NN(str(self.name), self.data.test_x_df.reshape((self.data.test_x_df.shape[0], self.data.sequence_len_minutes, self.data.number_of_features)), self.data.test_y_df, y_pred, self.data.pred_horizon)
+
+            Metrics.write_results_multi(str(self.name), self.data.test_x_df.reshape(
+                (self.data.test_x_df.shape[0],
+                 self.data.sequence_len_minutes,
+                 self.data.number_of_features)),
+                                      self.data.test_y_df, y_pred)
+
 
     def save_model(self):
         name = 'ann_' + str(self.data.month_split) + '_' + str(self.data.day_split) + '_' + str(self.data.pred_horizon)

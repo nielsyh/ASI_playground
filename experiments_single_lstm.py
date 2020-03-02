@@ -1,10 +1,8 @@
-from data.dataframe_sequence_multi_output import DataFrameSequenceMulti
+from data.dataframe_sequence import DataFrameSequence
 from metrics import Metrics
-from models.models_ts_multi import lstm_model_multi
-import threading
-import sys
+from models.models_ts import ann_model, lstm_model, svr_model
 from keras import optimizers
-from data.data import plot_history
+from data.data_helper import plot_history
 
 init_epochs = 40
 epochs = 40
@@ -27,9 +25,9 @@ def run_lstm_experiments():
 
 def LSTM_experiment(prediction_horizon, minutes_sequence, cams, st):
     if st == 1:
-        data = DataFrameSequenceMulti(False, prediction_horizon, False, True)
+        data = DataFrameSequence(False, prediction_horizon, False, True)
     if st == 2:
-        data = DataFrameSequenceMulti(False, prediction_horizon, True, True)
+        data = DataFrameSequence(False, prediction_horizon, True, True)
 
     data.build_ts_df(start, end, [7,8,9,10,11,12], minutes_sequence, cams)
     data.normalize_mega_df()
@@ -38,25 +36,25 @@ def LSTM_experiment(prediction_horizon, minutes_sequence, cams, st):
     name_cam = 'CAM_' + str(cams)
     name_stage = 'stg_' + str(st)
     name_pred = 'ph_' + str(prediction_horizon)
-    lstm = lstm_model_multi.LSTM_predictor(data, epochs, epochs, 'LSTM_SEQUENCE' + name_epoch + name_time + name_cam  + name_stage + name_pred)
+    lstm = lstm_model.LSTM_predictor(data, epochs, epochs, 'LSTM_SEQUENCE' + name_epoch + name_time + name_cam  + name_stage + name_pred)
     lstm.set_days(data.get_thesis_test_days())
     lstm.run_experiment()
 
 def LSTM_test():
-    data = DataFrameSequenceMulti(False, True, True)
-    data.build_ts_df(7, 19, [8,9,10,11,12], 10, 1)
-    lstm = lstm_model_multi.LSTM_predictor(data, 100, 50, 'LSTM_TEST')
+    data = DataFrameSequence(False, 20, True, True)
+    data.build_ts_df(7, 19, [8,9], 10, 1, clear_sky_label=True)
+    lstm = lstm_model.LSTM_predictor(data, 100, 50, 'LSTM_TEST', pred_csi=True)
     data.normalize_mega_df()
-    data.split_data_set(10, 15)
+    data.split_data_set(9, 15)
     data.flatten_data_set_to_3d()
     lstm.get_model()
     lstm.train(40)
     y_pred, rmse, mae, mape = lstm.predict()
     plot_history('s1', 1, lstm.history)
-    Metrics.write_results_SVR('LSTM_TEST 915', data.test_x_df, data.test_y_df, y_pred, 20)
+    Metrics.write_results_SVR('LSTM_TEST 915', data.test_x_df, data.test_y_df, y_pred, data.pred_horizon)
 
 def optimize():
-    data = lstm_model_multi(False, 20, True, False)
+    data = DataFrameSequence(False, 20, True, False)
     data.build_ts_df(6, 18, [7,8,9,10,11,12], 60, 1)
     data.normalize_mega_df()
     data.split_data_set(11,15)
@@ -68,7 +66,7 @@ def optimize():
     opts = ['Adam', 'RMSprop']
     learning_rate = [0.001, 0.01, 0.1]
 
-    lstm = lstm_model_multi.LSTM_predictor(data, 3, 3, 'LSTM_TEST')
+    lstm = lstm_model.LSTM_predictor(data, 3, 3, 'LSTM_TEST')
     num = 0
     for s in seq_l:
         data.build_ts_df(6, 18, [7, 8, 9, 10, 11, 12], s, 1)
@@ -111,7 +109,7 @@ def optimize():
 
 
 
-LSTM_test()
+# # LSTM_test()
 # minutes_sequence = int(sys.argv[1])
 # cams = int(sys.argv[2])
 # img = int(sys.argv[3])
@@ -125,5 +123,5 @@ LSTM_test()
 # print('Minutes sequence: ' + str(minutes_sequence))
 # print('Cams: ' + str(cams))
 # print('IMG: ' + str(img))
-# run_lstm_experiments()
+run_lstm_experiments()
 
