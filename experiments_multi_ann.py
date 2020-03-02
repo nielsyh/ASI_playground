@@ -36,8 +36,7 @@ def run_ann_experiments():
             name_data = 'data_' + permutations_names[pidx]
             name_epoch = 'epochs_' + str(epochs)
 
-            ann = ann_model_multi.ANN_Multi(data, init_epochs, epochs,
-                                            'ANN_SEQUENCE_MULTI' + name_epoch + name_time + name_data)
+            ann = ann_model_multi.ANN_Multi(data, epochs, 'ANN_SEQUENCE_MULTI' + name_epoch + name_time + name_data)
             ann.set_days(data.get_prem_days())
             ann.run_experiment()
 

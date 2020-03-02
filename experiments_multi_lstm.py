@@ -30,7 +30,7 @@ def run_lstm_experiments():
             name_data = 'data_' + permutations_names[pidx]
             name_epoch = 'epochs_' + str(epochs)
 
-            lstm = lstm_model_multi.LSTM_predictor(data, init_epochs, epochs,
+            lstm = lstm_model_multi.LSTM_predictor(data, epochs,
                                             'LSTM_SEQUENCE_MULTI' + name_epoch + name_time + name_data)
             lstm.set_days(data.get_prem_days())
             lstm.run_experiment()
@@ -39,7 +39,7 @@ def run_lstm_experiments():
 def LSTM_test():
     data = DataFrameSequenceMulti(False,True, True, True)
     data.build_ts_df(7, 19, [8,9,10], 10, 1)
-    lstm = lstm_model_multi.LSTM_predictor(data, 100, 50, 'LSTM_TEST')
+    lstm = lstm_model_multi.LSTM_predictor(data, 100, 'LSTM_TEST')
     data.normalize_mega_df()
     data.split_data_set(10, 15)
     data.flatten_data_set_to_3d()
