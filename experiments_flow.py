@@ -13,7 +13,7 @@ def predict(data, model):
         return y_pred, rmse, mae, mape
 
 def experiment(prediction_horizon):
-    prem = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
+    prem = [(10, 5), (10, 6), (10, 7)]
     for tup in tqdm(prem, total=len(prem), unit='Days to predict'):
         data = DataFrameIMG(False, prediction_horizon)
         data.build_img_df(8, 17, tup[0], tup[1])
