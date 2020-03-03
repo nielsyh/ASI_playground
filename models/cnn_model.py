@@ -37,8 +37,8 @@ class resnet50:
         self.model.fit(self.data.x_train, self.data.y_train, epochs=epochs, batch_size=batch_size, validation_data=(self.data.x_val, self.data.y_val))
 
     def predict(self):
-        y_pred =  self.model.predict(self.data.x_test)
-        rmse, mae, mape = Metrics.get_error(self.data.y_test, y_pred)
+        y_pred =  self.model.predict(self.data.mega_df_x)
+        rmse, mae, mape = Metrics.get_error(self.data.mega_df_y, y_pred)
         return y_pred, rmse, mae, mape
 
     def save_model(self, name):
@@ -47,10 +47,10 @@ class resnet50:
             np.save(str(name) + str(i), weights)
             # self.model.save(str(name) + '.h5')  # creates a HDF5 file 'my_model.h5'
 
-    def load_model(self, name):
+    def load_model_files(self, name):
         # self.model = load_model(str(name) + '.h5')
         for i in [2,3,4]:
-            weights  =np.load(str(name)+str(i)+'.npy')
+            weights  =np.load(str(name)+str(i)+'.npy',  allow_pickle=True)
             self.model.layers[i].set_weights(weights)
 
     def build_prem_models(self):

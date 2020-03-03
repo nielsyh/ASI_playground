@@ -6,7 +6,7 @@ import sys
 from keras import optimizers
 from data.data_helper import plot_history
 
-epochs = 5it 0
+epochs = 5
 start = 6
 end = 19
 

@@ -5,8 +5,8 @@ from features import get_image_by_date_time, int_to_str, extract_features, show_
 import calendar
 from tqdm import tqdm
 from sklearn.preprocessing import *
-from data.data_helper import month_to_year, PvLibPlayground, int_to_str, process_csv, get_df_csv_day_RP
-
+import data
+import pvlib_playground
 
 class DataFrameNormal:
     mega_df = []
@@ -130,7 +130,7 @@ class DataFrameNormal:
             elif m == 7:
                 days += 6
             else:
-                year = int(month_to_year(m))
+                year = int(data_helper.month_to_year(m))
                 days += calendar.monthrange(year, m)[1]
 
         # image res + label + month + day
@@ -149,7 +149,7 @@ class DataFrameNormal:
 
             for d in tqdm(days, total=len(days), unit='Day progress'):
                 # todo add sunrise/sundown for start end hour? half hour?
-                day_data = get_df_csv_day_RP(m, d, start, end, step).astype(int)
+                day_data = data_helper.get_df_csv_day_RP(m, d, start, end, step).astype(int)
                 day_index += 1
 
                 for idx, data in enumerate(day_data):
@@ -187,7 +187,7 @@ class DataFrameNormal:
             elif m == 7:
                 days += 6
             else:
-                year = int(month_to_year(m))
+                year = int(data_helper.month_to_year(m))
                 days += calendar.monthrange(year, m)[1]
 
         self.mega_df = np.zeros((days, self.queries_per_day, self.size_of_row), dtype=np.float)
@@ -203,11 +203,11 @@ class DataFrameNormal:
 
             for d in tqdm(days, total=len(days), unit='Days progress'):
                 # todo add sunrise/sundown for start end hour? half hour?
-                day_data = get_df_csv_day_RP(m, d, start, end, step).astype(int)
+                day_data = data_helper.get_df_csv_day_RP(m, d, start, end, step).astype(int)
                 if self.meteor_data:
-                    csi, azimuth, zenith, sun_earth_dis, ephemeris = PvLibPlayground.get_meteor_data(m,
+                    csi, azimuth, zenith, sun_earth_dis, ephemeris = pvlib_playground.vLibPlayground.get_meteor_data(m,
                                                                                                          d,
-                                                                                                         PvLibPlayground.get_times(
+                                                                                                         pvlib_playground.PvLibPlayground.get_times(
                                                                                                              2019,
                                                                                                              m,  # month
                                                                                                              d,  # day
@@ -259,7 +259,7 @@ class DataFrameNormal:
             if m == 7:
                 days += 8
             else:
-                year = int(month_to_year(m))
+                year = int(data_helper.month_to_year(m))
                 days += calendar.monthrange(year, m)[1]
 
         self.extra_df = np.zeros((days, self.pred_horizon, 1), dtype=np.float)  # make space for labels
@@ -276,7 +276,7 @@ class DataFrameNormal:
 
             for d in days:
                 # todo add sunrise/sundown for start end
-                extra = get_df_csv_day_RP(m, d, self.end, self.end + 1, self.step).astype(int)
+                extra = data_helper.get_df_csv_day_RP(m, d, self.end, self.end + 1, self.step).astype(int)
                 day_index += 1
 
                 for idx, data in enumerate(extra):  # getting label data for predictions
@@ -318,9 +318,9 @@ class DataFrameNormal:
                 print(idx_day, day)
 
             if self.meteor_data:
-                csi, azimuth, zenith, sun_earth_dis, ephemeris = PvLibPlayground.get_meteor_data(m,
+                csi, azimuth, zenith, sun_earth_dis, ephemeris = pvlib_playground.PvLibPlayground.get_meteor_data(m,
                                                                                                  d,
-                                                                                                 PvLibPlayground.get_times(
+                                                                                                 pvlib_playground.PvLibPlayground.get_times(
                                                                                                      2019,
                                                                                                      m,  # month
                                                                                                      d,  # day

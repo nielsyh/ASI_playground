@@ -1,5 +1,6 @@
 import numpy as np
-from data.data_helper import month_to_year, PvLibPlayground, int_to_str, process_csv, get_df_csv_day_RP
+import data
+import pvlib_playground
 import calendar
 from tqdm import tqdm
 import pandas as pd
@@ -43,7 +44,7 @@ class DataFrameIMG:
         self.mega_df_y = np.zeros((time_steps), dtype=np.float)
         self.mega_df_times = np.zeros((time_steps, 5))
 
-        day_data = get_df_csv_day_RP(self.month, self.day, start, end + 1, 1).astype(int)
+        day_data = data.data_helper.get_df_csv_day_RP(self.month, self.day, start, end + 1, 1).astype(int)
 
         for i in tqdm(range(0, time_steps), total=time_steps, unit='Timesteps progress'):
             year, month, day, hour, minute, ghi = day_data[i][0], day_data[i][1], day_data[i][2], day_data[i][3], day_data[i][4], day_data[i+self.pred_horizon][8]
@@ -56,8 +57,13 @@ class DataFrameIMG:
     def split_data_set(self, m, d):
         pass
 
-    def flatten_data_set(self):  # this is needed to use it as input for models
-        pass
+    def flatten_data_set_CNN(self):  # this is needed to use it as input for models
+        self.test_df = self.mega_df_x
+        self.test_y_df = self.mega_df_y
+
+        # self.x_test = self.test_df[:, 3:self.test_df.shape[1]]
+        # self.x_test = self.x_test.reshape((self.x_test.shape[0], 400, 400, 3))  # reshaping for tf
+        # self.y_test = self.test_df[:, 0]
 
 
     def normalize_mega_df(self, ctn = [6,7,8], metoer_to_normalize= [9,12,16]):
