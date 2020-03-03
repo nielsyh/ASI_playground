@@ -1,5 +1,5 @@
-import data
-import data_visuals
+import data.data_helper
+import data.data_visuals
 import metrics
 
 def avg_res(res):
@@ -9,7 +9,7 @@ def round_list(ls):
     avgls = [n/20 for n in ls]
     l = []
     for i in avgls:
-        l.append(round(i, 4))
+        l.append(round(i, 2))
     return l
 def calc_ss(res):
     result = ['NA']
@@ -19,8 +19,6 @@ def calc_ss(res):
     return result
 
 
-
-
 def print_table(model_names, rmse, mae, mape, ss_rmse, ss_mae, ss_mape, caption, label):
     print('\\begin{table}[]')
     print('\\resizebox{\\textwidth}{!}{%')
@@ -28,7 +26,7 @@ def print_table(model_names, rmse, mae, mape, ss_rmse, ss_mae, ss_mape, caption,
     print('\hline')
 
 
-    print('\\textbf{Model} & \\textbf{RMSE}      & \\textbf{MAE}       & \\textbf{MAPE}      & \\textbf{SS-RMSE}    & \\textbf{SS-MAE}     & \\textbf{SS-MAPE}    \\\\ \\hline')
+    print('\\textbf{Model} & \\textbf{RMSE} \\downarrow     & \\textbf{MAE} \\downarrow      & \\textbf{MAPE} \\downarrow   & \\textbf{SS-RMSE} \\uparrow  & \\textbf{SS-MAE} \\uparrow    & \\textbf{SS-MAPE} \\uparrow    \\\\ \\hline')
 
     for idx, name in enumerate(model_names):
         print(name + ' & ' +str(rmse[idx]) + ' & ' + str(mae[idx]) + ' & ' + str(mape[idx]) + ' & ' + str(ss_rmse[idx]) + ' & ' + str(ss_mae[idx]) + ' & ' + str(ss_mape[idx]) + '    \\\\ \\hline' )
@@ -74,6 +72,7 @@ amape = []
 ass_rmse = ['NA']
 ass_mae = ['NA']
 ass_mape = ['NA']
+all_model_names = []
 # for i in prediction_horizons:
 prediction_horizons = list(range(1,21))
 for i in prediction_horizons:
@@ -86,7 +85,7 @@ for i in prediction_horizons:
     ss_mape = ['NA']
 
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
-    actual, pred = data.get_persistence_dates(t, 7, 19, i)
+    actual, pred = data.data_helper.get_persistence_dates(t, 7, 19, i)
     trmse, tmae, tmape = metrics.Metrics.get_error(actual, pred)
     model_names.append("Persistence")
     rmse.append(round(trmse, 4))
@@ -97,18 +96,18 @@ for i in prediction_horizons:
     for folder in folders_lstm + folders_rf + folders_ann:
         extension = '.txt'
         file = folder + str(i) + extension
-        predicted, actual = data_visuals.file_to_values(file)
+        predicted, actual = data.data_visuals.file_to_values(file)
         trmse, tmae, tmape = metrics.Metrics.get_error(actual, predicted)
         modelname = folder[folder.find('/')+1:-1][0:(folder[folder.find('/')+1:-1]).find('/')]
 
         model_names.append(modelname)
-        rmse.append(round(trmse, 4))
-        mae.append(round(tmae, 4))
-        mape.append(round(tmape, 4))
+        rmse.append(round(trmse, 2))
+        mae.append(round(tmae, 2))
+        mape.append(round(tmape, 2))
 
-        ss_rmse.append(round(1 - (trmse / rmse[0]), 4))
-        ss_mae.append(round(1 - (tmae / mae[0]), 4))
-        ss_mape.append(round(1 - (tmape / mape[0]),4))
+        ss_rmse.append(round(1 - (trmse / rmse[0]), 2))
+        ss_mae.append(round(1 - (tmae / mae[0]), 2))
+        ss_mape.append(round(1 - (tmape / mape[0]),2))
 
     # print('L: '  + str(len(model_names) + 1))
     # print('W: 7' )
@@ -121,7 +120,8 @@ for i in prediction_horizons:
     ass_rmse.append(ss_rmse)
     ass_mae.append(ss_mae)
     ass_mape.append(ss_mape)
+    all_model_names = model_names
 
-    print_table( model_names, round_list(avg_res(armse)), round_list(avg_res(amae)),
-                 round_list(avg_res(amape)), calc_ss(avg_res(armse)), calc_ss(avg_res(amae)),
-                 calc_ss(avg_res(amape)), 'Average performance evaluation Prem. days', 'prem.avg')
+print_table( all_model_names, round_list(avg_res(armse)), round_list(avg_res(amae)),
+             round_list(avg_res(amape)), calc_ss(avg_res(armse)), calc_ss(avg_res(amae)),
+             calc_ss(avg_res(amape)), 'Average performance evaluation Prem. days', 'prem.avg')

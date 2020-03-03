@@ -26,7 +26,7 @@ def printf(str):
 def get_df_csv_day_RP(month, day, start, end,
                       step):  # replaces missing values with value of 15 seconds later.
 
-    path = 'asi_16124/2019' + features.int_to_str(month) + features.int_to_str(day) + '/'
+    path = '../asi_16124/2019' + features.int_to_str(month) + features.int_to_str(day) + '/'
     file_name = 'peridata_16124_' + month_to_year(month) + features.int_to_str(month) + features.int_to_str(
         day) + '.csv'  # todo make 2020 ready
     index = 0
@@ -96,7 +96,7 @@ def download_data(cam, overwrite=False, process=True):  # download data
     file_url = 0
 
     if (cam == 1):
-        cam_url = "/asi16_data/asi_16124/"
+        cam_url = "../asi16_data/asi_16124/"
         file_url = "asi_16124/"
         # todo add second
 
@@ -138,7 +138,7 @@ def process_all_csv(cam):
     file_url = 0
 
     if cam == 1:
-        cam_url = "/asi16_data/asi_16124/"
+        cam_url = "../asi16_data/asi_16124/"
         file_url = "asi_16124/"
         # todo add second
     if cam == 2:
@@ -297,7 +297,7 @@ def get_df_csv_day_RP(month, day, start, end,
                       step, cam=1):  # replaces missing values with value of 15 seconds later.
 
     if cam == 1:
-        path = 'asi_16124/2019' + features.int_to_str(month) + features.int_to_str(day) + '/'
+        path = '../asi_16124/2019' + features.int_to_str(month) + features.int_to_str(day) + '/'
         file_name = 'peridata_16124_' + month_to_year(month) + features.int_to_str(month) + features.int_to_str(day) + '.csv'
     elif cam == 2:
         # print('CAM 2 DATA')
@@ -309,9 +309,8 @@ def get_df_csv_day_RP(month, day, start, end,
     # data frame
     queries = int(((end - start) * 60 / step))
     df = np.empty([queries, 9])  # create df
-
+    print(path+file_name)
     try:
-
         process_csv(path + file_name)
         tmp_df = pd.read_csv(path + file_name, sep=',', header=0, usecols=[0, 1, 2, 3, 4, ],
                              encoding='cp1252')  # load csv

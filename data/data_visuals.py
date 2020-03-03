@@ -318,14 +318,14 @@ def file_to_months(file, offset):
 
 def get_files_ann_multi():
     files = ['persistence',
-             '../ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_all data.txt',
-             '../ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_img only.txt',
-             '../ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_meteor only.txt',
-             '../ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_onsite_only.txt',
-             '../ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_all data.txt',
-             '../ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_img only.txt',
-             '../ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_meteor only.txt',
-             '../ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_onsite_only.txt'
+             '/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_all data.txt',
+             '/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_img only.txt',
+             '/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_meteor only.txt',
+             '/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_onsite_only.txt',
+             '/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_all data.txt',
+             '/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_img only.txt',
+             '/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_meteor only.txt',
+             '/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_onsite_only.txt'
              ]
 
     names = ['persistence',
@@ -336,22 +336,26 @@ def get_files_ann_multi():
 
 
 def get_files_lstm_multi():
-    files = ['persistence',
-             '../LSTM_SEQUENCE_MULTIepochs_40_sqnc_5data_all data.txt',
-             '../LSTM_SEQUENCE_MULTIepochs_40_sqnc_10data_all data.txt'
+    # 'persistence',
+    #
+    files = ['LSTM_SEQUENCE_MULTIepochs_5_sqnc_20data_all data.txt',
+             'LSTM_SEQUENCE_MULTIepochs_5_sqnc_10data_all data.txt',
+             'LSTM_SEQUENCE_MULTIepochs_5_sqnc_20data_all data.txt'
              ]
 
-    names = ['persistence',
-             'LSTM 5 all',
-             'LSTM 10 all']
+    # 'persistence',
+    names = ['LSTM 5 all',
+             'LSTM 10 all',
+             'LSTM 20 all'
+             ]
 
     return files, names
 
 def get_files_rf_multi():
     files = ['persistence',
-             '../RF SEQUENCE multi_sqnc_30data_all data.txt',
-             '../RF SEQUENCE multi_sqnc_60data_all data.txt',
-             '../RF SEQUENCE multi_sqnc_120data_all data.txt'
+             '/RF SEQUENCE multi_sqnc_30data_all data.txt',
+             '/RF SEQUENCE multi_sqnc_60data_all data.txt',
+             '/RF SEQUENCE multi_sqnc_120data_all data.txt'
              ]
 
     names = ['persistence',
@@ -376,7 +380,8 @@ def plot_err_hor_multi(model):
     for file in files:
         tmp = []
         if file != 'persistence':
-            actual, pred = get_all_TP_multi(file)
+            add = '../prem results multi/'
+            actual, pred = get_all_TP_multi(add + file)
         for i in range(0,20):
             if file == 'persistence':
                 actual, pred = data_helper.get_persistence_dates(t, 6, 19, i+1)
@@ -476,9 +481,9 @@ def plot_err_hor(model):
         for i in predictions:
 
             if f == 'persistence':
-                actual, pred = data.get_persistence_dates(t, 6, 20, i)
+                actual, pred = data.data_helper.get_persistence_dates(t, 6, 20, i)
             else:
-                file = f + str(i) + extension
+                file =  f + str(i) + extension
                 actual, pred = get_all_TP(file)
 
             if len(pred) > 0:
