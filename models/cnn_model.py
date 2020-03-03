@@ -1,4 +1,4 @@
-from keras.layers import Input, Dense, concatenate, MaxPool2D, GlobalAveragePooling2D, Dropout, Conv2D, Flatten
+from keras.layers import Input, Dense, concatenate, MaxPool2D, GlobalAveragePooling2D, Dropout, Conv2D, Flatten, MaxPooling2D
 from keras.models import Model
 import keras
 from keras.applications.resnet50 import ResNet50
@@ -9,29 +9,45 @@ from metrics import Metrics
 import calendar
 import numpy as np
 
-class resnet50:
+class CnnNet:
     # windowSize minimum 32 for resnet-50
-    def __init__(self, data, init_epochs=200, epochs=50):
+    def __init__(self, data, epochs=200, modelarch='big'):
         self.data = data
         self.init_train = True
-        self.init_epochs = init_epochs
         self.epochs = epochs
+        self.modelarch = modelarch
 
     def get_model(self, image_res):
-        self.model = keras.models.Sequential()
-        base = ResNet50(include_top=False, weights='imagenet',
-                        input_shape=(image_res, image_res, 3))
-        #freezeing all layers
-        for layer in base.layers:
-            layer.trainable = False
-        self.model.add(base)
-        # model.add(Conv2D(64, kernel_size=3, input_shape=(224,224,3)))
-        self.model.add(Flatten())
-        self.model.add(Dense(256, kernel_initializer='normal'))
-        self.model.add(Dense(124))
-        self.model.add(Dense(1))
-        print(self.model.summary())
-        self.model.compile(optimizer='adam', loss='mean_squared_error')
+
+        if self.modelarch == 'big':
+            self.model = keras.models.Sequential()
+            base = ResNet50(include_top=False, weights='imagenet',
+                            input_shape=(image_res, image_res, 3))
+
+            #freezeing all layers
+            for layer in base.layers:
+                layer.trainable = False
+            self.model.add(base)
+            # model.add(Conv2D(64, kernel_size=3, input_shape=(224,224,3)))
+            self.model.add(Flatten())
+            self.model.add(Dense(256, kernel_initializer='normal'))
+            self.model.add(Dense(124))
+            self.model.add(Dense(1))
+            print(self.model.summary())
+            self.model.compile(optimizer='adam', loss='mean_squared_error')
+        elif self.modelarch == 'small':
+            self.model = keras.models.Sequential()
+            # add model layers
+            self.model.add(Conv2D(124, kernel_size=3, activation='relu', input_shape=(image_res, image_res, 3)))
+            self.model.add(Conv2D(256, kernel_size=3, activation='relu'))
+            self.model.add(MaxPooling2D(pool_size=3))
+            self.model.add(Conv2D(124, kernel_size=3, activation='relu'))
+            self.model.add(Flatten())
+            self.model.add(Dense(1))
+            self.model.compile(optimizer='adam', loss='mean_squared_error')
+
+
+
 
     def train(self, epochs=50, batch_size=128):
         self.model.fit(self.data.x_train, self.data.y_train, epochs=epochs, batch_size=batch_size, validation_data=(self.data.x_val, self.data.y_val))
@@ -42,16 +58,22 @@ class resnet50:
         return y_pred, rmse, mae, mape
 
     def save_model(self, name):
-        for i in [2,3,4]:
-            weights = self.model.layers[i].get_weights()
-            np.save(str(name) + str(i), weights)
-            # self.model.save(str(name) + '.h5')  # creates a HDF5 file 'my_model.h5'
+        if self.modelarch == 'big':
+            for i in [2,3,4]:
+                weights = self.model.layers[i].get_weights()
+                np.save(str(name) + str(i), weights)
+                # self.model.save(str(name) + '.h5')  # creates a HDF5 file 'my_model.h5'
+        elif self.modelarch == 'small':
+            self.model.save(str(name) + '.h5')  # creates a HDF5 file 'my_model.h5'
 
     def load_model_files(self, name):
-        # self.model = load_model(str(name) + '.h5')
-        for i in [2,3,4]:
-            weights  =np.load(str(name)+str(i)+'.npy',  allow_pickle=True)
-            self.model.layers[i].set_weights(weights)
+        if self.modelarch == 'big':
+            for i in [2,3,4]:
+                weights  =np.load(str(name)+str(i)+'.npy',  allow_pickle=True)
+                self.model.layers[i].set_weights(weights)
+        elif self.modelarch == 'small':
+            self.model = load_model(str(name) + '.h5')
+
 
     def build_prem_models(self):
         prem = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
@@ -61,12 +83,7 @@ class resnet50:
             self.data.flatten_data_set_CNN()
 
             self.get_model(400)
-
             epochs = self.epochs
-            if self.init_train:
-                epochs = self.init_epochs
-                self.init_train = False
-
             self.train(epochs=epochs)
             name = str(tup[0]) + str(tup[1])
             self.save_model(name)
