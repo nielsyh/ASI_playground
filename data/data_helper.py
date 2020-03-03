@@ -297,7 +297,7 @@ def get_df_csv_day_RP(month, day, start, end,
                       step, cam=1):  # replaces missing values with value of 15 seconds later.
 
     if cam == 1:
-        path = '../asi_16124/2019' + features.int_to_str(month) + features.int_to_str(day) + '/'
+        path = 'asi_16124/2019' + features.int_to_str(month) + features.int_to_str(day) + '/'
         file_name = 'peridata_16124_' + month_to_year(month) + features.int_to_str(month) + features.int_to_str(day) + '.csv'
     elif cam == 2:
         # print('CAM 2 DATA')
