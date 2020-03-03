@@ -316,6 +316,20 @@ def file_to_months(file, offset):
             times.append(a)
     return predicted, actual, times
 
+def get_files_best():
+    files = ['persistence',
+             'ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_all data.txt',
+             'LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_all data.txt',
+             'RF SEQUENCE multi_sqnc_30data_all data.txt'
+             ]
+
+    names = ['persistence',
+             'ANN 20 alldata',
+             'LSTM 5 all data',
+             'RF 30 all data']
+
+    return files, names
+
 def get_files_ann_multi():
     files = ['persistence',
              '/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_all data.txt',
@@ -338,15 +352,13 @@ def get_files_ann_multi():
 def get_files_lstm_multi():
     # 'persistence',
     #
-    files = ['LSTM_SEQUENCE_MULTIepochs_5_sqnc_20data_all data.txt',
-             'LSTM_SEQUENCE_MULTIepochs_5_sqnc_10data_all data.txt',
-             'LSTM_SEQUENCE_MULTIepochs_5_sqnc_20data_all data.txt'
+    files = ['LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_all data.txt',
+             'LSTM_SEQUENCE_MULTIepochs_50_sqnc_10data_all data.txt'
              ]
 
     # 'persistence',
     names = ['LSTM 5 all',
-             'LSTM 10 all',
-             'LSTM 20 all'
+             'LSTM 10 all'
              ]
 
     return files, names
@@ -374,13 +386,15 @@ def plot_err_hor_multi(model):
         files, names = get_files_rf_multi()
     elif model == 'lstm':
         files, names = get_files_lstm_multi()
+    elif model == 'best':
+        files, names = get_files_best()
 
     trmse = []
 
     for file in files:
         tmp = []
         if file != 'persistence':
-            add = '../prem results multi/'
+            add = 'prem results multi/'
             actual, pred = get_all_TP_multi(add + file)
         for i in range(0,20):
             if file == 'persistence':

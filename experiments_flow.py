@@ -49,4 +49,4 @@ for i in prediction_horizons:
     print('done: ' + str(i))
 
 # cnn_test()
-train()
+# train()

@@ -23,38 +23,38 @@ def printf(str):
     if enable_print:
         print(str)
 
-def get_df_csv_day_RP(month, day, start, end,
-                      step):  # replaces missing values with value of 15 seconds later.
-
-    path = '../asi_16124/2019' + features.int_to_str(month) + features.int_to_str(day) + '/'
-    file_name = 'peridata_16124_' + month_to_year(month) + features.int_to_str(month) + features.int_to_str(
-        day) + '.csv'  # todo make 2020 ready
-    index = 0
-
-    # data frame
-    queries = int(((end - start) * 60 / step))
-    df = np.empty([queries, 9])  # create df
-
-    process_csv(path + file_name)
-    tmp_df = pd.read_csv(path + file_name, sep=',', header=0, usecols=[0, 1, 2, 3, 4, ],
-                         encoding='cp1252')  # load csv
-    todo = 0
-
-    for i, row in tmp_df.iterrows():
-        if (int(row[1][3:5]) == todo and int(  # some magic for missing values.
-                row[1][0:2]) >= start and int(row[1][0:2]) < end):
-            df[index][0:9] = np.array([row[0][0:2], row[0][3:5], row[0][6:8],  # date
-                                       row[1][0:2], row[1][3:5], row[1][6:8],  # time
-                                       row[2],  # temp
-                                       row[3],  # humidity
-                                       row[4]])  # ghi  # set csv data to df
-            index += 1
-            todo += step
-            if (todo == 60):
-                todo = 0
-
-    # print('filled queries: ' + str(index) + ' out of: ' + str(queries))
-    return df.astype(int)
+# def get_df_csv_day_RP(month, day, start, end,
+#                       step):  # replaces missing values with value of 15 seconds later.
+#
+#     path = '../asi_16124/2019' + features.int_to_str(month) + features.int_to_str(day) + '/'
+#     file_name = 'peridata_16124_' + month_to_year(month) + features.int_to_str(month) + features.int_to_str(
+#         day) + '.csv'  # todo make 2020 ready
+#     index = 0
+#
+#     # data frame
+#     queries = int(((end - start) * 60 / step))
+#     df = np.empty([queries, 9])  # create df
+#
+#     process_csv(path + file_name)
+#     tmp_df = pd.read_csv(path + file_name, sep=',', header=0, usecols=[0, 1, 2, 3, 4, ],
+#                          encoding='cp1252')  # load csv
+#     todo = 0
+#
+#     for i, row in tmp_df.iterrows():
+#         if (int(row[1][3:5]) == todo and int(  # some magic for missing values.
+#                 row[1][0:2]) >= start and int(row[1][0:2]) < end):
+#             df[index][0:9] = np.array([row[0][0:2], row[0][3:5], row[0][6:8],  # date
+#                                        row[1][0:2], row[1][3:5], row[1][6:8],  # time
+#                                        row[2],  # temp
+#                                        row[3],  # humidity
+#                                        row[4]])  # ghi  # set csv data to df
+#             index += 1
+#             todo += step
+#             if (todo == 60):
+#                 todo = 0
+#
+#     # print('filled queries: ' + str(index) + ' out of: ' + str(queries))
+#     return df.astype(int)
 
 
 def month_to_year(month):
@@ -309,11 +309,17 @@ def get_df_csv_day_RP(month, day, start, end,
     # data frame
     queries = int(((end - start) * 60 / step))
     df = np.empty([queries, 9])  # create df
-    print(path+file_name)
+
+    dir = os.getcwd()
+    if dir[-4:] == 'data':
+        os.chdir("..")
+        print(os.getcwd())
+
     try:
         process_csv(path + file_name)
         tmp_df = pd.read_csv(path + file_name, sep=',', header=0, usecols=[0, 1, 2, 3, 4, ],
                              encoding='cp1252')  # load csv
+
         todo = 0
 
         for i, row in tmp_df.iterrows():
