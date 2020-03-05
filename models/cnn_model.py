@@ -38,18 +38,23 @@ class CnnNet:
         elif self.modelarch == 'small':
             self.model = keras.models.Sequential()
             # add model layers
-            self.model.add(Conv2D(124, kernel_size=3, activation='relu', input_shape=(image_res, image_res, 3)))
-            self.model.add(Conv2D(256, kernel_size=3, activation='relu'))
-            self.model.add(MaxPooling2D(pool_size=3))
-            self.model.add(Conv2D(124, kernel_size=3, activation='relu'))
+            input_shape = (image_res, image_res, 3)
+            self.model.add(Conv2D(64, kernel_size=(3, 3), strides=(1, 1),
+                             activation='relu',
+                             input_shape=input_shape))
+            self.model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+
+            self.model.add(Conv2D(128, kernel_size=(3, 3), strides=(1, 1),
+                                  activation='relu',
+                                  input_shape=input_shape))
+            self.model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
             self.model.add(Flatten())
+            self.model.add(Dense(128, activation='relu'))
             self.model.add(Dense(1))
             self.model.compile(optimizer='adam', loss='mean_squared_error')
 
 
-
-
-    def train(self, epochs=50, batch_size=128):
+    def train(self, epochs=50, batch_size=56):
         self.model.fit(self.data.x_train, self.data.y_train, epochs=epochs, batch_size=batch_size, validation_data=(self.data.x_val, self.data.y_val))
 
     def predict(self):
