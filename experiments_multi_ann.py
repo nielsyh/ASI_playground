@@ -40,7 +40,7 @@ def ann_test():
     data = DataFrameSequenceMulti(False, True, True, True)
     data.build_ts_df(6, 19, [8,9], 20)
     data.normalize_mega_df()
-    ann = ann_model_multi.ANN_Multi(data, 3, 3, 'ANN_BETA_SEQUENCE_MUTLI_TEST')
+    ann = ann_model_multi.ANN_Multi(data, 3, 'ANN_BETA_SEQUENCE_MUTLI_TEST')
     data.split_data_set(9, 27)
     data.flatten_data_set()
     ann.get_model()
@@ -58,7 +58,7 @@ def ann_test():
     print(rmse)
 
 def optimize():
-    data = ann_model_multi(False, 20, False, False)
+    data = DataFrameSequenceMulti(False, 20, False, False)
     data.build_ts_df(6, 18, [7,8,9,10,11,12], 60, 1)
     data.normalize_mega_df()
     data.split_data_set(11,15)
@@ -121,8 +121,8 @@ def optimize():
 # print('cams: ' + str(cams))
 # print('IMG: ' + str(img))
 
-run_ann_experiments()
-# ann_test()
+# run_ann_experiments()
+ann_test()
 # optimize()
 
 

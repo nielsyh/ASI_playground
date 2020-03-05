@@ -1,5 +1,4 @@
-from keras.layers import Input, Dense, concatenate, MaxPool2D, GlobalAveragePooling2D, Dropout, Conv2D, Flatten, MaxPooling2D
-from keras.models import Model
+from keras.layers import Dense, MaxPool2D, Conv2D, Flatten
 import keras
 from keras.applications.resnet50 import ResNet50
 from keras.models import load_model
@@ -42,12 +41,12 @@ class CnnNet:
             self.model.add(Conv2D(64, kernel_size=(3, 3), strides=(1, 1),
                              activation='relu',
                              input_shape=input_shape))
-            self.model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+            self.model.add(MaxPool2D(pool_size=(2, 2), strides=(2, 2)))
 
             self.model.add(Conv2D(128, kernel_size=(3, 3), strides=(1, 1),
                                   activation='relu',
                                   input_shape=input_shape))
-            self.model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+            self.model.add(MaxPool2D(pool_size=(2, 2), strides=(2, 2)))
             self.model.add(Flatten())
             self.model.add(Dense(128, activation='relu'))
             self.model.add(Dense(1))
