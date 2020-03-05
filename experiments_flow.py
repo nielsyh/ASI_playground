@@ -44,12 +44,13 @@ def train_test():
     # cnn.build_prem_models()
 
     tup = (9, 11)
+
     data.split_data_set(tup[0], tup[1])
     data.flatten_data_set_CNN()
 
     cnn.get_model(400)
     cnn.train(epochs=50)
-    cnn.save_model('test_model')
+    cnn.save_model('test')
     print('Done')
 
 def train():
@@ -65,5 +66,5 @@ def train():
 #     print('done: ' + str(i))
 
 # cnn_test()
-train()
-# train_test()
+# train()
+train_test()

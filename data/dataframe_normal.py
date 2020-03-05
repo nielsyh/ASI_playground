@@ -161,13 +161,12 @@ class DataFrameNormal:
                         data[3]), int(data[4]), int(data[5])
 
                     img = get_image_by_date_time(year, month, day, hour, minute, seconds)  # get image
-                    if img:
-                        try:
-                            self.mega_df[day_index][idx][3:size_of_row] = img.ravel()
-                        except:
-                            print('Broken image: ')
-                            print(month, day, minute, seconds)
-                            continue
+                    try:
+                        self.mega_df[day_index][idx][3:size_of_row] = img.ravel()
+                    except:
+                        print('Broken image: ')
+                        print(month, day, minute, seconds)
+                        continue
 
     def build_df(self, start, end, step, months):
 
