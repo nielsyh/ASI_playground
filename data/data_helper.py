@@ -11,50 +11,43 @@ import numpy as np
 from datetime import time
 from os import listdir, path
 import cv2
-import data
+import data.data_visuals
 import metrics
 import pvlib_playground
 import features
-# from features import get_image_by_date_time, int_to_str, extract_features, show_img
 from tqdm import tqdm
-enable_print = True
+import calendar
 
-def printf(str):
-    if enable_print:
-        print(str)
 
-# def get_df_csv_day_RP(month, day, start, end,
-#                       step):  # replaces missing values with value of 15 seconds later.
-#
-#     path = '../asi_16124/2019' + features.int_to_str(month) + features.int_to_str(day) + '/'
-#     file_name = 'peridata_16124_' + month_to_year(month) + features.int_to_str(month) + features.int_to_str(
-#         day) + '.csv'  # todo make 2020 ready
-#     index = 0
-#
-#     # data frame
-#     queries = int(((end - start) * 60 / step))
-#     df = np.empty([queries, 9])  # create df
-#
-#     process_csv(path + file_name)
-#     tmp_df = pd.read_csv(path + file_name, sep=',', header=0, usecols=[0, 1, 2, 3, 4, ],
-#                          encoding='cp1252')  # load csv
-#     todo = 0
-#
-#     for i, row in tmp_df.iterrows():
-#         if (int(row[1][3:5]) == todo and int(  # some magic for missing values.
-#                 row[1][0:2]) >= start and int(row[1][0:2]) < end):
-#             df[index][0:9] = np.array([row[0][0:2], row[0][3:5], row[0][6:8],  # date
-#                                        row[1][0:2], row[1][3:5], row[1][6:8],  # time
-#                                        row[2],  # temp
-#                                        row[3],  # humidity
-#                                        row[4]])  # ghi  # set csv data to df
-#             index += 1
-#             todo += step
-#             if (todo == 60):
-#                 todo = 0
-#
-#     # print('filled queries: ' + str(index) + ' out of: ' + str(queries))
-#     return df.astype(int)
+def load_features():
+    fix_directory()
+    return np.load('x_22_d6to19_m7to12.npy')
+
+def get_feature_data(features, month, day, start, end):
+    start_time_idx = (start - 6) * 60
+    end_time_idx = (end - 6) * 60
+    previous_days = 0
+
+    month_list = list(range(7, month + 1))
+    for i in month_list:
+        if i == 7:
+            continue
+        if i == 8:
+            previous_days += 5
+        else:
+            previous_days += calendar.monthrange(2019, i - 1)[1]
+    if month == 7:
+        day_idx = day - 26
+    else:
+        day_idx = previous_days + day
+    return features[day_idx, start_time_idx:end_time_idx]
+
+def get_features_month(start,end, month):
+    f = load_features()
+    f = f.reshape(f.shape[0]* f.shape[1], f.shape[2])
+    f  = f.astype(int)[f.astype(int)[:, 1] == month]  ##filter month
+    f = f.astype(int)[f.astype(int)[:, 3] > (start-1)] ##fiter start
+    return f.astype(int)[f.astype(int)[:, 3] < end] ##filter end
 
 
 def month_to_year(month):
@@ -200,7 +193,8 @@ def resize_image(img, height, width):
 def get_avg_var_by_minute(df, hour, minute):
     rows = df[df[:, 3] == hour]  # filter on hours
     rows = rows[rows[:, 4] == minute]  # filter on minutes
-    return np.mean(rows[:, 6:9], axis=0), np.var(rows[:, 6:9], axis=0)
+    return np.mean(rows[:, [6,7,8,9,18,19,20,21]], axis=0), np.var(rows[:, [6,7,8,9,18,19,20,21]], axis=0)
+
 
 def get_ghi_temp_by_minute(df, hour, minute):
 
@@ -253,6 +247,7 @@ def images_information():
 
 def get_df_csv_month(month, start, end,
                      step):  # get data frame for a month with start and end time not inc. image
+    fix_directory()
     folders = listdir('asi_16124')  # select cam
     del folders[0:3]  # first 3 are bad data
     index = 0
@@ -261,6 +256,7 @@ def get_df_csv_month(month, start, end,
 
     for folder in folders:  # fill df
         if (int(folder[4:6]) == month):  # only check for month
+
 
             path = 'asi_16124/' + str(folder) + '/'
             files = listdir(path)
@@ -291,6 +287,12 @@ def get_df_csv_month(month, start, end,
     # # YEAR, MONTH, DAY, HOURS, MINUTES, SECONDS, TEMP, IRRADIANCE, IMAGE
     # print('filled queries: ' + str(index) + 'out of: ' + str(queries))
     return df.astype(int)
+
+def fix_directory():
+    dir = os.getcwd()
+    if dir[-4:] == 'data':
+        os.chdir("..")
+        print(os.getcwd())
 
 
 def get_df_csv_day_RP(month, day, start, end,
@@ -341,21 +343,19 @@ def get_df_csv_day_RP(month, day, start, end,
         print(file_name)
         return None
 
-def plot_metoer_per_month(start, end , step):
-    months = [8,9]
-
-    for mon in months:
-        df = pvlib_playground.PvLibPlayground.get_meteor_data()
 
 def plot_per_month(start, end, step):
     times0, avg_temp0, var_temp0, avg_ghi0, var_ghi0, var_ghi0, avg_hum0, var_hum0, tick_times0 = ([] for i in range(9))
+    avg_int0, var_int0, avg_cld0, var_cld0, avg_corn0, var_corn0, avg_edge0, var_edge0 = ([] for i in range(8))
 
     months = [8,9,10,11,12]
     for mon in months:
-        df = get_df_csv_month(mon, start, end, step)
+        # df = get_df_csv_month(mon, start, end, step)
+        df = get_features_month(start,end, mon)
         hours = list(range(start, end))
         minutes = list(range(0, 60, step))
         times, avg_temp, var_temp, avg_ghi, var_ghi, var_ghi, avg_hum, var_hum, tick_times = ([] for i in range(9))
+        avg_int, var_int, avg_cld, var_cld, avg_corn, var_corn, avg_edge, var_edge = ([] for i in range(8))
 
         for h in hours:
             tick_times.append(time(h, 0, 0))  # round hours
@@ -375,6 +375,18 @@ def plot_per_month(start, end, step):
                 avg_ghi.append(tmp_avg[2])
                 var_ghi.append(tmp_var[2])
 
+                avg_int.append(tmp_avg[3])
+                var_int.append(tmp_var[3])
+
+                avg_cld.append(tmp_avg[4])
+                var_cld.append(tmp_var[4])
+
+                avg_corn.append(tmp_avg[5])
+                var_corn.append(tmp_var[5])
+
+                avg_edge.append(tmp_avg[6])
+                var_edge.append(tmp_var[6])
+
         times0.append(times)
         tick_times0.append(tick_times)
 
@@ -387,20 +399,52 @@ def plot_per_month(start, end, step):
         avg_hum0.append(avg_hum)
         var_hum0.append(var_hum)
 
+        avg_int0.append(avg_int)
+        var_int0.append(var_int)
+
+        avg_cld0.append(avg_cld)
+        var_cld0.append(var_cld)
+
+        avg_corn0.append(avg_corn)
+        var_corn0.append(var_corn)
+
+        avg_edge0.append(avg_edge)
+        var_edge0.append(var_edge)
 
         #avg_temp0, var_temp0, avg_ghi0, var_ghi0, var_ghi0, avg_hum0, var_hum0, tick_times0
 
     labels = ['August', 'September', 'October', 'November', 'December']
 
-    # plot data
-    data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, avg_temp0, labels, 'time', 'Temp. in Celsius', 'avg. Temp. in months')
-    data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, var_temp0, labels,  'time', 'Variance temp. Celsius.', 'var. Temp. in months')
+    # # plot data
+    # data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, avg_temp0, labels, 'time', 'Temp. in Celsius', 'avg. Temp. in months')
+    # data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, var_temp0, labels,  'time', 'Variance temp. Celsius.', 'var. Temp. in months')
+    #
+    # data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, avg_ghi0, labels, 'time', 'GHI in W/m^2', 'avg. GHI in months')
+    # data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, var_ghi0, labels, 'time', 'Variance GHI', 'var. GHI in months')
+    #
+    # data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, avg_hum0, labels,  'time', 'Humidity', 'avg. Humidity in months')
+    # data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, var_hum0, labels,  'time', 'Variance Humidity', 'var. Humidity in months')
 
-    data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, avg_ghi0, labels, 'time', 'GHI in W/m^2', 'avg. GHI in months')
-    data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, var_ghi0, labels, 'time', 'Variance GHI', 'var. GHI in months')
+    data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, avg_int0, labels, 'time', 'Intensity feature',
+                                          'avg. intensity in months')
+    data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, var_int0, labels, 'time', 'Variance intensity feature',
+                                          'var. intensity in months')
 
-    data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, avg_hum0, labels,  'time', 'Humidity', 'avg. Humidity in months')
-    data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, var_hum0, labels,  'time', 'Variance Humidity', 'var. Humidity in months')
+
+    data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, avg_cld0, labels, 'time', '#CloudPixel feature',
+                                          'avg. #CloudPixel in months')
+    data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, var_cld0, labels, 'time', 'Variance #CloudPixel feature',
+                                          'var. #CloudPixel in months')
+
+    data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, avg_corn0, labels, 'time', '#Corners feature',
+                                          'avg. #Corners in months')
+    data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, var_corn0, labels, 'time', 'Variance #Corners feature',
+                                          'var. #Corners in months')
+
+    data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, avg_edge0, labels, 'time', '#Edges feature',
+                                          'avg. #Edges in months')
+    data.data_visuals.plot_time_avg_multi(tick_times0[0], times0, var_edge0, labels, 'time', 'Variance #Edges feature',
+                                          'var. #Edges in months')
 
 def plot_day(day, month, start, end, step):
     df = get_df_csv_day_RP(month, day, start, end, step)
@@ -514,7 +558,7 @@ def get_persistence_dates(tups, start, end, pred_hor):
     actual = []
     pred = []
     for tup in tups:
-        print(tup)
+        # print(tup)
         p, a, _ = get_persistence_df(tup[0], tup[1], start, end, pred_hor)
 
         if p == 0 or a == 0:

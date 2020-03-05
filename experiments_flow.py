@@ -37,16 +37,32 @@ def cnn_test():
         name = 'CNN_predhor' + str(10)
         metrics.Metrics.write_results(name, data.mega_df_times, data.mega_df_y, y_pred.ravel(), 10)
 
+def train_test():
+    data = DataFrameNormal()
+    data.build_df_for_cnn(10, 12, 1, [9])
+    cnn = cnn_model.CnnNet(data, 200, modelarch='small')
+    # cnn.build_prem_models()
+
+    tup = (9, 11)
+
+    data.split_data_set(tup[0], tup[1])
+    data.flatten_data_set_CNN()
+
+    cnn.get_model(400)
+    cnn.train(epochs=50)
+    print('Done')
+
 def train():
     data = DataFrameNormal()
-    data.build_df_for_cnn(6, 20, 1, [7,8,9,10,11,12])
+    data.build_df_for_cnn(6, 19, 1, [7,8,9,10,11,12])
     cnn = cnn_model.CnnNet(data, 200, modelarch='small')
     cnn.build_prem_models()
 
-prediction_horizons = list(range(1,21))
-for i in prediction_horizons:
-    experiment(i)
-    print('done: ' + str(i))
+# prediction_horizons = list(range(1,21))
+# for i in prediction_horizons:
+#     experiment(i)
+#     print('done: ' + str(i))
 
 # cnn_test()
 # train()
+train_test()

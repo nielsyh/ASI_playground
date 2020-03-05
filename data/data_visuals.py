@@ -192,6 +192,8 @@ def get_all_TP_multi(file):
     actual = [[] for x in range(20)]
     predicted = [[] for x in range(20)]
 
+    data_helper.fix_directory()
+
     with open(file) as fp:
         for line in fp:
 
@@ -213,11 +215,7 @@ def get_all_TP_multi(file):
 
     return actual, predicted
 
-
-
-
-
-def file_to_values(file):
+def file_to_values(file, prediction_horizon = 0, times_=False):
     predicted, actual = [],[]
     times = []
     with open(file) as fp:
@@ -228,6 +226,10 @@ def file_to_values(file):
             day = int(float(l[1]))
             hour = int(float(l[2]))
             minute = int(float(l[3]))
+            pred_hor = int(float(l[4]))
+
+            if prediction_horizon > 0 and pred_hor != prediction_horizon:
+                continue
 
             if l[5][0] == '[':
                 true = float(l[5][1:-2])
@@ -243,7 +245,16 @@ def file_to_values(file):
             else:
                 predicted.append(pred)
                 actual.append(true)
-    return predicted, actual
+                times.append((hour, minute))
+                # a = datetime.datetime(hour=int(hour), minute=int(minute))
+                # a = matplotlib.dates.date2num(a)
+                # times.append(a)
+
+    if times_:
+        print('TIMES TRUE')
+        return predicted, actual, times
+    else:
+        return predicted, actual
 
 
 def file_to_dates(file, month, day, offset):
@@ -316,48 +327,60 @@ def file_to_months(file, offset):
             times.append(a)
     return predicted, actual, times
 
-def get_files_best():
+def get_files_best_multi():
+
     files = ['persistence',
-             'ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_all data.txt',
-             'LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_all data.txt',
-             'RF SEQUENCE multi_sqnc_30data_all data.txt'
+             'ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_all data.txt',
+             'lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_all data.txt',
+             'lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_onsite_only.txt',
+             'rf/RF SEQUENCE multi_sqnc_30data_all data.txt'
              ]
 
-    names = ['persistence',
+    names = ['Persistence',
              'ANN 20 alldata',
              'LSTM 5 all data',
+             'LSTM 5 onsite only',
              'RF 30 all data']
 
     return files, names
 
 def get_files_ann_multi():
     files = ['persistence',
-             '/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_all data.txt',
-             '/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_img only.txt',
-             '/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_meteor only.txt',
-             '/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_onsite_only.txt',
-             '/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_all data.txt',
-             '/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_img only.txt',
-             '/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_meteor only.txt',
-             '/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_onsite_only.txt'
+             'ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_all data.txt',
+             'ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_img only.txt',
+             'ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_meteor only.txt',
+             'ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_onsite_only.txt',
+             'ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_all data.txt',
+             'ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_img only.txt',
+             'ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_onsite_only.txt'
              ]
 
     names = ['persistence',
              'ANN 20 all', 'ANN 20 img', 'ANN 20 metoer', 'ANN 20 onsite',
-             'ANN 40 all', 'ANN 40 img', 'ANN 40 meteor', 'ANN 40 onsite']
+             'ANN 40 all', 'ANN 40 img', 'ANN 40 onsite']
 
     return files, names
 
 
 def get_files_lstm_multi():
-    # 'persistence',
     #
-    files = ['LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_all data.txt',
-             'LSTM_SEQUENCE_MULTIepochs_50_sqnc_10data_all data.txt'
+    #
+    files = [ 'persistence',
+              'lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_all data.txt',
+             'lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_meteor only.txt',
+             'lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_img only.txt',
+             'lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_onsite_only.txt',
+             'lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_10data_all data.txt'
              ]
 
+
+
     # 'persistence',
-    names = ['LSTM 5 all',
+    names = ['Persistence',
+             'LSTM 5 all',
+             'LSTM 5 metoer only',
+             'LSTM 5 img only',
+             'LSTM 5 on-site only',
              'LSTM 10 all'
              ]
 
@@ -365,13 +388,17 @@ def get_files_lstm_multi():
 
 def get_files_rf_multi():
     files = ['persistence',
-             '/RF SEQUENCE multi_sqnc_30data_all data.txt',
-             '/RF SEQUENCE multi_sqnc_60data_all data.txt',
-             '/RF SEQUENCE multi_sqnc_120data_all data.txt'
+             'rf/RF SEQUENCE multi_sqnc_30data_all data.txt',
+             'rf/RF SEQUENCE multi_sqnc_30data_img only.txt',
+             'rf/RF SEQUENCE multi_sqnc_30data_meteor only.txt',
+             'rf/RF SEQUENCE multi_sqnc_60data_all data.txt',
+             'rf/RF SEQUENCE multi_sqnc_120data_all data.txt'
              ]
 
     names = ['persistence',
              'RF 30 all',
+             'RF 30 img only',
+             'RF 30 meteor only',
              'RF 60 all',
              'RF 120 all']
 
@@ -387,12 +414,16 @@ def plot_err_hor_multi(model):
     elif model == 'lstm':
         files, names = get_files_lstm_multi()
     elif model == 'best':
-        files, names = get_files_best()
+        files, names = get_files_best_multi()
 
     trmse = []
+    tmae = []
+    tmape = []
 
     for file in files:
-        tmp = []
+        tmp_rmse = []
+        tmp_mae = []
+        tmp_mape = []
         if file != 'persistence':
             add = 'prem results multi/'
             actual, pred = get_all_TP_multi(add + file)
@@ -403,15 +434,27 @@ def plot_err_hor_multi(model):
             else:
                 rmse, mae, mape = Metrics.get_error(actual[i], pred[i])
 
-            print(rmse)
-            tmp.append(rmse)
+            # print(rmse)
+            tmp_rmse.append(rmse)
+            tmp_mae.append(mae)
+            tmp_mape.append(mape)
 
-        trmse.append(tmp)
+        trmse.append(tmp_rmse)
+        tmae.append(tmp_mae)
+        tmape.append(tmp_mape)
 
     predictions = list(range(1, 21))
-    print(trmse)
-    plot_error_per_horizons(trmse, predictions,names,
-                            'RMSE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in RMSE')
+
+    print(trmse, predictions, names)
+
+    plot_error_per_horizons(trmse, predictions, names,
+                            'RMSE Error per prediction horizon (mutli)', 'Prediction Horizon in minutes', 'Error in RMSE')
+
+    plot_error_per_horizons(tmae, predictions, names,
+                            'MAE Error per prediction horizon (mutli)', 'Prediction Horizon in minutes', 'Error in MAE')
+
+    plot_error_per_horizons(tmape, predictions, names,
+                            'MAPE Error per prediction horizon (mutli)', 'Prediction Horizon in minutes', 'Error in MAPE')
 
 
 def get_folders_ann():
@@ -713,3 +756,7 @@ def plot_months_error_day():
 
 # test_plot()
 # plot_months_error_day()
+# plot_err_hor_multi('rf')
+# plot_err_hor_multi('ann')
+# plot_err_hor_multi('lstm')
+# plot_err_hor_multi('best')

@@ -14,13 +14,13 @@ def round_list(ls):
 def calc_ss(res):
     result = ['NA']
     for i in range(1, len(res)):
-        result.append(round(1 - (res[i] / res[0]),4))
+        result.append(round(1 - (res[i] / res[0]),2))
 
     return result
 
 
 def print_table(model_names, rmse, mae, mape, ss_rmse, ss_mae, ss_mape, caption, label):
-    print('\\begin{table}[]')
+    print('\\begin{table}[!htb]')
     print('\\resizebox{\\textwidth}{!}{%')
     print('\\begin{tabular}{|l|l|l|l|l|l|l|}')
     print('\hline')
@@ -66,6 +66,49 @@ folders_lstm = ['prem results/LSTM 5 IMG/LSTM_SEQUENCE_epochs_40_sequence_5CAM_1
            'prem results/LSTM 20 IMG/LSTM_SEQUENCE_epochs_40_sequence_20CAM_1_img_Truepredhor_',
            'prem results/LSTM 20 NOIMG/LSTM_SEQUENCE_epochs_40_sequence_20CAM_1_img_Falsepredhor_']
 
+folders_rf_multi = ['prem results multi/rf/RF SEQUENCE multi_sqnc_120data_onsite_only.txt',
+                    'prem results multi/rf/RF SEQUENCE multi_sqnc_30data_img only.txt',
+                    'prem results multi/rf/RF SEQUENCE multi_sqnc_30data_meteor only.txt',
+                    'prem results multi/rf/RF SEQUENCE multi_sqnc_120data_all data.txt',
+                    'prem results multi/rf/RF SEQUENCE multi_sqnc_120data_img only.txt',
+                    'prem results multi/rf/RF SEQUENCE multi_sqnc_30data_onsite_only.txt',
+                    'prem results multi/rf/RF SEQUENCE multi_sqnc_60data_all data.txt',
+                    'prem results multi/rf/RF SEQUENCE multi_sqnc_60data_meteor only.txt',
+                    'prem results multi/rf/RF SEQUENCE multi_sqnc_60data_img only.txt',
+                    'prem results multi/rf/RF SEQUENCE multi_sqnc_30data_all data.txt',
+                    'prem results multi/rf/RF SEQUENCE multi_sqnc_120data_meteor only.txt',
+                    'prem results multi/rf/RF SEQUENCE multi_sqnc_60data_onsite_only.txt']
+
+folders_lstm_multi = [
+                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_20data_onsite_only.txt',
+                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_20data_meteor only.txt',
+                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_10data_meteor only.txt',
+                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_20data_all data.txt',
+                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_meteor only.txt',
+                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_10data_onsite_only.txt',
+                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_onsite_only.txt',
+                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_10data_img only.txt',
+                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_10data_all data.txt',
+                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_all data.txt',
+                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_20data_img only.txt',
+                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_img only.txt'
+]
+
+folders_ann_multi = [
+                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_all data.txt',
+                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_all data.txt',
+                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_meteor only.txt',
+                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_meteor only.txt',
+                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_60data_all data.txt',
+                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_img only.txt',
+                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_60data_onsite_only.txt',
+                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_onsite_only.txt',
+                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_onsite_only.txt',
+                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_60data_img only.txt',
+                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_img only.txt',
+                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_60data_meteor only.txt'
+]
+
 armse = []
 amae = []
 amape = []
@@ -73,55 +116,76 @@ ass_rmse = ['NA']
 ass_mae = ['NA']
 ass_mape = ['NA']
 all_model_names = []
-# for i in prediction_horizons:
-prediction_horizons = list(range(1,21))
-for i in prediction_horizons:
-    model_names = []
-    rmse = []
-    mae = []
-    mape = []
-    ss_rmse = ['NA']
-    ss_mae = ['NA']
-    ss_mape = ['NA']
 
-    t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
-    actual, pred = data.data_helper.get_persistence_dates(t, 7, 19, i)
-    trmse, tmae, tmape = metrics.Metrics.get_error(actual, pred)
-    model_names.append("Persistence")
-    rmse.append(round(trmse, 4))
-    mae.append(round(tmae, 4))
-    mape.append(round(tmape, 4))
+def print_results(folders):
+    prediction_horizons = list(range(1,21))
+    for i in prediction_horizons:
+        model_names = []
+        rmse = []
+        mae = []
+        mape = []
+        ss_rmse = ['NA']
+        ss_mae = ['NA']
+        ss_mape = ['NA']
 
-
-    for folder in folders_lstm + folders_rf + folders_ann:
-        extension = '.txt'
-        file = folder + str(i) + extension
-        predicted, actual = data.data_visuals.file_to_values(file)
-        trmse, tmae, tmape = metrics.Metrics.get_error(actual, predicted)
-        modelname = folder[folder.find('/')+1:-1][0:(folder[folder.find('/')+1:-1]).find('/')]
-
-        model_names.append(modelname)
+        t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
+        actual, pred = data.data_helper.get_persistence_dates(t, 7, 19, i)
+        trmse, tmae, tmape = metrics.Metrics.get_error(actual, pred)
+        model_names.append("Persistence")
         rmse.append(round(trmse, 2))
         mae.append(round(tmae, 2))
         mape.append(round(tmape, 2))
 
-        ss_rmse.append(round(1 - (trmse / rmse[0]), 2))
-        ss_mae.append(round(1 - (tmae / mae[0]), 2))
-        ss_mape.append(round(1 - (tmape / mape[0]),2))
+        for folder in folders:
+            extension = '.txt'
 
-    # print('L: '  + str(len(model_names) + 1))
-    # print('W: 7' )
+            if folder[-1] == '_':
+                file = folder + str(i) + extension
+                predicted, actual = data.data_visuals.file_to_values(file)
+                trmse, tmae, tmape = metrics.Metrics.get_error(actual, predicted)
+                modelname = folder[folder.find('/')+1:-1][0:(folder[folder.find('/')+1:-1]).find('/')]
+            else:
+                file = folder
+                predicted, actual = data.data_visuals.file_to_values(file,i)
+                trmse, tmae, tmape = metrics.Metrics.get_error(actual, predicted)
 
-    # print_table(model_names, rmse, mae, mape, ss_rmse, ss_mae, ss_mape, 'Performance evaluation Prem. days with prediction horizon: ' + str(i), 'prem.' + str(i))
+                if 'ANN' in folder:
+                    tmp_name = 'ANN'
+                elif 'LSTM' in folder:
+                    tmp_name = 'LSTM'
+                elif 'RF' in folder:
+                    tmp_name = 'RF'
 
-    armse.append(rmse)
-    amae.append(mae)
-    amape.append(mape)
-    ass_rmse.append(ss_rmse)
-    ass_mae.append(ss_mae)
-    ass_mape.append(ss_mape)
-    all_model_names = model_names
+                modelname = folder[folder.find(tmp_name):folder.find('SEQUENCE')-1] + ' Multi ' + folder[folder.find('sqnc')+5:folder.find('data')] + ' ' + folder[folder.find('data')+5:folder.find('.txt')]
 
-print_table( all_model_names, round_list(avg_res(armse)), round_list(avg_res(amae)),
-             round_list(avg_res(amape)), calc_ss(avg_res(armse)), calc_ss(avg_res(amae)),
-             calc_ss(avg_res(amape)), 'Average performance evaluation Prem. days', 'prem.avg')
+
+            model_names.append(modelname)
+            rmse.append(round(trmse, 2))
+            mae.append(round(tmae, 2))
+            mape.append(round(tmape, 2))
+
+            ss_rmse.append(round(1 - (trmse / rmse[0]), 2))
+            ss_mae.append(round(1 - (tmae / mae[0]), 2))
+            ss_mape.append(round(1 - (tmape / mape[0]),2))
+
+        # print('L: '  + str(len(model_names) + 1))
+        # print('W: 7' )
+
+        print_table(model_names, rmse, mae, mape, ss_rmse, ss_mae, ss_mape, 'Performance evaluation Prem. days with prediction horizon: ' + str(i), 'prem.' + str(i))
+
+    #     armse.append(rmse)
+    #     amae.append(mae)
+    #     amape.append(mape)
+    #     ass_rmse.append(ss_rmse)
+    #     ass_mae.append(ss_mae)
+    #     ass_mape.append(ss_mape)
+    #     all_model_names = model_names
+    #
+    # print_table( all_model_names, round_list(avg_res(armse)), round_list(avg_res(amae)),
+    #              round_list(avg_res(amape)), calc_ss(avg_res(armse)), calc_ss(avg_res(amae)),
+    #              calc_ss(avg_res(amape)), 'Average performance evaluation prem. days', 'prem.avg')
+
+
+print_results(folders_rf + folders_rf_multi)
+print_results(folders_ann + folders_ann_multi)
+print_results(folders_lstm + folders_lstm_multi)

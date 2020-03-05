@@ -135,7 +135,7 @@ class DataFrameNormal:
 
         # image res + label + month + day
         size_of_row = 3 + (400 * 400 * 3)
-        self.mega_df = np.zeros((days, self.queries_per_day, size_of_row), dtype=np.uint16)
+        self.mega_df = np.zeros((days, self.queries_per_day, size_of_row), dtype=np.uint8)
 
         print(months)
         for m in tqdm(months, total=len(months), unit='Month progress'):
