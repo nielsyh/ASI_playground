@@ -44,12 +44,12 @@ def train_test():
     # cnn.build_prem_models()
 
     tup = (9, 11)
-
     data.split_data_set(tup[0], tup[1])
     data.flatten_data_set_CNN()
 
     cnn.get_model(400)
     cnn.train(epochs=50)
+    cnn.save_model('test_model')
     print('Done')
 
 def train():
@@ -58,11 +58,12 @@ def train():
     cnn = cnn_model.CnnNet(data, 200, modelarch='small')
     cnn.build_prem_models()
 
+
 # prediction_horizons = list(range(1,21))
 # for i in prediction_horizons:
 #     experiment(i)
 #     print('done: ' + str(i))
 
 # cnn_test()
-# train()
-train_test()
+train()
+# train_test()

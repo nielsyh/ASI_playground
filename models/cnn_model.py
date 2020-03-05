@@ -51,6 +51,7 @@ class CnnNet:
             self.model.add(Flatten())
             self.model.add(Dense(128, activation='relu'))
             self.model.add(Dense(1))
+            print(self.model.summary())
             self.model.compile(optimizer='adam', loss='mean_squared_error')
 
 
@@ -82,11 +83,9 @@ class CnnNet:
 
     def build_prem_models(self):
         prem = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
-
         for tup in tqdm(prem, total=len(prem), unit='Days to predict'):
             self.data.split_data_set(tup[0], tup[1])
             self.data.flatten_data_set_CNN()
-
             self.get_model(400)
             epochs = self.epochs
             self.train(epochs=epochs)
