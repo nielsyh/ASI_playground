@@ -191,6 +191,7 @@ def get_all_TP(file):
 def get_all_TP_multi(file):
     actual = [[] for x in range(20)]
     predicted = [[] for x in range(20)]
+    times = [[] for x in range(20)]
 
     data_helper.fix_directory()
 
@@ -206,14 +207,18 @@ def get_all_TP_multi(file):
             minute = int(float(l[3]))
             horizon = int(float(l[4])) -1
 
+            a = datetime.datetime(year=2019, month=int(month), day=int(day), hour=int(hour), minute=int(minute))
+            a = a + timedelta(minutes=horizon)
+            a = matplotlib.dates.date2num(a)
+            times[horizon].append(a)
+
             true = float(l[5])
             pred = float(l[6])
 
             actual[horizon].append(true)
             predicted[horizon].append(pred)
 
-
-    return actual, predicted
+    return actual, predicted, times
 
 def file_to_values(file, prediction_horizon = 0, times_=False):
     predicted, actual = [],[]
@@ -403,6 +408,32 @@ def get_files_rf_multi():
              'RF 120 all']
 
     return files, names
+
+def plot_day_multi(offset):
+    files, names = get_files_best_multi()
+    t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
+    add = 'prem results multi/'
+    actual, pred, times = data_helper.get_persistence_dates(t, 6, 19, 20, offset=offset) #24 for 5 lstm
+    actual2, pred2, times2 = get_all_TP_multi(str(add + files[2]))
+
+    plt.plot(actual, linestyle='-', label='1')
+    plt.plot(actual2[19], linestyle='-', label='2')
+    plt.legend()
+    plt.show()
+    plt.close()
+
+def get_statistical_sig():
+    files, names = get_files_best_multi()
+    add = 'prem results multi/'
+    print(str(add + files[0]))
+    t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
+    actual, pred, _ = data_helper.get_persistence_dates(t, 6, 19, 20, 24)
+    actual2, pred2, _ = get_all_TP_multi(str(add + files[2]))
+
+
+    print(Metrics.dm_test(actual, pred, pred2[19], h=20, crit="MSE", power=2))
+
+
 
 def plot_err_hor_multi(model):
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]

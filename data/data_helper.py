@@ -522,12 +522,15 @@ def plot_persistence_day(day, month, start, end, step):
                   'GHI at day: ' + str(day) + ' month: ' + str(month))
 
 def get_persistence_df(month, day, start, end, pred_hor):
-    df_truth = get_df_csv_day_RP(month, day, start, end, 1)
+    end_length = (end - start)*60
+    df_truth = get_df_csv_day_RP(month, day, start, end+1, 1)
     df_pred = get_df_csv_day_RP(month, day, start-1, end, 1)
     copy = df_pred.copy()
 
+
     for i in range(0, len(df_pred)):
-        if i < pred_hor:
+        if i < (pred_hor):
+            # print(i)
             continue
         else:
             df_pred[i][8] = copy[i - pred_hor][8]
@@ -554,20 +557,25 @@ def get_persistence_df(month, day, start, end, pred_hor):
 
     return ghi_pred, ghi_truth, times
 
-def get_persistence_dates(tups, start, end, pred_hor):
+def get_persistence_dates(tups, start, end, pred_hor, offset=0):
     actual = []
     pred = []
+    times = []
     for tup in tups:
         # print(tup)
-        p, a, _ = get_persistence_df(tup[0], tup[1], start, end, pred_hor)
+        # print(offset)
+        p, a, tm = get_persistence_df(tup[0], tup[1], start, end+1, pred_hor)
 
-        if p == 0 or a == 0:
-            continue
-        else:
-            actual.extend(a)
-            pred.extend(p)
+        # if p == 0 or a == 0:
+        #     continue
+        # else:
 
-    return actual, pred
+        actual.extend(a[offset:offset+775])
+        pred.extend(p[offset:offset+775])
+        times.extend(tm[offset:offset+775])
+
+    return actual, pred, times
+
 
 
 

@@ -16,9 +16,11 @@ min_vals = []
 min_loss = []
 
 def run_lstm_experiment():
-    sqs = [5, 10, 20]
-    permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
-    permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
+    sqs = [3, 5, 10]
+    # permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
+    permutations = [(True, True, False)]
+    # permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
+    permutations_names = ['onsite,img']
     for pidx, p in enumerate(permutations):
         for s in sqs:
             data = DataFrameSequenceMulti(False, p[0], p[1], p[2])
