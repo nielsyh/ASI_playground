@@ -54,7 +54,7 @@ class CnnNet:
             self.model.compile(optimizer='adam', loss='mean_squared_error')
 
 
-    def train(self, epochs=50, batch_size=56):
+    def train(self, epochs=50, batch_size=16):
         self.model.fit(self.data.x_train, self.data.y_train, epochs=epochs, batch_size=batch_size, validation_data=(self.data.x_val, self.data.y_val))
 
     def predict(self):

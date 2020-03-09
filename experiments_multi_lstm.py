@@ -129,7 +129,7 @@ def optimize():
 
 # run_lstm_experiment()
 # LSTM_test()
-run_final_all_days
+run_final_all_days()
 # minutes_sequence = int(sys.argv[1])
 # cams = int(sys.argv[2])
 # img = int(sys.argv[3])
