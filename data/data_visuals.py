@@ -375,7 +375,10 @@ def get_files_lstm_multi():
              'lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_meteor only.txt',
              'lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_img only.txt',
              'lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_onsite_only.txt',
-             'lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_10data_all data.txt'
+             'lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_10data_all data.txt',
+              'lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_3data_onsite,img.txt',
+              'lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_onsite,img.txt',
+              'lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_10data_onsite,img.txt'
              ]
 
 
@@ -386,7 +389,10 @@ def get_files_lstm_multi():
              'LSTM 5 metoer only',
              'LSTM 5 img only',
              'LSTM 5 on-site only',
-             'LSTM 10 all'
+             'LSTM 10 all',
+             'LSTM 3 onsite/img',
+             'LSTM 5 onsite/img',
+             'LSTM 10 onsite/img',
              ]
 
     return files, names
@@ -457,10 +463,10 @@ def plot_err_hor_multi(model):
         tmp_mape = []
         if file != 'persistence':
             add = 'prem results multi/'
-            actual, pred = get_all_TP_multi(add + file)
+            actual, pred, _ = get_all_TP_multi(add + file)
         for i in range(0,20):
             if file == 'persistence':
-                actual, pred = data_helper.get_persistence_dates(t, 6, 19, i+1)
+                actual, pred, _ = data_helper.get_persistence_dates(t, 6, 19, i+1)
                 rmse, mae, mape = Metrics.get_error(actual, pred)
             else:
                 rmse, mae, mape = Metrics.get_error(actual[i], pred[i])
@@ -479,13 +485,13 @@ def plot_err_hor_multi(model):
     print(trmse, predictions, names)
 
     plot_error_per_horizons(trmse, predictions, names,
-                            'RMSE Error per prediction horizon (mutli)', 'Prediction Horizon in minutes', 'Error in RMSE')
+                            'RMSE Error per prediction horizon (multi)', 'Prediction Horizon in minutes', 'Error in RMSE')
 
     plot_error_per_horizons(tmae, predictions, names,
-                            'MAE Error per prediction horizon (mutli)', 'Prediction Horizon in minutes', 'Error in MAE')
+                            'MAE Error per prediction horizon (multi)', 'Prediction Horizon in minutes', 'Error in MAE')
 
     plot_error_per_horizons(tmape, predictions, names,
-                            'MAPE Error per prediction horizon (mutli)', 'Prediction Horizon in minutes', 'Error in MAPE')
+                            'MAPE Error per prediction horizon (multi)', 'Prediction Horizon in minutes', 'Error in MAPE')
 
 
 def get_folders_ann():

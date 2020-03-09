@@ -574,9 +574,9 @@ def get_persistence_dates(tups, start, end, pred_hor, offset=0):
         pred.extend(p[offset:offset+775])
         times.extend(tm[offset:offset+775])
 
+
+
     return actual, pred, times
-
-
 
 
 def plot_history(settings, num, history):
