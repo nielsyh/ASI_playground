@@ -56,7 +56,7 @@ def train_test():
 def train():
     data = DataFrameNormal()
     data.build_df_for_cnn(6, 19, 1, [7,8,9,10,11,12])
-    cnn = cnn_model.CnnNet(data, 200, modelarch='small')
+    cnn = cnn_model.CnnNet(data, 100, modelarch='small')
     cnn.build_prem_models()
 
 
@@ -66,5 +66,5 @@ def train():
 #     print('done: ' + str(i))
 
 # cnn_test()
-# train()
-train_test()
+train()
+# train_test()
