@@ -252,11 +252,11 @@ class DataFrameSequenceMulti:
         n = [1, 6, 7, 8, 14, 18, 19, 20, 21, 26, 28]
 
         for i in s:
-            total.append(9,i)
+            total.append((9,i))
         for j in o:
-            total.append(10,j)
+            total.append((10,j))
         for k in n:
-            total.append(11, k)
+            total.append((11, k))
 
         return total
 
