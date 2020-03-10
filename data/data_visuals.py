@@ -415,6 +415,67 @@ def get_files_rf_multi():
 
     return files, names
 
+def get_files_all_results():
+    files = ['RF SEQUENCE multi_sqnc_30data_all.txt',
+             'LSTM_SEQUENCE_MULTI_alldata_epochs_50_sqnc_5data_all.txt'
+             ]
+
+    names = ['RF 30 all data','LSTM 5 all data']
+
+    return files, names
+
+
+def construct_hybrid():
+    files, names = get_files_all_results()
+    t = data_helper.get_all_test_days()
+
+
+
+    actual1, pred1, times1 = get_all_TP_multi(str(files[0]))
+    actual2, pred2, times2 = get_all_TP_multi(str(files[1]))
+    actual3, pred3, times3 = get_all_TP_multi(str(files[1]))
+
+    names.append('Hybrid')
+    names.append('Persistence')
+    trmse = [[],[],[],[]]
+
+
+    for i in range(0, 20):
+        rmse1, mae1, mape1 = Metrics.get_error(actual1[i], pred1[i])
+        rmse2, mae2, mape2 = Metrics.get_error(actual2[i], pred2[i])
+
+        actual, pred, _ = data_helper.get_persistence_dates(t, 6, 19, i + 1)
+        rmse_p, mae_p, mape_p = Metrics.get_error(actual, pred)
+
+        if i < 11:  #take file 1
+            rmse_h, mae_h, mape_h = Metrics.get_error(actual1[i], pred1[i])
+        else:
+            rmse_h, mae_h, mape_h = Metrics.get_error(actual2[i], pred2[i])
+
+
+        trmse[0].append(rmse1)
+        trmse[1].append(rmse2)
+        trmse[2].append(rmse_h)
+        trmse[3].append(rmse_p)
+
+
+    predictions = list(range(1, 21))
+
+    print(trmse, predictions, names)
+
+    plot_error_per_horizons(trmse, predictions, names,
+                            'RMSE Error per prediction horizon (multi)', 'Prediction Horizon in minutes',
+                            'Error in RMSE')
+
+    # plot_error_per_horizons(tmae, predictions, names,
+    #                         'MAE Error per prediction horizon (multi)', 'Prediction Horizon in minutes', 'Error in MAE')
+    #
+    # plot_error_per_horizons(tmape, predictions, names,
+    #                         'MAPE Error per prediction horizon (multi)', 'Prediction Horizon in minutes',
+    #                         'Error in MAPE')
+
+
+
 def plot_day_multi(offset):
     files, names = get_files_best_multi()
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]

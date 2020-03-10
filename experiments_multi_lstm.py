@@ -25,10 +25,23 @@ def run_final_all_days():
     name_epoch = 'epochs_' + str(epochs)
 
     lstm = lstm_model_multi.LSTM_predictor(data, epochs,
-                                           'LSTM_SEQUENCE_MULTI' + name_epoch + name_time + name_data)
+                                           'LSTM_SEQUENCE_MULTI alldays' + name_epoch + name_time + name_data)
     lstm.set_days(data.get_all_test_days())
     lstm.run_experiment()
 
+def run_final_test_days():
+    data = DataFrameSequenceMulti(False, True, True, True)
+    data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], 5)
+    data.normalize_mega_df()
+
+    name_time = '_sqnc_' + str(5)
+    name_data = 'data_' + 'all'
+    name_epoch = 'epochs_' + str(epochs)
+
+    lstm = lstm_model_multi.LSTM_predictor(data, epochs,
+                                           'LSTM_SEQUENCE_MULTI_testset' + name_epoch + name_time + name_data)
+    lstm.set_days(data.get_thesis_test_days())
+    lstm.run_experiment()
 
 def run_lstm_experiment():
     sqs = [3, 5, 10]
@@ -127,21 +140,5 @@ def optimize():
     print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
 
 
-# run_lstm_experiment()
-# LSTM_test()
-run_final_all_days()
-# minutes_sequence = int(sys.argv[1])
-# cams = int(sys.argv[2])
-# img = int(sys.argv[3])
-#
-# if img == 1:
-#     img = True
-# else:
-#     img = False
-#
-#
-# print('Minutes sequence: ' + str(minutes_sequence))
-# print('Cams: ' + str(cams))
-# print('IMG: ' + str(img))
-# run_lstm_experiments()
+run_final_test_days()
 

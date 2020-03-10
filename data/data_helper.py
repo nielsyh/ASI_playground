@@ -578,6 +578,21 @@ def get_persistence_dates(tups, start, end, pred_hor, offset=0):
 
     return actual, pred, times
 
+def get_all_test_days():  # copernicus test days
+    total = []
+    s = [24, 29, 30]
+    o = [1, 5, 6, 7, 8, 10, 12, 17, 18, 20, 23, 26, 29, 30 ]
+    n = [1, 6, 7, 8, 14, 18, 19, 20, 21, 26, 28]
+
+    for i in s:
+        total.append((9,i))
+    for j in o:
+        total.append((10,j))
+    for k in n:
+        total.append((11, k))
+
+    return total
+
 
 def plot_history(settings, num, history):
     plt.figure()

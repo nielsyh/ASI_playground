@@ -18,6 +18,37 @@ min_loss = []
 prediction_horizons = list(range(1, 21))
 
 
+def run_final_all_days():
+    data = DataFrameSequenceMulti(False, True, True, True)
+    data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], 5)
+    data.normalize_mega_df()
+
+    name_time = '_sqnc_' + str(5)
+    name_data = 'data_' + 'all'
+    name_epoch = 'epochs_' + str(epochs)
+
+    ann = ann_model_multi.ANN_Multi(data, epochs,
+                                           'ANN_SEQUENCE_MULTI_alldays' + name_epoch + name_time + name_data)
+    ann.set_days(data.get_all_test_days())
+    ann.run_experiment()
+
+def run_final_test_days():
+    data = DataFrameSequenceMulti(False, True, True, True)
+    data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], 5)
+    data.normalize_mega_df()
+
+    name_time = '_sqnc_' + str(5)
+    name_data = 'data_' + 'all'
+    name_epoch = 'epochs_' + str(epochs)
+
+    ann = ann_model_multi.ANN_Multi(data, epochs,
+                                           'ANN_SEQUENCE_MULTI_testset' + name_epoch + name_time + name_data)
+    ann.set_days(data.get_thesis_test_days())
+    ann.run_experiment()
+
+
+
+
 def run_ann_experiments():
     sqs = [20, 40, 60]
     permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
@@ -107,22 +138,4 @@ def optimize():
     print('epoch: ')
     print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
 
-
-# minutes_sequence = int(sys.argv[1])
-# cams = int(sys.argv[2])
-# img = int(sys.argv[3])
-#
-# if img == 1:
-#     img = True
-# else:
-#     img = False
-#
-# print('Minutes sequence: ' + str(minutes_sequence))
-# print('cams: ' + str(cams))
-# print('IMG: ' + str(img))
-
-# run_ann_experiments()
-ann_test()
-# optimize()
-
-
+run_final_test_days()
