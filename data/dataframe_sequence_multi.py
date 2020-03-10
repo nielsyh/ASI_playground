@@ -128,22 +128,25 @@ class DataFrameSequenceMulti:
             for d in tqdm(days, total=len(days), unit='Days progress'):
                 # todo add sunrise/sundown for start end hour? half hour?
                 day_data = get_df_csv_day_RP(m, d, start, end+1, 1).astype(int)
+                if cams == 2:
+                    day_data2 = get_df_csv_day_RP(m, d, start, end+1, 1, cam=2).astype(int)
+
                 if self.img_data:
                     # intensity, cloudpixels, corners, edges = get_features_by_day(m, d, start, end+1)
                     f = self.get_feature_data(m ,d, start, end+1)
+                    if cams == 2:
+                        f2 = self.get_feature_data(m ,d, start, end+1)
 
-                if cams == 2:
-                    day_data_2 = get_df_csv_day_RP(m, d, start, end+1, 1, cam=2).astype(int)
 
                 if self.meteor_data:  # get metoer data for 1st location
                     PvLibPlayground.set_cam(1)
                     csi, azimuth, zenith, sun_earth_dis, ephemeris = \
                         PvLibPlayground.get_meteor_data(m, d, PvLibPlayground.get_times(2019,
-                                                                                       m,  # month
-                                                                                       d,  # day
-                                                                                       start,# start time
-                                                                                       end+1))  # end time
-                    if cams == 2:  # get metoer data for 2nd location
+                                                                                        m,  # month
+                                                                                        d,  # day
+                                                                                        start,# start time
+                                                                                        end+1))  # end time
+                    if cams == 2:
                         PvLibPlayground.set_cam(2)
                         csi2, azimuth2, zenith2, sun_earth_dis2, ephemeris2 = \
                             PvLibPlayground.get_meteor_data(m, d, PvLibPlayground.get_times(2019,
@@ -199,45 +202,59 @@ class DataFrameSequenceMulti:
                             if v == self.img_idx:
                                 ts[0:minutes, v:v+4] = f[i:i + minutes, 18:22]
 
-                        # if cams == 2: todo
-                        #     if v < 9:
-                        #         ts2[0:minutes, v] = day_data_2[i:i + minutes, v]
-                        #     elif v == 9 and self.meteor_data:
-                        #         ts2[0:minutes, v] = csi2[i:i + minutes]
-                        #     elif v == 10 and self.meteor_data:
-                        #         a = day_data_2[i:i + minutes, 8]
-                        #         b = csi2[i:i + minutes]
-                        #         c = []
-                        #         for x,y in zip(a,b):
-                        #             if y == 0:
-                        #                 c.append(0)
-                        #             else:
-                        #                 c.append(x/y)
-                        #         ts2[0:minutes, v] = c  # clear sky index
-                        #     elif v == 11 and self.meteor_data:
-                        #         ts2[0:minutes, v] = azimuth2[i:i + minutes]
-                        #     elif v == 12 and self.meteor_data:
-                        #         ts2[0:minutes, v] = zenith2[i:i + minutes]
-                        #     elif v == 13 and self.meteor_data:
-                        #         ts2[0:minutes, v] = sun_earth_dis2[i:i + minutes]
-                        #     elif v > 14 and self.meteor_data:
-                        #         ts2[0:minutes, v] = [item[v - 14] for item in ephemeris2[i:i + minutes]]
+
+                        if cams == 2:
+                            for v in range(variables):
+
+                                if v < 6:  # always day data 0:5
+                                    ts2[0:minutes, 0:6] = day_data2[i:i + minutes, 0:6]
+
+                                elif self.onsite_features and v < 9:  # onsite features
+                                    ts2[0:minutes, 6:9] = day_data2[i:i + minutes, 6:9]
+
+                                if self.meteor_data and v >= self.meteor_idx and v < self.meteor_idx + self.meteor_features:
+                                    if v == self.meteor_idx:
+                                        ts2[0:minutes, self.meteor_idx] = csi2[i:i + minutes]
+
+                                    elif v == self.meteor_idx + 1:
+                                        a = day_data2[i:i + minutes, 8]
+                                        b = csi2[i:i + minutes]
+                                        c = []
+                                        for x, y in zip(a, b):
+                                            if y == 0:
+                                                c.append(0)
+                                            else:
+                                                c.append(x / y)
+                                        ts2[0:minutes, v] = c  # clear sky index
+
+                                    elif v == self.meteor_idx + 2:
+                                        ts2[0:minutes, v] = azimuth2[i:i + minutes]
+                                    elif v == self.meteor_idx + 3:
+                                        ts2[0:minutes, v] = zenith2[i:i + minutes]
+                                    elif v == self.meteor_idx + 4:
+                                        ts2[0:minutes, v] = sun_earth_dis2[i:i + minutes]
+                                    elif v > self.meteor_idx + 4 and v < self.meteor_idx + 9:
+                                        ts2[0:minutes, v] = [item[v - 14] for item in ephemeris2[i:i + minutes]]
+
+                                # if img
+                                if self.img_data:
+                                    if v == self.img_idx:
+                                        ts2[0:minutes, v:v + 4] = f2[i:i + minutes, 18:22]
+
 
                     self.mega_df_x_1[day_index, i] = ts
                     first = i + (minutes-1) + 1
                     last = first + 20
-
                     if not clear_sky_label:
                         self.mega_df_y_1[day_index, i] = day_data[first:last, 8]
-                    # else:
-                    #     self.mega_df_y_1[day_index, i] = PvLibPlayground.calc_clear_sky(day_data[pred, 8],csi[pred])
+                    else:
+                        self.mega_df_y_1[day_index, i] = PvLibPlayground.calc_clear_sky(day_data[first:last, 8],csi[first:last])
 
                     if cams == 2:
                         self.mega_df_x_2[day_index, i] = ts2
                         if not clear_sky_label:
-                            self.mega_df_y_2[day_index, i] = day_data_2[first:last, 8]
-                        # else:
-                        #     self.mega_df_y_2[day_index, i] = PvLibPlayground.calc_clear_sky(day_data_2[pred, 8], csi2[pred])
+                            self.mega_df_y_2[day_index, i] = day_data2[first:last, 8]
+
 
     def label_df(self):
         pass
