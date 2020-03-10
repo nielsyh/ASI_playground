@@ -17,7 +17,18 @@ import pvlib_playground
 import features
 from tqdm import tqdm
 import calendar
+import pickle
 
+def dump_list(nm, ls):
+    with open('persistence/' + nm, 'wb') as filehandle:
+        # store the data as binary data stream
+        pickle.dump(ls, filehandle)
+
+def load_list(nm):
+    with open('persistence/' + nm, 'rb') as filehandle:
+        # read the data as binary data stream
+        ls = pickle.load(filehandle)
+        return ls
 
 def load_features():
     fix_directory()
@@ -522,7 +533,16 @@ def plot_persistence_day(day, month, start, end, step):
                   'GHI at day: ' + str(day) + ' month: ' + str(month))
 
 def get_persistence_df(month, day, start, end, pred_hor):
-    end_length = (end - start)*60
+    name = str(month) + str(day) + str(start) + str(end) + str(pred_hor)
+
+    additions = ['pred', 'truth', 'times']
+
+    if os.path.isfile('persistence/' + name+additions[0]):
+        print('from cache')
+        ghi_pred, ghi_truth, times = load_list(name+additions[0]), load_list(name+additions[1]), load_list(name+additions[2])
+        return ghi_pred, ghi_truth, times
+
+
     df_truth = get_df_csv_day_RP(month, day, start, end+1, 1)
     df_pred = get_df_csv_day_RP(month, day, start-1, end, 1)
     copy = df_pred.copy()
@@ -554,6 +574,11 @@ def get_persistence_df(month, day, start, end, pred_hor):
                 times.append(matplotlib_timestamp)
                 ghi_truth.append(ghi_truth_tmp)
                 ghi_pred.append(ghi_pred_tmp)
+
+
+    dump_list(name+additions[0], ghi_pred)
+    dump_list(name + additions[1], ghi_truth)
+    dump_list(name + additions[2], times)
 
     return ghi_pred, ghi_truth, times
 
