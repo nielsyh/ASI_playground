@@ -55,10 +55,9 @@ def train_test():
 
 def train():
     data = DataFrameNormal()
-    data.build_df_for_cnn(6, 19, 1, [7,8,9,10,11,12])
-    cnn = cnn_model.CnnNet(data, 100, modelarch='small')
+    data.build_df_for_cnn(6, 19, 1, [7,8,9,10])
+    cnn = cnn_model.CnnNet(data, 50, modelarch='small')
     cnn.build_prem_models()
-
 
 # prediction_horizons = list(range(1,21))
 # for i in prediction_horizons:

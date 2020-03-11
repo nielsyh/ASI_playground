@@ -263,6 +263,7 @@ def file_to_values(file, prediction_horizon = 0, times_=False):
 
 
 def file_to_dates(file, month, day, offset):
+    data_helper.fix_directory()
     predicted, actual = [],[]
     times = []
     with open(file) as fp:
@@ -426,12 +427,13 @@ def get_files_all_results():
 
 def get_files_test_set():
 
-    files = ['persistence','RF SEQUENCE multi testset_sqnc_5data_all.txt',
+    files = ['persistence','RF SEQUENCE multi testset_sqnc_30data_all.txt',
              'ANN_SEQUENCE_MULTI_testsetepochs_40_sqnc_5data_all.txt',
-             'LSTM_SEQUENCE_MULTI_testsetepochs_50_sqnc_5data_all.txt'
+             'LSTM_SEQUENCE_MULTI_testsetepochs_50_sqnc_5data_all.txt',
+             'LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_all data 2 cam.txt'
              ]
 
-    names = ['Persistence', 'rf 30', 'ann 20', 'lstm 5']
+    names = ['Persistence', 'rf 30', 'ann 20', 'lstm 5', 'LSTM 5 2cam']
 
     return files, names
 
@@ -511,6 +513,26 @@ def get_statistical_sig():
 
     print(Metrics.dm_test(actual, pred, pred2[19], h=20, crit="MSE", power=2))
 
+
+def plot_err_all_days():
+    files, names = get_files_all_results()
+    file, name = files[1], names[1]
+    errors = []
+    days = data_helper.get_all_days()
+
+    for day in days:
+        predicted, actual, _ = file_to_dates(file, day[0], day[1], 0)
+        r, _, _ = Metrics.get_error(actual, predicted)
+        errors.append(r)
+
+    plt.plot(errors, linestyle='-', label='errors')
+    plt.legend()
+    plt.title('title')
+    plt.xlabel('days')
+    plt.ylabel('RMSE')
+
+    plt.show()
+    plt.close()
 
 
 def plot_err_hor_multi(model):

@@ -538,7 +538,7 @@ def get_persistence_df(month, day, start, end, pred_hor):
     additions = ['pred', 'truth', 'times']
 
     if os.path.isfile('persistence/' + name+additions[0]):
-        print('from cache')
+        # print('from cache')
         ghi_pred, ghi_truth, times = load_list(name+additions[0]), load_list(name+additions[1]), load_list(name+additions[2])
         return ghi_pred, ghi_truth, times
 

@@ -81,8 +81,8 @@ class CnnNet:
 
 
     def build_prem_models(self):
-        prem = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
-        for tup in tqdm(prem, total=len(prem), unit='Days to predict'):
+        prem = [(10, 7), (10, 8), (10, 20)]
+        for tup in tqdm(prem, total=len(prem), unit='Days to train'):
             self.data.split_data_set(tup[0], tup[1])
             self.data.flatten_data_set_CNN()
             self.get_model(400)
