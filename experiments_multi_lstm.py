@@ -44,15 +44,17 @@ def run_final_test_days():
     lstm.run_experiment()
 
 def run_lstm_experiment():
-    sqs = [3, 5, 10]
+    sqs = [5]
     # permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
-    permutations = [(True, True, False)]
+    permutations = [(True, True, True)]
     # permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
-    permutations_names = ['onsite,img']
+    permutations_names = ['all data 2 cam']
+
+
     for pidx, p in enumerate(permutations):
         for s in sqs:
             data = DataFrameSequenceMulti(False, p[0], p[1], p[2])
-            data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], s)
+            data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], s, cams=2)
             data.normalize_mega_df()
 
             name_time = '_sqnc_' + str(s)
@@ -67,7 +69,7 @@ def run_lstm_experiment():
 
 def LSTM_test():
     data = DataFrameSequenceMulti(False, True, True, True)
-    data.build_ts_df(6, 19, [8,9,10], 10, 1)
+    data.build_ts_df(6, 19, [8,9], 10, cams=2)
     lstm = lstm_model_multi.LSTM_predictor(data, 100, 'LSTM_TEST')
     data.normalize_mega_df()
     data.split_data_set(9, 15)
@@ -140,5 +142,7 @@ def optimize():
     print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
 
 
-run_final_test_days()
+# run_final_test_days()
+# LSTM_test()
 
+run_lstm_experiment()

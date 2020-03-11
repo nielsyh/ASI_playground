@@ -458,7 +458,7 @@ def construct_hybrid():
         actual, pred, _ = data_helper.get_persistence_dates(t, 6, 19, i + 1)
         rmse_p, mae_p, mape_p = Metrics.get_error(actual, pred)
 
-        if i < 11:  #take file 1
+        if i < 5:  #take file 1 RF
             rmse_h, mae_h, mape_h = Metrics.get_error(actual1[i], pred1[i])
         else:
             rmse_h, mae_h, mape_h = Metrics.get_error(actual2[i], pred2[i])

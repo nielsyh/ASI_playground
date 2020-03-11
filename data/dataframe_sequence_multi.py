@@ -82,7 +82,7 @@ class DataFrameSequenceMulti:
         return self.features[day_idx, start_time_idx:end_time_idx]
 
 
-    def build_ts_df(self, start, end, months, lenth_tm, cams = 1, clear_sky_label = False):
+    def build_ts_df(self, start, end, months, lenth_tm, cams=1, clear_sky_label = False):
 
         self.start = start
         self.end = end
@@ -116,7 +116,7 @@ class DataFrameSequenceMulti:
 
         if cams == 2:
             self.mega_df_x_2 = np.zeros((days, int(time_steps), self.sequence_len_minutes, self.number_of_features), dtype=np.float)
-            self.mega_df_y_2 = np.zeros((days, int(time_steps), 1), dtype=np.float)
+            self.mega_df_y_2 = np.zeros((days, int(time_steps), 20), dtype=np.float)
 
         for m in tqdm(months, total=len(months), unit='Month progress'):
             days = list(range(1, calendar.monthrange(2019, m)[1] + 1))  # create an array with days for that month
