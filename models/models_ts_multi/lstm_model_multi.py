@@ -71,13 +71,11 @@ class LSTM_predictor():
             # translate back to ghi
             pred_ghi  = []
             for idx, i in enumerate(y_pred):
-                print('csi: ' + str(i))
-                # print(int(self.data.test_x_df[idx][-1][4]))
-
-                ghi  = pvlib_playground.PvLibPlayground.csi_to_ghi(i, int(self.data.test_x_df[idx][-1][1]),
-                                                                   int(self.data.test_x_df[idx][-1][2]), int(self.data.test_x_df[idx][-1][3]),
-                                                                   int(self.data.test_x_df[idx][-1][4]))
-                print('ghi' + str(ghi))
+                # csi, month, day, hour, minute
+                ghi = pvlib_playground.PvLibPlayground.csi_to_ghi_ls(i, int(self.data.test_x_df[idx][-1][1]),  # month
+                                                                     int(self.data.test_x_df[idx][-1][2]),     # day
+                                                                     int(self.data.test_x_df[idx][-1][3]),     # hour
+                                                                     int(self.data.test_x_df[idx][-1][4]))     # minute
                 pred_ghi.append(ghi)
             return pred_ghi, rmse, mae, mape
 

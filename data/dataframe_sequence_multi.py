@@ -13,6 +13,7 @@ class DataFrameSequenceMulti:
     meteor_data = True
     mega_df_x_1 = None
     mega_df_y_1 = None
+    mega_df_label = None
 
     mega_df_x_2 = None
     mega_df_y_2 = None
@@ -23,6 +24,7 @@ class DataFrameSequenceMulti:
 
     train_y_df = None
     test_y_df = None
+    test_label_df = None
     val_y_df = None
 
     features = None
@@ -40,6 +42,8 @@ class DataFrameSequenceMulti:
         self.onsite_data  = onsite_data
         self.img_data = img_data
         self.meteor_data = meteor_data
+
+        self.clear_sky_label = False
 
         # first onsite
         if onsite_data:
@@ -89,6 +93,7 @@ class DataFrameSequenceMulti:
         self.months = months
         self.cams = cams
         self.sequence_len_minutes = lenth_tm
+        self.clear_sky_label = clear_sky_label
 
         print('BUILDING SEQUENCE DF: ')
         print('start: ' + str(start) + ' end: ' + str(end) + ' months: ' + str(months)
@@ -113,6 +118,7 @@ class DataFrameSequenceMulti:
 
         self.mega_df_x_1 = np.zeros((days, int(time_steps), self.sequence_len_minutes, self.number_of_features), dtype=np.float)
         self.mega_df_y_1 = np.zeros((days, int(time_steps), 20), dtype=np.float)
+        self.mega_df_label = np.zeros((days, int(time_steps), 20), dtype=np.float)
 
         if cams == 2:
             self.mega_df_x_2 = np.zeros((days, int(time_steps), self.sequence_len_minutes, self.number_of_features), dtype=np.float)
@@ -248,7 +254,8 @@ class DataFrameSequenceMulti:
                     if not clear_sky_label:
                         self.mega_df_y_1[day_index, i] = day_data[first:last, 8]
                     else:
-                        self.mega_df_y_1[day_index, i] = PvLibPlayground.calc_clear_sky(day_data[first:last, 8],csi[first:last])
+                        self.mega_df_y_1[day_index, i] = PvLibPlayground.calc_clear_sky_ls(day_data[first:last, 8],csi[first:last])
+                        self.mega_df_label[day_index, i] = day_data[first:last, 8]
 
                     if cams == 2:
                         self.mega_df_x_2[day_index, i] = ts2
@@ -306,12 +313,14 @@ class DataFrameSequenceMulti:
         elif self.cams == 2:  # double training data
             self.train_x_df = np.concatenate((np.copy(self.mega_df_x_1[0:day_idx]), np.copy(self.mega_df_x_2[0:day_idx])))
             self.train_y_df = np.concatenate((np.copy(self.mega_df_y_1[0:day_idx]), np.copy(self.mega_df_y_2[0:day_idx])))
-
         self.test_x_df = np.copy(self.mega_df_x_1[day_idx])
         self.val_x_df = np.copy(self.mega_df_x_1[day_idx + 1:self.mega_df_x_1.shape[0]])
 
         self.test_y_df = np.copy(self.mega_df_y_1[day_idx])
         self.val_y_df = np.copy(self.mega_df_y_1[day_idx + 1:self.mega_df_x_1.shape[0]])
+
+        if self.clear_sky_label:
+            self.test_label_df = np.copy(self.mega_df_label[day_idx])
 
         print('done')
 

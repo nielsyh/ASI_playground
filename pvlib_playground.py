@@ -1,11 +1,8 @@
 import os
-import itertools
-import matplotlib.pyplot as plt
+from datetime import datetime, timedelta
 import pandas as pd
 import pvlib
-from pvlib import clearsky, atmosphere, solarposition
 from pvlib.location import Location
-from pvlib.iotools import read_tmy3
 import math
 
 class PvLibPlayground:
@@ -94,6 +91,17 @@ class PvLibPlayground:
     def get_sun_earth_distance(times):
         return pvlib.solarposition.pyephem_earthsun_distance(times).values.tolist()
 
+    @staticmethod
+    def csi_to_ghi_ls(csi, month, day, hour, minute):
+        res = []
+        for i in range(0, len(csi)):
+
+            tmp_dt = datetime(year=2019, month=month, day=day, hour=hour, minute= minute)
+            new_dt = tmp_dt + timedelta(minutes=(i+1))
+
+            res.append(PvLibPlayground.csi_to_ghi(csi[i], new_dt.month, new_dt.day, new_dt.hour, new_dt.minute))
+
+        return res
 
     @staticmethod
     def csi_to_ghi(csi, month, day, hour, minute):
@@ -103,10 +111,6 @@ class PvLibPlayground:
         dni_extra = PvLibPlayground.get_dni_extra(times)[0]
         sun_earth_dist = PvLibPlayground.get_sun_earth_distance(times)[0]
         zsa = math.cos(math.radians(PvLibPlayground.get_solar_zenith_angle(times)[0]))
-        #
-        # print(month, day, hour, minute)
-        # print(PvLibPlayground.get_solar_zenith_angle(times)[0])
-        # print(zsa)
 
         return csi * abs(dni_extra * math.pow( (PvLibPlayground.get_mean_sun_earth_distance() / sun_earth_dist), 2) * zsa)
 
@@ -147,6 +151,13 @@ class PvLibPlayground:
     @staticmethod
     def calc_clear_sky(ghi, ghi_clr):
         return pvlib.irradiance.clearsky_index(ghi, ghi_clr, max_clearsky_index=2.0)
+
+    @staticmethod
+    def calc_clear_sky_ls(ghi, ghi_clr):
+        res = []
+        for i in range(0, len(ghi)):
+            res.append(PvLibPlayground.calc_clear_sky(ghi[i], ghi_clr[i]))
+        return res
 
     @staticmethod
     def get_ephemeris_data(times):

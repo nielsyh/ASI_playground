@@ -30,6 +30,8 @@ def run_final_all_days():
     lstm.run_experiment()
 
 def run_final_test_days():
+
+
     data = DataFrameSequenceMulti(False, True, True, True)
     data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], 5)
     data.normalize_mega_df()
@@ -43,34 +45,34 @@ def run_final_test_days():
     lstm.set_days(data.get_thesis_test_days())
     lstm.run_experiment()
 
+
 def run_lstm_experiment():
     sqs = [5]
     # permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
     permutations = [(True, True, True)]
     # permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
-    permutations_names = ['all data 2 cam']
-
+    permutations_names = ['all data clrsky']
 
     for pidx, p in enumerate(permutations):
         for s in sqs:
             data = DataFrameSequenceMulti(False, p[0], p[1], p[2])
-            data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], s, cams=2)
+            data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], s, cams=1, clear_sky_label=True)
             data.normalize_mega_df()
 
             name_time = '_sqnc_' + str(s)
             name_data = 'data_' + permutations_names[pidx]
-            name_epoch = 'epochs_' + str(epochs)
+            name_epoch = '_epochs_' + str(epochs)
 
             lstm = lstm_model_multi.LSTM_predictor(data, epochs,
-                                            'LSTM_SEQUENCE_MULTI' + name_epoch + name_time + name_data)
+                                            'LSTM_SEQUENCE_MULTI' + name_epoch + name_time + name_data, pred_csi=True)
             lstm.set_days(data.get_prem_days())
             lstm.run_experiment()
 
 
 def LSTM_test():
     data = DataFrameSequenceMulti(False, True, True, True)
-    data.build_ts_df(6, 19, [8,9], 10, cams=2)
-    lstm = lstm_model_multi.LSTM_predictor(data, 100, 'LSTM_TEST')
+    data.build_ts_df(6,19, [8,9], 10, cams=1, clear_sky_label=True)
+    lstm = lstm_model_multi.LSTM_predictor(data, 100, 'LSTM_TEST', pred_csi=True)
     data.normalize_mega_df()
     data.split_data_set(9, 15)
     data.flatten_data_set_to_3d()
@@ -78,11 +80,12 @@ def LSTM_test():
     lstm.train(50)
     y_pred, rmse, mae, mape = lstm.predict()
     plot_history('s1', 1, lstm.history)
-    Metrics.write_results_multi('LSTM_TEST_MULTI', data.test_x_df.reshape(
+
+    Metrics.write_results_multi('LSTM_TEST_MULTI csi', data.test_x_df.reshape(
         (data.test_x_df.shape[0],
          data.sequence_len_minutes,
          data.number_of_features)),
-                                data.test_y_df, y_pred)
+                                data.test_label_df, y_pred)
 
     print(rmse)
 
