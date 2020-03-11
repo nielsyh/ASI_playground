@@ -424,11 +424,22 @@ def get_files_all_results():
 
     return files, names
 
+def get_files_test_set():
+
+    files = ['persistence','RF SEQUENCE multi testset_sqnc_5data_all.txt',
+             'ANN_SEQUENCE_MULTI_testsetepochs_40_sqnc_5data_all.txt',
+             'LSTM_SEQUENCE_MULTI_testsetepochs_50_sqnc_5data_all.txt'
+             ]
+
+    names = ['Persistence', 'rf 30', 'ann 20', 'lstm 5']
+
+    return files, names
+
+
 
 def construct_hybrid():
     files, names = get_files_all_results()
-    t = data_helper.get_all_test_days()
-
+    t = data_helper.get_all_days()
 
 
     actual1, pred1, times1 = get_all_TP_multi(str(files[0]))
@@ -513,6 +524,9 @@ def plot_err_hor_multi(model):
         files, names = get_files_lstm_multi()
     elif model == 'best':
         files, names = get_files_best_multi()
+    elif model == 'test':
+        files, names = get_files_test_set()
+        t = data_helper.get_thesis_test_days()
 
     trmse = []
     tmae = []
@@ -522,9 +536,12 @@ def plot_err_hor_multi(model):
         tmp_rmse = []
         tmp_mae = []
         tmp_mape = []
-        if file != 'persistence':
+        if file != 'persistence' and model != 'test':
             add = 'prem results multi/'
             actual, pred, _ = get_all_TP_multi(add + file)
+        elif model == 'test' and file != 'persistence':
+            actual, pred, _ = get_all_TP_multi(file)
+
         for i in range(0,20):
             if file == 'persistence':
                 actual, pred, _ = data_helper.get_persistence_dates(t, 6, 19, i+1)
@@ -736,6 +753,9 @@ def plot_prem_day_folder():
                                 [times, times],
                                 ['actual', 'pred'], name, 'GHI in W/m2',
                                 xl='Time of day')
+
+
+
 
 
 
