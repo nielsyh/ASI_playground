@@ -94,7 +94,7 @@ class LSTM_predictor():
             y_pred, rmse, mae, mape = self.predict()
 
             if self.data.clear_sky_label:
-                Metrics.write_results_multi(str(self.name), self.data.test_x_df.reshape(
+                Metrics.write_results_multi(str(self.name) + '_clrsky_' , self.data.test_x_df.reshape(
                     (self.data.test_x_df.shape[0],
                      self.data.sequence_len_minutes,
                      self.data.number_of_features)),
