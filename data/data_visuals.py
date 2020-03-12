@@ -379,7 +379,8 @@ def get_files_lstm_multi():
              'lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_10data_all data.txt',
               'lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_3data_onsite,img.txt',
               'lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_onsite,img.txt',
-              'lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_10data_onsite,img.txt'
+              'lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_10data_onsite,img.txt',
+              'lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_all data 2 cam.txt'
              ]
 
 
@@ -394,6 +395,7 @@ def get_files_lstm_multi():
              'LSTM 3 onsite/img',
              'LSTM 5 onsite/img',
              'LSTM 10 onsite/img',
+             'LSTM 5 all data 2CAM'
              ]
 
     return files, names
@@ -430,7 +432,8 @@ def get_files_test_set():
     files = ['persistence','RF SEQUENCE multi testset_sqnc_30data_all.txt',
              'ANN_SEQUENCE_MULTI_testsetepochs_40_sqnc_5data_all.txt',
              'LSTM_SEQUENCE_MULTI_testsetepochs_50_sqnc_5data_all.txt',
-             'LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_all data 2 cam.txt'
+             'LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_all data 2 cam.txt',
+             ''
              ]
 
     names = ['Persistence', 'rf 30', 'ann 20', 'lstm 5', 'LSTM 5 2cam']

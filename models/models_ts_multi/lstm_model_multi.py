@@ -92,11 +92,19 @@ class LSTM_predictor():
             self.train(epochs=epochs)
 
             y_pred, rmse, mae, mape = self.predict()
-            Metrics.write_results_multi(str(self.name), self.data.test_x_df.reshape(
-                (self.data.test_x_df.shape[0],
-                 self.data.sequence_len_minutes,
-                 self.data.number_of_features)),
-                                      self.data.test_y_df, y_pred)
+
+            if self.data.clear_sky_label:
+                Metrics.write_results_multi(str(self.name), self.data.test_x_df.reshape(
+                    (self.data.test_x_df.shape[0],
+                     self.data.sequence_len_minutes,
+                     self.data.number_of_features)),
+                                            self.data.test_label_df, y_pred)
+            else:
+                Metrics.write_results_multi(str(self.name), self.data.test_x_df.reshape(
+                    (self.data.test_x_df.shape[0],
+                     self.data.sequence_len_minutes,
+                     self.data.number_of_features)),
+                                          self.data.test_y_df, y_pred)
 
     def save_model(self):
         name = 'LSTM_' + str(self.data.month_split) + '_' + str(self.data.day_split) + '_' + str(self.data.pred_horizon)
