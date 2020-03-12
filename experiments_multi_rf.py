@@ -41,8 +41,8 @@ def rf_experiment():
             name_time = '_sqnc_' + str(s)
             name_data = '_data_' + permutations_names[pidx]
 
-            rf = rf_model_multi.RF_predictor(data, 'RF SEQUENCE multi tesset' + name_time + name_data)
-            rf.set_days(data.get_all_test_days())
+            rf = rf_model_multi.RF_predictor(data, 'RF SEQUENCE multi prem' + name_time + name_data)
+            rf.set_days(data.get_prem_days())
             rf.run_experiment()
             print('Finish rf')
 
