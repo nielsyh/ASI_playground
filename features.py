@@ -21,6 +21,8 @@ def get_full_image_by_date_time(month, day, hour, minute, seconds):
     base_url = base_url + tmp_url + '/'  # folder
     found_img = False
     while not found_img:
+        print('Trying: ')
+        print(month, day, hour, minute)
         for s in seconds_list:
             img_url = tmp_url + int_to_str(hour) + int_to_str(minute) + int_to_str(s) + '_11.jpg'
             total_url = base_url + img_url
@@ -30,6 +32,7 @@ def get_full_image_by_date_time(month, day, hour, minute, seconds):
                 if (image is None):
                     continue
                 else:
+                    print('found..')
                     return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         minute = minute + 1
         if minute == 60:
