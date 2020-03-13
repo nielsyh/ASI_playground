@@ -58,11 +58,12 @@ def train():
     cnn = cnn_model.CnnNet(data, 50, modelarch='small')
     cnn.build_prem_models()
 #
-prediction_horizons = list(range(1,21))
-for i in prediction_horizons:
-    experiment(i)
-    print('done: ' + str(i))
+# prediction_horizons = list(range(1,21))
+# for i in prediction_horizons:
+#     experiment(i)
+#     print('done: ' + str(i))
 
+experiment(1)
 # cnn_test()
 # train()
 # train_test()
