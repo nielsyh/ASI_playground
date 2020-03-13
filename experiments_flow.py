@@ -16,10 +16,9 @@ def experiment(prediction_horizon):
     prem = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
     for tup in tqdm(prem, total=len(prem), unit='Days to predict'):
         data = DataFrameIMG(False, prediction_horizon)
-        data.build_img_df(8, 17, tup[0], tup[1])
+        data.build_img_df(7, 18, tup[0], tup[1])
         cnn = cnn_model.CnnNet(data)
         cnn.get_model(400)
-        # cnn.load_model_files(str(tup[0] + str(tup[1])))
         cnn.load_model_files(str(tup[0]) + str(tup[1]))
         y_pred, rmse, mae, mape = cnn.predict()
         name = 'CNN_predhor' + str(prediction_horizon)
@@ -29,7 +28,7 @@ def cnn_test():
     prem = [(10, 5)]
     for tup in tqdm(prem, total=len(prem), unit='Days to predict'):
         data = DataFrameIMG(False, 10)
-        data.build_img_df(10, 12, tup[0], tup[1])
+        data.build_img_df(7, 18, tup[0], tup[1])
         cnn = cnn_model.CnnNet(data, modelarch='small')
         cnn.get_model(400)
         cnn.load_model_files(str(tup[0]) + str(tup[1]))
@@ -59,10 +58,10 @@ def train():
     cnn = cnn_model.CnnNet(data, 50, modelarch='small')
     cnn.build_prem_models()
 #
-# prediction_horizons = list(range(1,21))
-# for i in prediction_horizons:
-#     experiment(i)
-#     print('done: ' + str(i))
+prediction_horizons = list(range(1,21))
+for i in prediction_horizons:
+    experiment(i)
+    print('done: ' + str(i))
 
 # cnn_test()
 # train()
