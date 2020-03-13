@@ -15,57 +15,50 @@ min_vals = []
 min_loss = []
 prediction_horizons = list(range(1, 21))
 
-#BONUSSES/TODO
-#forecast metoeor data
-#data 24 hours ago
-#
 
-def run_ann_experiements():
-    sqs = [20, 40, 60]
-    stages = [1,2]
-    for st in stages:
+def run_ann_experiments():
+    sqs = [5, 10, 20]
+    permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
+    permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
+    for idx, p in enumerate(permutations):
         for s in sqs:
             for i in prediction_horizons:
-                ann_experiment(i, s, 1, st)
+                ANN_experiment(i, s, p, permutations_names[idx])
 
-def ann_experiment(prediction_horizon, minutes_sequence, cams, st):
-
-    if st == 1:
-        data = DataFrameSequence(False, prediction_horizon, False, True)
-    if st == 2:
-        data = DataFrameSequence(False, prediction_horizon, True, True)
-
-    data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], minutes_sequence, cams)
+def ANN_experiment(prediction_horizon, minutes_sequence, data, data_name):
+    data = DataFrameSequence(False, prediction_horizon, data[0], data[1], data[2])
+    data.build_ts_df(start, end, [7,8,9,10,11,12], minutes_sequence)
     data.normalize_mega_df()
 
     name_epoch = 'epochs_' + str(epochs)
     name_time = '_sqnc_' + str(minutes_sequence)
-    name_cam = 'CAM_' + str(cams)
-    name_stage = 'stg_' + str(st)
+    name_data = 'data_' + str(data_name)
     name_pred = 'ph_' + str(prediction_horizon)
 
-    ann = ann_model.ANN(data, init_epochs, epochs, 'ANN_SEQUENCE_' + name_epoch + name_time + name_cam + name_stage + name_pred)
-    ann.set_days(data.get_thesis_test_days())
+    ann = ann_model.ANN(data, epochs, epochs, 'ANN_SEQUENCE' + name_epoch + name_time + name_data + name_pred)
+    ann.set_days(data.get_prem_days())
     ann.run_experiment()
 
+
 def ann_test():
-    data = DataFrameSequence(False, 20, True, False)
-    data.build_ts_df(7, 17, [7,8,9], 20, 1)
+    # debug, pred_horizon, onsite_data, img_data, meteor_data
+    data = DataFrameSequence(False, 20, True, True, True)
+    data.build_ts_df(10, 15, [9], 20)
     data.normalize_mega_df()
     ann = ann_model.ANN(data, 3, 3, 'ANN_BETA_SEQUENCE_TEST')
     data.split_data_set(9, 20)
-    data.flatten_data_set_to_3d()
+    data.flatten_data_set()
     ann.get_model()
     ann.train(100)
     plot_history('s1',1, ann.history)
     y_pred, rmse, mae, mape = ann.predict()
-    # Metrics.write_results_NN('ANN_TEST', data.test_x_df.reshape(
-    #     (data.test_x_df.shape[0], data.sequence_len_minutes, data.number_of_features)),
-    #                           data.test_y_df, y_pred, data.pred_horizon)
+    Metrics.write_results_NN('ANN_TEST', data.test_x_df.reshape(
+        (data.test_x_df.shape[0], data.sequence_len_minutes, data.number_of_features)),
+                              data.test_y_df, y_pred, data.pred_horizon)
 
 def optimize():
     data = DataFrameSequence(False, 20, False, False)
-    data.build_ts_df(6, 18, [7,8,9,10,11,12], 60, 1)
+    data.build_ts_df(6, 18, [7,8,9,10,11,12], 60)
     data.normalize_mega_df()
     data.split_data_set(11,15)
     data.flatten_data_set()
@@ -114,21 +107,6 @@ def optimize():
     print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
 
 
-# minutes_sequence = int(sys.argv[1])
-# cams = int(sys.argv[2])
-# img = int(sys.argv[3])
-#
-# if img == 1:
-#     img = True
-# else:
-#     img = False
-#
-# print('Minutes sequence: ' + str(minutes_sequence))
-# print('cams: ' + str(cams))
-# print('IMG: ' + str(img))
-
-run_ann_experiements()
-# ann_test()
-# optimize()
+run_ann_experiments()
 
 

@@ -26,30 +26,34 @@ class DataFrameSequence:
 
     features = None
 
-    number_of_features = 9
+    number_of_features = 6
+    onsite_features  = 3
     meteor_features = 9
+    img_features = 4
     sequence_len_minutes = 60
 
     cams = 1
 
-    def __init__(self, debug, pred_horizon, metoer, images):
+    def __init__(self,  debug, pred_horizon, onsite_data, img_data, meteor_data):
         self.debug = debug
+        self.onsite_data  = onsite_data
+        self.img_data = img_data
+        self.meteor_data = meteor_data
         self.pred_horizon = pred_horizon
-        self.images = images
-        self.meteor_data = metoer
-        self.index_img = 9
 
-        if metoer:
+
+        # first onsite
+        if onsite_data:
+            self.number_of_features += self.onsite_features
+        if meteor_data:
+            self.meteor_idx = self.number_of_features
             self.number_of_features = self.number_of_features + self.meteor_features
-            self.index_img = 18
-
-        if images:
-            self.number_of_features = self.number_of_features + 4
+            # self.index_img = 18
+        if img_data:
+            self.img_idx = self.number_of_features
+            self.number_of_features = self.number_of_features + self.img_features
             self.load_features()
             print('DF with images')
-
-        if images and self.cams == 2:
-            raise ValueError('Cams 2 and images not possible')
 
     def load_features(self):
         self.features = np.load('x_22_d6to19_m7to12.npy')
@@ -73,21 +77,18 @@ class DataFrameSequence:
             day_idx = previous_days + day
         return self.features[day_idx, start_time_idx:end_time_idx]
 
+    def build_ts_df(self, start, end, months, lenth_tm):
 
-    def build_ts_df(self, start, end, months, lenth_tm, cams, clear_sky_label = False, step=1):
         self.start = start
         self.end = end
         self.months = months
-        self.cams = cams
         self.sequence_len_minutes = lenth_tm
 
         print('BUILDING SEQUENCE DF: ')
         print('start: ' + str(start) + ' end: ' + str(end) + ' months: ' + str(months)
-              + ' lenght: ' + str(lenth_tm) + ' cams: ' + str(cams))
+              + ' lenght: ' + str(lenth_tm) + ' cams: ')
 
-        # time_steps = int((((end - start) / lenth_tm) * 60) - self.sequence_len_minutes)
-        # time_steps = int((end-start)*60 - lenth_tm) + 1
-        time_steps = int(((end - start) * 60 - lenth_tm) /step)
+        time_steps = int(((end - start) * 60 - lenth_tm))
         days = 0
         day_index = -1
 
@@ -106,10 +107,8 @@ class DataFrameSequence:
 
         self.mega_df_x_1 = np.zeros((days, int(time_steps), self.sequence_len_minutes, self.number_of_features), dtype=np.float)
         self.mega_df_y_1 = np.zeros((days, int(time_steps), 1), dtype=np.float)
+        self.mega_df_label = np.zeros((days, int(time_steps), 1), dtype=np.float)
 
-        if cams == 2:
-            self.mega_df_x_2 = np.zeros((days, int(time_steps), self.sequence_len_minutes, self.number_of_features), dtype=np.float)
-            self.mega_df_y_2 = np.zeros((days, int(time_steps), 1), dtype=np.float)
 
         for m in tqdm(months, total=len(months), unit='Month progress'):
             days = list(range(1, calendar.monthrange(2019, m)[1] + 1))  # create an array with days for that month
@@ -121,29 +120,19 @@ class DataFrameSequence:
             for d in tqdm(days, total=len(days), unit='Days progress'):
                 # todo add sunrise/sundown for start end hour? half hour?
                 day_data = get_df_csv_day_RP(m, d, start, end+1, 1).astype(int)
-                if self.images:
+
+                if self.img_data:
                     # intensity, cloudpixels, corners, edges = get_features_by_day(m, d, start, end+1)
                     f = self.get_feature_data(m ,d, start, end+1)
-
-                if cams == 2:
-                    day_data_2 = get_df_csv_day_RP(m, d, start, end+1, 1, cam=2).astype(int)
 
                 if self.meteor_data:  # get metoer data for 1st location
                     pvlib_playground.PvLibPlayground.set_cam(1)
                     csi, azimuth, zenith, sun_earth_dis, ephemeris = \
                         pvlib_playground.PvLibPlayground.get_meteor_data(m, d, pvlib_playground.PvLibPlayground.get_times(2019,
-                                                                                       m,  # month
-                                                                                       d,  # day
-                                                                                       start,# start time
-                                                                                       end+1))  # end time
-                    if cams == 2:  # get metoer data for 2nd location
-                        pvlib_playground.PvLibPlayground.set_cam(2)
-                        csi2, azimuth2, zenith2, sun_earth_dis2, ephemeris2 = \
-                            pvlib_playground.PvLibPlayground.get_meteor_data(m, d, pvlib_playground.PvLibPlayground.get_times(2019,
-                                                                                            m,  # month
-                                                                                            d,  # day
-                                                                                            start,  # start time
-                                                                                            end+1))  # end time
+                                                                                                                          m,  # month
+                                                                                                                          d,  # day
+                                                                                                                          start,  # start time
+                                                                                                                          end + 1))  # end time
 
                 day_index += 1
 
@@ -152,82 +141,48 @@ class DataFrameSequence:
                     variables = self.number_of_features
 
                     ts = np.zeros((minutes, variables))
-                    if cams == 2:
-                        ts2 = np.zeros((minutes, variables))
-
                     for v in range(variables):
-                        if v < 9:
-                            ts[0:minutes, v] = day_data[i:i + minutes, v]
-                        elif v == 9 and self.meteor_data:
-                            ts[0:minutes, v] = csi[i:i + minutes]
-                        elif v == 10 and self.meteor_data:
-                            a = day_data[i:i + minutes, 8]
-                            b = csi[i:i + minutes]
-                            c = []
-                            for x,y in zip(a,b):
-                                if y == 0:
-                                    c.append(0)
-                                else:
-                                    c.append(x/y)
-                            ts[0:minutes, v] = c  # clear sky index
 
-                        elif v == 11 and self.meteor_data:
-                            ts[0:minutes, v] = azimuth[i:i + minutes]
-                        elif v == 12 and self.meteor_data:
-                            ts[0:minutes, v] = zenith[i:i + minutes]
-                        elif v == 13 and self.meteor_data:
-                            ts[0:minutes, v] = sun_earth_dis[i:i + minutes]
-                        elif v > 13 and v < 18:
-                            ts[0:minutes, v] = [item[v - 14] for item in ephemeris[i:i+minutes]]
+                        if v < 6:  # always day data 0:5
+                            ts[0:minutes, 0:6] = day_data[i:i + minutes, 0:6]
 
-                        elif v == self.index_img:
-                            ts[0:minutes, v] = f[i:i + minutes,18]
-                        elif v == self.index_img+1:
-                            ts[0:minutes, v] = f[i:i + minutes,19]
-                        elif v == self.index_img+2:
-                            ts[0:minutes, v] = f[i:i + minutes,20]
-                        elif v == self.index_img+3:
-                            ts[0:minutes, v] = f[i:i + minutes,21]
+                        elif self.onsite_features and v < 9:  # onsite features
+                            ts[0:minutes, 6:9] = day_data[i:i + minutes, 6:9]
 
+                        if self.meteor_data and v >= self.meteor_idx and v < self.meteor_idx + self.meteor_features:
+                            if v == self.meteor_idx:
+                                ts[0:minutes, self.meteor_idx] = csi[i:i + minutes]
 
-                        if cams == 2:
-                            if v < 9:
-                                ts2[0:minutes, v] = day_data_2[i:i + minutes, v]
-                            elif v == 9 and self.meteor_data:
-                                ts2[0:minutes, v] = csi2[i:i + minutes]
-                            elif v == 10 and self.meteor_data:
-                                a = day_data_2[i:i + minutes, 8]
-                                b = csi2[i:i + minutes]
+                            elif v == self.meteor_idx + 1:
+                                a = day_data[i:i + minutes, 8]
+                                b = csi[i:i + minutes]
                                 c = []
                                 for x,y in zip(a,b):
                                     if y == 0:
                                         c.append(0)
                                     else:
                                         c.append(x/y)
-                                ts2[0:minutes, v] = c  # clear sky index
-                            elif v == 11 and self.meteor_data:
-                                ts2[0:minutes, v] = azimuth2[i:i + minutes]
-                            elif v == 12 and self.meteor_data:
-                                ts2[0:minutes, v] = zenith2[i:i + minutes]
-                            elif v == 13 and self.meteor_data:
-                                ts2[0:minutes, v] = sun_earth_dis2[i:i + minutes]
-                            elif v > 14 and self.meteor_data:
-                                ts2[0:minutes, v] = [item[v - 14] for item in ephemeris2[i:i + minutes]]
+                                ts[0:minutes, v] = c  # clear sky index
+
+                            elif v == self.meteor_idx + 2:
+                                ts[0:minutes, v] = azimuth[i:i + minutes]
+                            elif v == self.meteor_idx + 3:
+                                ts[0:minutes, v] = zenith[i:i + minutes]
+                            elif v == self.meteor_idx + 4:
+                                ts[0:minutes, v] = sun_earth_dis[i:i + minutes]
+                            elif v > self.meteor_idx + 4 and v < self.meteor_idx + 9:
+                                ts[0:minutes, v] = [item[v - 14] for item in ephemeris[i:i+minutes]]
+
+                        # if img
+                        if self.img_data:
+                            if v == self.img_idx:
+                                ts[0:minutes, v:v+4] = f[i:i + minutes, 18:22]
 
                     self.mega_df_x_1[day_index, i] = ts
-                    pred = i + (minutes-1) + self.pred_horizon
 
-                    if not clear_sky_label:
-                        self.mega_df_y_1[day_index, i] = day_data[pred, 8]
-                    else:
-                        self.mega_df_y_1[day_index, i] = pvlib_playground.PvLibPlayground.calc_clear_sky(day_data[pred, 8],csi[pred])
+                    pred = i + (minutes - 1) + self.pred_horizon
+                    self.mega_df_y_1[day_index, i] = day_data[pred, 8]
 
-                    if cams == 2:
-                        self.mega_df_x_2[day_index, i] = ts2
-                        if not clear_sky_label:
-                            self.mega_df_y_2[day_index, i] = day_data_2[pred, 8]
-                        else:
-                            self.mega_df_y_2[day_index, i] = pvlib_playground.PvLibPlayground.calc_clear_sky(day_data_2[pred, 8], csi2[pred])
 
     def label_df(self):
         pass
@@ -310,24 +265,27 @@ class DataFrameSequence:
         print('done')
 
 
-    def normalize_mega_df(self, ctn = [6,7,8], metoer_to_normalize= [9,13,17]):
-        colums_to_normalize = ctn
-        if (self.meteor_data):
-            colums_to_normalize.extend(metoer_to_normalize)
-        if self.images:
-            colums_to_normalize.extend([18,19,20,21])
+    def normalize_mega_df(self):
+        norm_onsite = [1, 2, 3, 4, 5, 6, 7, 8]
+        if self.meteor_data:
+            norm_metoer = [self.meteor_idx,self.meteor_idx+1, self.meteor_idx + 4, self.meteor_idx + 5, self.meteor_idx + 6, self.meteor_idx + 7, self.meteor_idx + 8] #[9, 13, 17]
+        if self.img_data:
+            norm_img = [self.img_idx, self.img_idx +1 , self.img_idx+ 2, self.img_idx + 3]
+
+        colums_to_normalize = []
+        if self.onsite_data:
+            colums_to_normalize.extend(norm_onsite)
+        if self.meteor_data:
+            colums_to_normalize.extend(norm_metoer)
+        if self.img_data:
+            colums_to_normalize.extend(norm_img)
+
         print('Mega normalzing for: ' + str(colums_to_normalize))
 
         shape = self.mega_df_x_1.shape
         a = self.mega_df_x_1.reshape(shape[2], shape[0]*shape[1]*shape[3])
         a[:, colums_to_normalize]  = normalize(a[:, colums_to_normalize], axis=0, norm='l2')
         self.mega_df_x_1 = a.reshape(shape)
-
-        if self.cams == 2:
-            shape = self.mega_df_x_2.shape
-            a = self.mega_df_x_2.reshape(shape[2], shape[0] * shape[1] * shape[3])
-            a[:, colums_to_normalize]  = normalize(a[:, colums_to_normalize], axis=0, norm='l2')
-            self.mega_df_x_2 = a.reshape(shape)
 
     def flatten_data_set_to_3d(self):
         print('Flattening..')

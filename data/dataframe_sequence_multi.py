@@ -42,7 +42,6 @@ class DataFrameSequenceMulti:
         self.onsite_data  = onsite_data
         self.img_data = img_data
         self.meteor_data = meteor_data
-
         self.clear_sky_label = False
 
         # first onsite

@@ -118,7 +118,8 @@ ass_mape = ['NA']
 all_model_names = []
 
 def print_results(folders):
-    prediction_horizons = list(range(1,21))
+    # prediction_horizons = list(range(1,21))
+    prediction_horizons = [5, 15, 20]
     for i in prediction_horizons:
         model_names = []
         rmse = []
@@ -129,7 +130,7 @@ def print_results(folders):
         ss_mape = ['NA']
 
         t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
-        actual, pred = data.data_helper.get_persistence_dates(t, 7, 19, i)
+        actual, pred, _ = data.data_helper.get_persistence_dates(t, 7, 19, i)
         trmse, tmae, tmape = metrics.Metrics.get_error(actual, pred)
         model_names.append("Persistence")
         rmse.append(round(trmse, 2))
@@ -186,6 +187,6 @@ def print_results(folders):
     #              calc_ss(avg_res(amape)), 'Average performance evaluation prem. days', 'prem.avg')
 
 
-print_results(folders_rf + folders_rf_multi)
-print_results(folders_ann + folders_ann_multi)
-print_results(folders_lstm + folders_lstm_multi)
+# print_results(folders_rf + folders_rf_multi)
+# print_results(folders_ann + folders_ann_multi)
+# print_results(folders_lstm + folders_lstm_multi)

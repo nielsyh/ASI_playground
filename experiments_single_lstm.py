@@ -1,6 +1,6 @@
 from data.dataframe_sequence import DataFrameSequence
 from metrics import Metrics
-from models.models_ts import ann_model, lstm_model, svr_model
+from models.models_ts import lstm_model
 from keras import optimizers
 from data.data_helper import plot_history
 
@@ -9,7 +9,6 @@ epochs = 40
 start = 6
 end = 19
 prediction_horizons = list(range(1, 21))
-
 res = []
 sets = []
 min_vals = []
@@ -17,33 +16,33 @@ min_loss = []
 
 def run_lstm_experiments():
     sqs = [5, 10, 20]
-    stages = [1,2]
-    for st in stages:
+    permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
+    permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
+    for idx, p in enumerate(permutations):
         for s in sqs:
             for i in prediction_horizons:
-                LSTM_experiment(i, s, 1, st)
+                LSTM_experiment(i, s, p, permutations_names[idx])
 
-def LSTM_experiment(prediction_horizon, minutes_sequence, cams, st):
-    if st == 1:
-        data = DataFrameSequence(False, prediction_horizon, False, True)
-    if st == 2:
-        data = DataFrameSequence(False, prediction_horizon, True, True)
-
-    data.build_ts_df(start, end, [7,8,9,10,11,12], minutes_sequence, cams)
+def LSTM_experiment(prediction_horizon, minutes_sequence, data, data_name):
+    data = DataFrameSequence(False, prediction_horizon, data[0], data[1], data[2])
+    data.build_ts_df(start, end, [7,8,9,10,11,12], minutes_sequence)
     data.normalize_mega_df()
+
     name_epoch = 'epochs_' + str(epochs)
     name_time = '_sqnc_' + str(minutes_sequence)
-    name_cam = 'CAM_' + str(cams)
-    name_stage = 'stg_' + str(st)
+    name_data = 'data_' + str(data_name)
     name_pred = 'ph_' + str(prediction_horizon)
-    lstm = lstm_model.LSTM_predictor(data, epochs, epochs, 'LSTM_SEQUENCE' + name_epoch + name_time + name_cam  + name_stage + name_pred)
-    lstm.set_days(data.get_thesis_test_days())
+
+    lstm = lstm_model.LSTM_predictor(data, epochs, epochs, 'LSTM_SEQUENCE' + name_epoch + name_time + name_data + name_pred)
+    lstm.set_days(data.get_prem_days())
     lstm.run_experiment()
 
 def LSTM_test():
-    data = DataFrameSequence(False, 20, True, True)
-    data.build_ts_df(7, 19, [8,9], 10, 1, clear_sky_label=True)
-    lstm = lstm_model.LSTM_predictor(data, 100, 50, 'LSTM_TEST', pred_csi=True)
+    # debug, pred_horizon, onsite_data, img_data, meteor_data
+    data = DataFrameSequence(False, 20, True, True, True)
+    # start, end, months, lenth_tm
+    data.build_ts_df(12, 15, [8,9], 5)
+    lstm = lstm_model.LSTM_predictor(data, 50, 50, 'LSTM_TEST')
     data.normalize_mega_df()
     data.split_data_set(9, 15)
     data.flatten_data_set_to_3d()
@@ -108,20 +107,4 @@ def optimize():
     print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
 
 
-
-# # LSTM_test()
-# minutes_sequence = int(sys.argv[1])
-# cams = int(sys.argv[2])
-# img = int(sys.argv[3])
-#
-# if img == 1:
-#     img = True
-# else:
-#     img = False
-#
-#
-# print('Minutes sequence: ' + str(minutes_sequence))
-# print('Cams: ' + str(cams))
-# print('IMG: ' + str(img))
 run_lstm_experiments()
-
