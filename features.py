@@ -35,9 +35,11 @@ def get_full_image_by_date_time(month, day, hour, minute, seconds):
                     print('found..')
                     return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         minute = minute + 1
-        if minute == 60:
+        if minute >= 60:
             minute = 0
             hour = hour + 1
+        if hour >= 19:
+            return 0
 
 
 def get_features_by_day(month, day, start, end):
