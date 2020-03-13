@@ -54,11 +54,8 @@ class DataFrameIMG:
                 self.mega_df_y[i] = ghi
                 self.mega_df_times[i] = [year, month, day, hour, minute]
             except:
-                img = generate_img_for_cnn(month, day, hour, minute+2, 0, self.pred_horizon)
-                self.mega_df_x[i] = img
-                self.mega_df_y[i] = ghi
-                self.mega_df_times[i] = [year, month, day, hour, minute]
-
+                print('ERROR: ' + str(month) + '' + str(day) + '' + str(hour) + '' + str(minute))
+                continue
 
 
     def split_data_set(self, m, d):
