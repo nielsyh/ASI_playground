@@ -21,15 +21,21 @@ def get_full_image_by_date_time(month, day, hour, minute, seconds):
     base_url = base_url + tmp_url + '/'  # folder
 
     for s in seconds_list:
-        img_url = tmp_url + int_to_str(hour) + int_to_str(minute) + int_to_str(s) + '_11.jpg'
-        total_url = base_url + img_url
-        # print(total_url)
-        if os.path.isfile(total_url):
-            image = cv2.imread(total_url)
-            if (image is None):
-                continue
-            else:
-                return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+        try:
+            img_url = tmp_url + int_to_str(hour) + int_to_str(minute) + int_to_str(s) + '_11.jpg'
+            total_url = base_url + img_url
+            # print(total_url)
+            if os.path.isfile(total_url):
+                image = cv2.imread(total_url)
+                if (image is None):
+                    continue
+                else:
+                    return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        except:
+            print('ERROR: ' + str(month) + ' ' + str(day) + ' ' + str(minute))
+
+    return 0
 
 def get_features_by_day(month, day, start, end):
     intensity = []

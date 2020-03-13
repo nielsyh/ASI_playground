@@ -37,9 +37,11 @@ def generate_next_img(frame1, frame2):
 
 def generate_img_for_cnn(month, day, hour, minute, second, pred_horizon):
     frame_2 = get_full_image_by_date_time(month, day, hour, minute, second)
+
     a = time(hour=hour, minute=minute,second=second)
     b = (dt.datetime.combine(dt.date(1, 1, 1), a) - dt.timedelta(minutes=pred_horizon)).time()
     frame_1 = get_full_image_by_date_time(month, day, int(b.hour), int(b.minute), int(b.second))
+
     gen3, hsv = generate_next_img(frame_1, frame_2)
     return pre_process_img(gen3,400)
 

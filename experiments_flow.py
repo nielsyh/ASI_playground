@@ -17,7 +17,7 @@ def experiment(prediction_horizon):
     for tup in tqdm(prem, total=len(prem), unit='Days to predict'):
         data = DataFrameIMG(False, prediction_horizon)
         data.build_img_df(7, 18, tup[0], tup[1])
-        cnn = cnn_model.CnnNet(data)
+        cnn = cnn_model.CnnNet(data, modelarch='small')
         cnn.get_model(400)
         cnn.load_model_files(str(tup[0]) + str(tup[1]))
         y_pred, rmse, mae, mape = cnn.predict()
