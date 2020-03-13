@@ -3,6 +3,7 @@ import keras
 from keras.applications.resnet50 import ResNet50
 from keras.models import load_model
 from tqdm import tqdm
+import data.data_helper
 
 from metrics import Metrics
 import calendar
@@ -72,12 +73,13 @@ class CnnNet:
             self.model.save(str(name) + '.h5')  # creates a HDF5 file 'my_model.h5'
 
     def load_model_files(self, name):
+        data.data_helper.fix_directory()
         if self.modelarch == 'big':
             for i in [2,3,4]:
                 weights  =np.load(str(name)+str(i)+'.npy',  allow_pickle=True)
                 self.model.layers[i].set_weights(weights)
         elif self.modelarch == 'small':
-            self.model = load_model(str(name) + '.h5')
+            self.model = load_model(str(name))
 
 
     def build_prem_models(self):

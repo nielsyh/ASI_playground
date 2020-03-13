@@ -11,12 +11,13 @@ def rf_experiment():
     sqs = [10, 20, 30]
     permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
     permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
-    for idx, data in enumerate(permutations):
+    for idx, d in enumerate(permutations):
         for s in sqs:
             for i in prediction_horizons:
 
                 print('start rf: ' + str(i))
-                data = DataFrameSequence(False, i, data[0], data[1], data[2])
+
+                data = DataFrameSequence(False, i, d[0], d[1], d[2])
                 data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], s)
                 data.normalize_mega_df()
 

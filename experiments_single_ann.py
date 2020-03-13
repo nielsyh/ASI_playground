@@ -25,8 +25,8 @@ def run_ann_experiments():
             for i in prediction_horizons:
                 ANN_experiment(i, s, p, permutations_names[idx])
 
-def ANN_experiment(prediction_horizon, minutes_sequence, data, data_name):
-    data = DataFrameSequence(False, prediction_horizon, data[0], data[1], data[2])
+def ANN_experiment(prediction_horizon, minutes_sequence, d, data_name):
+    data = DataFrameSequence(False, prediction_horizon, d[0], d[1], d[2])
     data.build_ts_df(start, end, [7,8,9,10,11,12], minutes_sequence)
     data.normalize_mega_df()
 
