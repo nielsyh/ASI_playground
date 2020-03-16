@@ -21,7 +21,7 @@ def experiment(prediction_horizon):
         cnn.get_model(400)
         cnn.load_model_files(str(tup[0]) + str(tup[1]) + '.h5')
         y_pred, rmse, mae, mape = cnn.predict()
-        name = 'CNN_predhor' + str(prediction_horizon)
+        name = 'CNN_predhor_LK' + str(prediction_horizon)
         metrics.Metrics.write_results(name, data.mega_df_times, data.mega_df_y, y_pred.ravel(), prediction_horizon)
 
 def cnn_test():
