@@ -21,7 +21,8 @@ import pickle
 
 
 def get_folders_ann():
-    folders = ['persistence',
+    folders = [
+    # 'persistence',
                'prem results/ANN 5 IMG/ANN_SEQUENCE_epochs_40_sequence_5CAM_1_img_Truepredhor_',
            'prem results/ANN 5 NOIMG/ANN_SEQUENCE_epochs_40_sequence_5CAM_1_img_Falsepredhor_',
            'prem results/ANN 10 IMG/ANN_SEQUENCE_epochs_40_sequence_10CAM_1_img_Truepredhor_',
@@ -35,7 +36,8 @@ def get_folders_ann():
 
 
 def get_folders_rf():
-    folders = ['persistence',
+    folders = [
+        # 'persistence',
                'prem results/RF 5 IMG/RF SEQUENCE PREM__sequence_5CAM_1_img_Truepredhor_',
                'prem results/RF 5 NOIMG/RF SEQUENCE PREM__sequence_5CAM_1_img_Falsepredhor_',
                'prem results/RF 10 IMG/RF SEQUENCE PREM__sequence_10CAM_1_img_Truepredhor_',
@@ -52,7 +54,8 @@ def get_folders_rf():
     return folders
 
 def get_folders_lstm():
-    folders = ['persistence',
+    folders = [
+        # 'persistence',
                'prem results/LSTM 5 IMG/LSTM_SEQUENCE_epochs_40_sequence_5CAM_1_img_Truepredhor_',
                'prem results/LSTM 10 IMG/LSTM_SEQUENCE_epochs_40_sequence_10CAM_1_img_Truepredhor_',
                'prem results/LSTM 10 NOIMG/LSTM_BETA_SEQUENCE_epochs_40CAM_1_sequence_10predhor_',
@@ -62,7 +65,8 @@ def get_folders_lstm():
     return folders
 
 def get_folders_best():
-    folders = ['persistence',
+    folders = [
+        # 'persistence',
                'prem results/LSTM 5 IMG/LSTM_SEQUENCE_epochs_40_sequence_5CAM_1_img_Truepredhor_',
                'prem results/LSTM 10 IMG/LSTM_SEQUENCE_epochs_40_sequence_10CAM_1_img_Truepredhor_',
                'prem results/LSTM 10 NOIMG/LSTM_BETA_SEQUENCE_epochs_40CAM_1_sequence_10predhor_',
@@ -138,6 +142,10 @@ def get_files_lstm_multi():
              ]
 
     return files, names
+
+def get_files_cnn():
+    folders = ['persistence', 'prem results cnn/CNN_predhor']
+    return folders
 
 def get_files_rf_multi():
     files = ['persistence',

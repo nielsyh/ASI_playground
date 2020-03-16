@@ -58,10 +58,16 @@ def ann_test():
 
 def optimize():
     data = DataFrameSequence(False, 20, False, False)
-    data.build_ts_df(6, 18, [7,8,9,10,11,12], 60)
+    data.build_ts_df(6, 18, [7,8,9,10,11,12], 20)
     data.normalize_mega_df()
     data.split_data_set(11,15)
     data.flatten_data_set()
+
+    # nodes = [(50,10),(60,20), (40,20)]
+    # activations = ['relu']
+    # opts = ['Adam', 'RMSprop']
+    # drop_out = [0, 0.1, 0.5]
+    # learning_rate = [0.001, 0.01, 0.1]
 
     nodes = [(50,10),(60,20), (40,20)]
     activations = ['relu']

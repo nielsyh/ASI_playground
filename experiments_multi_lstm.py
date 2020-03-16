@@ -6,7 +6,7 @@ import sys
 from keras import optimizers
 from data.data_helper import plot_history
 
-epochs = 50
+epochs = 54
 start = 6
 end = 19
 
@@ -47,26 +47,29 @@ def run_final_test_days():
 
 
 def run_lstm_experiment():
-    sqs = [5]
-    # permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
-    permutations = [(True, True, True)]
-    # permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
-    permutations_names = ['all data clrsky']
+    sqs = [3,5,10]
+    cams = [1,2]
+    permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
+    # permutations = [(True, True, True)]
+    permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
+    # permutations_names = ['all data clrsky']
 
     for pidx, p in enumerate(permutations):
         for s in sqs:
-            data = DataFrameSequenceMulti(False, p[0], p[1], p[2])
-            data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], s, cams=1, clear_sky_label=True)
-            data.normalize_mega_df()
+            for c in cams:
+                data = DataFrameSequenceMulti(False, p[0], p[1], p[2])
+                data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], s, cams=c, clear_sky_label=False)
+                data.normalize_mega_df()
 
-            name_time = '_sqnc_' + str(s)
-            name_data = 'data_' + permutations_names[pidx]
-            name_epoch = '_epochs_' + str(epochs)
+                name_time = '_sqnc_' + str(s)
+                name_data = 'data_' + permutations_names[pidx]
+                name_epoch = '_epochs_' + str(epochs)
+                name_cam = '_cams_' + str(c)
 
-            lstm = lstm_model_multi.LSTM_predictor(data, epochs,
-                                            'LSTM_SEQUENCE_MULTI' + name_epoch + name_time + name_data, pred_csi=True)
-            lstm.set_days(data.get_prem_days())
-            lstm.run_experiment()
+                lstm = lstm_model_multi.LSTM_predictor(data, epochs,
+                                                'LSTM_SEQUENCE_MULTI' + name_epoch + name_time + name_data + name_cam, pred_csi=False)
+                lstm.set_days(data.get_prem_days())
+                lstm.run_experiment()
 
 
 def LSTM_test():
@@ -91,24 +94,31 @@ def LSTM_test():
 
 
 def optimize():
-    data = lstm_model_multi(False, 20, True, False)
-    data.build_ts_df(6, 18, [7,8,9,10,11,12], 60, 1)
-    data.normalize_mega_df()
-    data.split_data_set(11,15)
-    data.flatten_data_set_to_3d()
+    # data.build_ts_df(6, 19, [8, 9, 10,11,12], 10, cams=1, clear_sky_label=False)
+    # data.normalize_mega_df()
+    # data.split_data_set(10,15)
+    # data.flatten_data_set_to_3d()
+    #
+    # seq_l = [3,5,10]
+    # nodes =  [(50,25,10),(60,30,15),(80,40,20)]
+    # activations = ['relu', 'sigmoid']
+    # opts = ['Adam', 'RMSprop']
+    # learning_rate = [0.001, 0.01, 0.1]
 
-    seq_l = [3,5,10]
-    nodes =  [(50,25,10),(60,30,15),(80,40,20)]
-    activations = ['relu', 'sigmoid']
-    opts = ['Adam', 'RMSprop']
-    learning_rate = [0.001, 0.01, 0.1]
 
-    lstm = lstm_model_multi.LSTM_predictor(data, 3, 3, 'LSTM_TEST')
+    seq_l = [5]
+    nodes =  [(50,25,10)]
+    activations = ['relu']
+    opts = ['Adam']
+    learning_rate = [0.001]
+
+    data = DataFrameSequenceMulti(False, True, True, True)
+    lstm = lstm_model_multi.LSTM_predictor(data, 50, 'LSTM_TEST')
     num = 0
     for s in seq_l:
-        data.build_ts_df(6, 18, [7, 8, 9, 10, 11, 12], s, 1)
+        data.build_ts_df(6, 19, [7,8,9,10,11,12], s, 1)
         data.normalize_mega_df()
-        data.split_data_set(11, 15)
+        data.split_data_set(10, 15)
         data.flatten_data_set_to_3d()
         for n in nodes:
             for a in activations:
@@ -125,7 +135,7 @@ def optimize():
                         res.append(out)
                         settings = 'nodes: ' + str(n) + ' activation: ' + str(a) + ' optimizer: ' + str(o) + ' lr: ' + str(lr) + " seq_l: " + str(s)
                         sets.append(settings)
-                        plot_history(settings, num)
+                        plot_history(settings, num, out)
                         min_loss.append(min(out.history['loss']))
                         min_vals.append(min(out.history['val_loss']))
                         num = num + 1
@@ -147,5 +157,5 @@ def optimize():
 
 # run_final_test_days()
 # LSTM_test()
-
+# optimize()
 run_lstm_experiment()
