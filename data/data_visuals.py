@@ -16,11 +16,12 @@ def plot_error_per_horizons(errors, horizons, names, title, xl, yl):
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
     # plt.setp(ax.get_xticklabels(), rotation=90, horizontalalignment='right', fontsize='x-small')
 
-    lines = ['-','-','-','-','-','-','-','--','--','--','--','--','--','--', '-.','-.','-.','-.','-.','-.','-.']
+    lines = ['-','-','-','-','-','-','-',
+             '--','--','--','--','--','--','--',
+             '-.','-.','-.','-.','-.','-.','-.',
+             ':',':',':',':',':',':',':']
 
     for idx, i in enumerate(errors):
-        print(len(horizons))
-        print(len(i))
         plt.plot(horizons, i, linestyle=lines[idx], label=names[idx])
 
     plt.legend()
@@ -371,49 +372,54 @@ def plot_err_day_split(model, prediction_horizon):
     plot_error_per_horizons(trmse, times, names, 'AVG RMSE per hour', 'hours', 'avg error in RMSE')
 
 
-def plot_err_hor_all(model):
+def plot_err_hor_all(model, max_models=6):
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
 
     if model == 'ann':
         files, names = data_helper.get_files_ann_multi()
-        folders = data_helper.get_folders_ann()
+        folders, names_ = data_helper.get_folders_ann()
     elif model == 'rf':
         files, names = data_helper.get_files_rf_multi()
-        folders = data_helper.get_folders_rf()
+        folders, names_ = data_helper.get_folders_rf()
     elif model == 'lstm':
         files, names = data_helper.get_files_lstm_multi()
-        folders = data_helper.get_folders_lstm()
+        folders, names_ = data_helper.get_folders_lstm()
     elif model == 'best':
         files, names = data_helper.get_files_best_multi()
-        folders = data_helper.get_folders_best()
+        folders, names_ = data_helper.get_folders_best()
     elif model == 'test':
         files, names = data_helper.get_files_test_set()
         t = data_helper.get_thesis_test_days()
     elif model == 'cnn':
+        # files, names = [],[]
         folders = data_helper.get_files_cnn()
 
+    #merge names
+    names = names + names_
     trmse = []
     tmae = []
     tmape = []
-
     predictions = list(range(1, 21))
 
-    for file in files:
+    # get persistence errors:
+    rmse_persistence = []
+    mae_persistence = []
+    mape_persistence = []
+    for i in range(0, 20):
+        actual, pred, _ = data_helper.get_persistence_dates(t, 6, 19, i + 1)
+        rmse, mae, mape = Metrics.get_error(actual, pred)
+        rmse_persistence.append(rmse)
+        mae_persistence.append(mae)
+        mape_persistence.append(mape)
+
+    for file in files:  # get multi model data
         tmp_rmse = []
         tmp_mae = []
         tmp_mape = []
-
-        if file != 'persistence':
-            actual, pred, _ = get_all_TP_multi(file)
+        actual, pred, _ = get_all_TP_multi(file)
 
         for i in range(0,20):
-            if file == 'persistence':
-                actual, pred, _ = data_helper.get_persistence_dates(t, 6, 19, i+1)
-                rmse, mae, mape = Metrics.get_error(actual, pred)
-            else:
-                rmse, mae, mape = Metrics.get_error(actual[i], pred[i])
-
-            # print(rmse)
+            rmse, mae, mape = Metrics.get_error(actual[i], pred[i])
             tmp_rmse.append(rmse)
             tmp_mae.append(mae)
             tmp_mape.append(mape)
@@ -422,26 +428,12 @@ def plot_err_hor_all(model):
         tmae.append(tmp_mae)
         tmape.append(tmp_mape)
 
-    # plot_error_per_horizons(trmse, predictions, names,
-    #                         'RMSE Error per prediction horizon (multi)', 'Prediction Horizon in minutes', 'Error in RMSE')
-
-    # 'Persistence',
     extension = '.txt'
-    for f in folders:
-
-        if f != 'persistence':
-            names.append(f[f.find('/') + 1:-1][0:(f[f.find('/') + 1:-1]).find('/')])
-
+    for f in folders:  # get single model data
         rmse, mae, mape = [], [], []
-
         for i in predictions:
-            if f == 'persistence':
-                continue
-                # actual, pred, _ = data.data_helper.get_persistence_dates(t, 6, 20, i)
-            else:
-                file =  f + str(i) + extension
-                actual, pred = get_all_TP(file)
-
+            file =  f + str(i) + extension
+            actual, pred = get_all_TP(file)
             if len(pred) > 0:
                 a, b, c = Metrics.get_error(actual, pred)
                 rmse.append(a)
@@ -451,22 +443,22 @@ def plot_err_hor_all(model):
                 rmse.append(0)
                 mae.append(0)
                 mape.append(0)
-
         trmse.append(rmse)
         tmae.append(mae)
         tmape.append(mape)
 
-    # for idx, i in enumerate(trmse):
-    #     print(i)
-    #     print(len(i))
-    #     print(names[idx])
+    for i in range(0, len(trmse), max_models):
 
+        print(trmse[i:i+max_models])
 
-    # print(len(predictions))
-    # print(len(names))
-    # print(len(trmse))
-    plot_error_per_horizons(trmse, predictions, names,
-                            'RMSE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in RMSE')
+        errors_itt =  trmse[i:i+max_models]
+        names_itt = names[i:i+max_models]
+
+        errors_itt.insert(0, rmse_persistence)
+        names_itt.insert(0, 'Persistence')
+
+        plot_error_per_horizons(errors_itt, predictions, names_itt ,
+                                'RMSE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in RMSE')
 
 def plot_err_hor_multi(model):
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
@@ -654,29 +646,17 @@ def plot_prem_day_folder():
                                 xl='Time of day')
 
 
-def plot_prem_day():
+def plot_prem_day(pred_hor=20):
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
     for tup in t:
-        # pred0, actual0, times0 = file_to_dates('prem results/SVR SEQUENCE PREM_1CAM_60Minutes__pred_hor_20.txt', tup[0], tup[1],0)
-        # pred0, actual0, times0 = get_persistence_df(tup[0], tup[1], 6, 20, 20)
-        # pred1, actual1, times1 = file_to_dates('results/Persistence_b_horizon_20.txt', tup[0], tup[1], 0)
+        pred1, actual1, times1 = data.data_helper.get_persistence_df(tup[0], tup[1], 6, 18, pred_hor)
+        pred2, actual2, times2 = file_to_dates('results_18march/cnn/farneback/CNN_predhor1.txt', tup[0], tup[1], 1)
+        pred3, actual3, times3 = file_to_dates('results_18march/cnn/lukaskanade/CNN_predhor_LK1.txt', tup[0], tup[1], 1)
 
-        pred1, actual1, times1 = data.get_persistence_df(tup[0], tup[1], 6, 20, 20)
-        pred2, actual2, times2 = file_to_dates('prem results/ANN_SEQUENCE_40epoch_pred60_1CAM_20Minutes_.txt', tup[0], tup[1], 20)
-        pred3, actual3, times3 = file_to_dates('prem results/ANN PREM 20 min 1 cam/ANN_SEQUENCE_40epoch_pred20_1CAM_20Minutes_.txt', tup[0], tup[1], 20)
-        pred4, actual4, times4 = file_to_dates('prem results/ANN PREM 120min 1 cam/ANN_SEQUENCE_40epoch_pred20_1CAM_120Minutes_.txt', tup[0], tup[1], 20)
+        names = ['true', 'persistence', 'CNN FB', 'CNN LK']
 
-        pred5, actual5, times5 = file_to_dates('LSTM_BETA_SEQUENCE_CAM_1_sequence_10predhor_20.txt', tup[0], tup[1], 20)
-        pred6, actual6, times6 = file_to_dates('LSTM_BETA_SEQUENCE_CAM_1_sequence_5predhor_20.txt', tup[0], tup[1], 20)
-
-        pred7, actual7, times7 = file_to_dates('prem results/ANN PREM 10min 1cam/ANN_SEQUENCE_40epoch_pred20_CAMs_1sq_10.txt', tup[0], tup[1], 20)
-
-
-
-        names = ['true', 'persistence', 'ann 60', 'ann 20', 'ann 120', 'lstm 10', 'lstm 5', 'ANN 10']
-
-        plot_with_times([actual1, pred1, pred2, pred3, pred4, pred5, pred6, pred7],
-                        [times1, times1, times2, times3, times4,times5,times6, times7],
+        plot_with_times([actual1, pred1, pred2, pred3],
+                        [times1, times1, times2, times3],
                         names, 'GHI forecast ' + str(tup[1]) + '/' + str(tup[0]), 'GHI in W/m2', xl='Time of day')
 
 

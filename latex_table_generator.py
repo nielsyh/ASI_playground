@@ -117,9 +117,26 @@ ass_mae = ['NA']
 ass_mape = ['NA']
 all_model_names = []
 
-def print_results(folders):
+def print_results(model):
     # prediction_horizons = list(range(1,21))
     prediction_horizons = [5, 15, 20]
+
+    t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
+
+    if model == 'ann':
+        files, names = data.data_helper.get_files_ann_multi()
+        folders, names_ = data.data_helper.get_folders_ann()
+    elif model == 'rf':
+        files, names = data.data_helper.get_files_rf_multi()
+        folders, names_ = data.data_helper.get_folders_rf()
+    elif model == 'lstm':
+        files, names = data.data_helper.get_files_lstm_multi()
+        folders, names_ = data.data_helper.get_folders_lstm()
+    elif model == 'best':
+        files, names = data.data_helper.get_files_best_multi()
+        folders, names_ = data.data_helper.get_folders_best()
+
+
     for i in prediction_horizons:
         model_names = []
         rmse = []
@@ -129,7 +146,7 @@ def print_results(folders):
         ss_mae = ['NA']
         ss_mape = ['NA']
 
-        t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
+        # Persistence results
         actual, pred, _ = data.data_helper.get_persistence_dates(t, 7, 19, i)
         trmse, tmae, tmape = metrics.Metrics.get_error(actual, pred)
         model_names.append("Persistence")
@@ -137,40 +154,34 @@ def print_results(folders):
         mae.append(round(tmae, 2))
         mape.append(round(tmape, 2))
 
-        for folder in folders:
+        for idx, folder in enumerate(folders):
             extension = '.txt'
-
-            if folder[-1] == '_':
-                file = folder + str(i) + extension
-                predicted, actual = data.data_visuals.file_to_values(file)
-                trmse, tmae, tmape = metrics.Metrics.get_error(actual, predicted)
-                modelname = folder[folder.find('/')+1:-1][0:(folder[folder.find('/')+1:-1]).find('/')]
-            else:
-                file = folder
-                predicted, actual = data.data_visuals.file_to_values(file,i)
-                trmse, tmae, tmape = metrics.Metrics.get_error(actual, predicted)
-
-                if 'ANN' in folder:
-                    tmp_name = 'ANN'
-                elif 'LSTM' in folder:
-                    tmp_name = 'LSTM'
-                elif 'RF' in folder:
-                    tmp_name = 'RF'
-
-                modelname = folder[folder.find(tmp_name):folder.find('SEQUENCE')-1] + ' Multi ' + folder[folder.find('sqnc')+5:folder.find('data')] + ' ' + folder[folder.find('data')+5:folder.find('.txt')]
-
+            file = folder + str(i) + extension
+            predicted, actual = data.data_visuals.file_to_values(file)
+            trmse, tmae, tmape = metrics.Metrics.get_error(actual, predicted)
+            modelname = names_[idx]
 
             model_names.append(modelname)
             rmse.append(round(trmse, 2))
             mae.append(round(tmae, 2))
             mape.append(round(tmape, 2))
-
             ss_rmse.append(round(1 - (trmse / rmse[0]), 2))
             ss_mae.append(round(1 - (tmae / mae[0]), 2))
-            ss_mape.append(round(1 - (tmape / mape[0]),2))
+            ss_mape.append(round(1 - (tmape / mape[0]), 2))
 
-        # print('L: '  + str(len(model_names) + 1))
-        # print('W: 7' )
+        for idx, file in enumerate(files):
+            predicted, actual = data.data_visuals.file_to_values(file, i)
+            trmse, tmae, tmape = metrics.Metrics.get_error(actual, predicted)
+            modelname = names[idx]
+
+            model_names.append(modelname)
+            rmse.append(round(trmse, 2))
+            mae.append(round(tmae, 2))
+            mape.append(round(tmape, 2))
+            ss_rmse.append(round(1 - (trmse / rmse[0]), 2))
+            ss_mae.append(round(1 - (tmae / mae[0]), 2))
+            ss_mape.append(round(1 - (tmape / mape[0]), 2))
+
 
         print_table(model_names, rmse, mae, mape, ss_rmse, ss_mae, ss_mape, 'Performance evaluation Prem. days with prediction horizon: ' + str(i), 'prem.' + str(i))
 

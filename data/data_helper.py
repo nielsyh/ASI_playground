@@ -22,47 +22,91 @@ import pickle
 
 def get_folders_ann():
     folders = [
-    # 'persistence',
-               'prem results/ANN 5 IMG/ANN_SEQUENCE_epochs_40_sequence_5CAM_1_img_Truepredhor_',
-           'prem results/ANN 5 NOIMG/ANN_SEQUENCE_epochs_40_sequence_5CAM_1_img_Falsepredhor_',
-           'prem results/ANN 10 IMG/ANN_SEQUENCE_epochs_40_sequence_10CAM_1_img_Truepredhor_',
-           'prem results/ANN 20 IMG/ANN_SEQUENCE_epochs_40_sequence_20CAM_1_img_Truepredhor_',
-           'prem results/ANN 20 NOIMG/ANN_SEQUENCE_epochs_40_sequence_20CAM_1_img_Falsepredhor_',
-           'prem results/ANN 50 IMG/ANN_SEQUENCE_epochs_40_sequence_50CAM_1_img_Truepredhor_',
-           'prem results/ANN 60 NOIMG NOMETEOR/ANN_SEQUENCE_NOMETEORepochs_40_sequence_60CAM_1_img_Falsepredhor_'
+                # 'results_18march/single/ann/ANN_SEQUENCEepochs_40_sqnc_5data_all dataph_',
+               'results_18march/single/ann/ANN_SEQUENCEepochs_40_sqnc_5data_img onlyph_',
+               'results_18march/single/ann/ANN_SEQUENCEepochs_40_sqnc_5data_onsite_onlyph_',
+               # 'results_18march/single/ann/ANN_SEQUENCEepochs_40_sqnc_10data_all dataph_',
+               'results_18march/single/ann/ANN_SEQUENCEepochs_40_sqnc_10data_onsite_onlyph_',
+               # 'results_18march/single/ann/ANN_SEQUENCEepochs_40_sqnc_20data_all dataph_',
+               'results_18march/single/ann/ANN_SEQUENCEepochs_40_sqnc_20data_onsite_onlyph_'
                ]
 
-    return folders
+    names = [
+            # 'ANN S 5 all data',
+             'ANN S 5 img',
+             'ANN S 5 onsite',
+             # 'ANN S 10 all data',
+             # 'ANN S 10 img',
+             'ANN S 10 onsite',
+             # 'ANN S 20 all data',
+             'ANN S 20 onsite']
+
+    return folders, names
 
 
 def get_folders_rf():
-    folders = [
-        # 'persistence',
-               'prem results/RF 5 IMG/RF SEQUENCE PREM__sequence_5CAM_1_img_Truepredhor_',
-               'prem results/RF 5 NOIMG/RF SEQUENCE PREM__sequence_5CAM_1_img_Falsepredhor_',
-               'prem results/RF 10 IMG/RF SEQUENCE PREM__sequence_10CAM_1_img_Truepredhor_',
-               'prem results/RF 10 NOIMG/RF SEQUENCE PREM__sequence_10CAM_1_img_Falsepredhor_',
-               'prem results/RF 20 IMG/RF SEQUENCE PREM__sequence_20CAM_1_img_Truepredhor_',
-               'prem results/RF 20 NOIMG/RF SEQUENCE PREM__sequence_20CAM_1_img_Falsepredhor_',
-               'prem results/RF 30 IMG/RF SEQUENCE PREM__sequence_30CAM_1_img_Truepredhor_',
-               'prem results/RF 30 NOIMG/RF SEQUENCE PREM__sequence_30CAM_1_img_Falsepredhor_',
-               'prem results/RF 60 IMG/RF SEQUENCE PREM__sequence_60CAM_1_img_Truepredhor_',
-               'prem results/RF 60 NOIMG/RF SEQUENCE PREM__sequence_60CAM_1_img_Falsepredhor_',
-               'prem results/RF 120 IMG/RF SEQUENCE PREM__sequence_120CAM_1_img_Truepredhor_',
-               'prem results/RF 120 NOIMG/RF SEQUENCE PREM__sequence_120CAM_1_img_Falsepredhor_']
+    folders = ['results_18march/single/rf/RF SEQUENCE_sqnc_10data_all dataph_',
+               'results_18march/single/rf/RF SEQUENCE_sqnc_10data_img onlyph_',
+               'results_18march/single/rf/RF SEQUENCE_sqnc_10data_meteor onlyph_',
+               'results_18march/single/rf/RF SEQUENCE_sqnc_10data_onsite_onlyph_',
+               'results_18march/single/rf/RF SEQUENCE_sqnc_20data_all dataph_',
+               'results_18march/single/rf/RF SEQUENCE_sqnc_20data_img onlyph_',
+               'results_18march/single/rf/RF SEQUENCE_sqnc_20data_meteor onlyph_',
+               'results_18march/single/rf/RF SEQUENCE_sqnc_20data_onsite_onlyph_',
+               'results_18march/single/rf/RF SEQUENCE_sqnc_30data_all dataph_',
+               'results_18march/single/rf/RF SEQUENCE_sqnc_30data_img onlyph_',
+               'results_18march/single/rf/RF SEQUENCE_sqnc_30data_meteor onlyph_',
+               'results_18march/single/rf/RF SEQUENCE_sqnc_30data_onsite_onlyph_']
 
-    return folders
+    names = ['RF S 10 all data',
+             'RF S 10 img',
+             'RF S 10 meteor',
+             'RF S 10 onsite',
+             'RF S 20 all data',
+             'RF S 20 img',
+             'RF S 20 meteor',
+             'RF S 20 onsite',
+             'RF S 30 all data',
+             'RF S 30 img',
+             'RF S 30 meteor',
+             'RF S 30 onsite'
+             ]
+        # 'persistence',
+        #        'prem results/RF 5 IMG/RF SEQUENCE PREM__sequence_5CAM_1_img_Truepredhor_',
+        #        'prem results/RF 5 NOIMG/RF SEQUENCE PREM__sequence_5CAM_1_img_Falsepredhor_',
+        #        'prem results/RF 10 IMG/RF SEQUENCE PREM__sequence_10CAM_1_img_Truepredhor_',
+        #        'prem results/RF 10 NOIMG/RF SEQUENCE PREM__sequence_10CAM_1_img_Falsepredhor_',
+        #        'prem results/RF 20 IMG/RF SEQUENCE PREM__sequence_20CAM_1_img_Truepredhor_',
+        #        'prem results/RF 20 NOIMG/RF SEQUENCE PREM__sequence_20CAM_1_img_Falsepredhor_',
+        #        'prem results/RF 30 IMG/RF SEQUENCE PREM__sequence_30CAM_1_img_Truepredhor_',
+        #        'prem results/RF 30 NOIMG/RF SEQUENCE PREM__sequence_30CAM_1_img_Falsepredhor_',
+        #        'prem results/RF 60 IMG/RF SEQUENCE PREM__sequence_60CAM_1_img_Truepredhor_',
+        #        'prem results/RF 60 NOIMG/RF SEQUENCE PREM__sequence_60CAM_1_img_Falsepredhor_',
+        #        'prem results/RF 120 IMG/RF SEQUENCE PREM__sequence_120CAM_1_img_Truepredhor_',
+        #        'prem results/RF 120 NOIMG/RF SEQUENCE PREM__sequence_120CAM_1_img_Falsepredhor_'
+
+    return folders, names
 
 def get_folders_lstm():
-    folders = [
-        # 'persistence',
-               'prem results/LSTM 5 IMG/LSTM_SEQUENCE_epochs_40_sequence_5CAM_1_img_Truepredhor_',
-               'prem results/LSTM 10 IMG/LSTM_SEQUENCE_epochs_40_sequence_10CAM_1_img_Truepredhor_',
-               'prem results/LSTM 10 NOIMG/LSTM_BETA_SEQUENCE_epochs_40CAM_1_sequence_10predhor_',
-               'prem results/LSTM 20 IMG/LSTM_SEQUENCE_epochs_40_sequence_20CAM_1_img_Truepredhor_',
-               'prem results/LSTM 20 NOIMG/LSTM_SEQUENCE_epochs_40_sequence_20CAM_1_img_Falsepredhor_']
+    folders = ['results_18march/single/lstm/LSTM_SEQUENCEepochs_40_sqnc_5data_all dataph_',
+               # 'results_18march/single/lstm/LSTM_SEQUENCEepochs_40_sqnc_5data_onsite_onlyph_',
+               'results_18march/single/lstm/LSTM_SEQUENCEepochs_40_sqnc_10data_all dataph_',
+               'results_18march/single/lstm/LSTM_SEQUENCEepochs_40_sqnc_20data_all dataph_'
+              ]
 
-    return folders
+    names = ['LSTM S 5 all data',
+             # 'LSTM S 5 onsite',
+             'LSTM S 10 all data',
+             'LSTM S 20 all data']
+
+        # # 'persistence',
+        #        'prem results/LSTM 5 IMG/LSTM_SEQUENCE_epochs_40_sequence_5CAM_1_img_Truepredhor_',
+        #        'prem results/LSTM 10 IMG/LSTM_SEQUENCE_epochs_40_sequence_10CAM_1_img_Truepredhor_',
+        #        'prem results/LSTM 10 NOIMG/LSTM_BETA_SEQUENCE_epochs_40CAM_1_sequence_10predhor_',
+        #        'prem results/LSTM 20 IMG/LSTM_SEQUENCE_epochs_40_sequence_20CAM_1_img_Truepredhor_',
+        #        'prem results/LSTM 20 NOIMG/LSTM_SEQUENCE_epochs_40_sequence_20CAM_1_img_Falsepredhor_']
+
+    return folders, names
 
 def get_folders_best():
     folders = [
@@ -96,60 +140,125 @@ def get_files_best_multi():
     return files, names
 
 def get_files_ann_multi():
-    files = ['persistence',
-             'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_all data.txt',
-             'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_img only.txt',
-             'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_meteor only.txt',
-             'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_onsite_only.txt',
-             'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_all data.txt',
-             'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_img only.txt',
-             'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_onsite_only.txt'
+    files = ['results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_20data_all data_cams_1.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_20data_all data_cams_2.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_20data_img only_cams_1.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_20data_img only_cams_2.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_20data_meteor only_cams_1.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_20data_meteor only_cams_2.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_20data_onsite_only_cams_1.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_20data_onsite_only_cams_2.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_40data_all data_cams_1.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_40data_all data_cams_2.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_40data_img only_cams_1.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_40data_img only_cams_2.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_40data_meteor only_cams_1.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_40data_meteor only_cams_2.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_40data_onsite_only_cams_1.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_40data_onsite_only_cams_2.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_60data_all data_cams_1.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_60data_all data_cams_2.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_60data_img only_cams_1.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_60data_img only_cams_2.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_60data_meteor only_cams_1.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_60data_meteor only_cams_2.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_60data_onsite_only_cams_1.txt',
+             'results_18march/multi/ann/ANN_SEQUENCE_MULTIepochs_36_sqnc_60data_onsite_only_cams_2.txt'
              ]
+    names = []
 
-    names = ['persistence',
-             'ANN 20 all', 'ANN 20 img', 'ANN 20 metoer', 'ANN 20 onsite',
-             'ANN 40 all', 'ANN 40 img', 'ANN 40 onsite']
+    for f in files:
+        tmp_name = 'ANN M'
+
+        if 'sqnc_20' in f:  # seq length
+            tmp_name = tmp_name + ' 20'
+        elif 'sqnc_40' in f:
+            tmp_name = tmp_name + ' 40'
+        elif 'sqnc_60' in f:
+            tmp_name = tmp_name + ' 60'
+
+        if 'all data' in f:  # data type
+            tmp_name = tmp_name + ' all data'
+        elif 'onsite' in f:
+            tmp_name = tmp_name + ' onsite'
+        elif 'img only' in f:
+            tmp_name = tmp_name + ' img'
+        elif 'meteor' in f:
+            tmp_name = tmp_name + ' meteor'
+
+        if 'cams_2' in f:  # 2 cam?
+            tmp_name = tmp_name + ' 2CAM'
+
+        names.append(tmp_name)
 
     return files, names
 
 
 def get_files_lstm_multi():
-    #
-    #
-    files = [ 'persistence',
-              'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_all data.txt',
-              'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_meteor only.txt',
-              'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_img only.txt',
-              'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_onsite_only.txt',
-              'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_10data_all data.txt',
-              'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_3data_onsite,img.txt',
-              'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_onsite,img.txt',
-              'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_10data_onsite,img.txt',
-              'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_all data 2 cam.txt',
-             ]
 
-    # 'persistence',
-    names = ['Persistence',
-             'LSTM 5 all',
-             'LSTM 5 metoer only',
-             'LSTM 5 img only',
-             'LSTM 5 on-site only',
-             'LSTM 10 all',
-             'LSTM 3 onsite/img',
-             'LSTM 5 onsite/img',
-             'LSTM 10 onsite/img',
-             'LSTM 5 all data 2CAM'
-             ]
+    files = ['results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_3data_all data_cams_1.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_3data_all data_cams_2.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_3data_img only_cams_1.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_3data_img only_cams_2.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_3data_meteor only_cams_1.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_3data_meteor only_cams_2.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_3data_onsite_only_cams_1.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_3data_onsite_only_cams_2.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_5data_all data_cams_1.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_5data_all data_cams_2.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_50_sqnc_5data_all data clrsky_clrsky_.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_5data_img only_cams_1.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_5data_img only_cams_2.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_5data_meteor only_cams_1.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_5data_meteor only_cams_2.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_5data_onsite_only_cams_1.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_5data_onsite_only_cams_2.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_10data_all data_cams_1.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_10data_all data_cams_2.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_10data_img only_cams_1.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_10data_img only_cams_2.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_10data_meteor only_cams_1.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_10data_meteor only_cams_2.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_10data_onsite_only_cams_1.txt',
+             'results_18march/multi/lstm/LSTM_SEQUENCE_MULTI_epochs_54_sqnc_10data_onsite_only_cams_2.txt']
+
+    names = []
+
+    for f in files:
+        tmp_name = 'LSTM M'
+
+        if 'sqnc_3' in f:  # seq length
+            tmp_name = tmp_name + ' 3'
+        elif 'sqnc_5' in f:
+            tmp_name = tmp_name + ' 5'
+        elif 'sqnc_10' in f:
+            tmp_name = tmp_name + ' 10'
+
+        if 'all data' in f:  # data type
+            tmp_name = tmp_name + ' all data'
+        elif 'onsite' in f:
+            tmp_name = tmp_name + ' onsite'
+        elif 'img only' in f:
+            tmp_name = tmp_name + ' img'
+        elif 'meteor' in f:
+            tmp_name = tmp_name + ' meteor'
+
+        if 'cams_2' in f:  # 2 cam?
+            tmp_name = tmp_name + ' 2CAM'
+
+        if 'clrsky' in f:
+            tmp_name = tmp_name + ' Prz'
+
+        names.append(tmp_name)
 
     return files, names
 
 def get_files_cnn():
-    folders = ['persistence', 'prem results cnn/CNN_predhor']
+    folders = ['persistence', 'prem results cnn/farneback/CNN_predhor', 'prem results cnn/lukaskanade/CNN_predhor_LK']
     return folders
 
 def get_files_rf_multi():
-    files = ['persistence',
-             'prem results multi/rf/RF SEQUENCE multi prem_sqnc_5_data_all data.txt',
+    files = ['prem results multi/rf/RF SEQUENCE multi prem_sqnc_5_data_all data.txt',
              'prem results multi/rf/RF SEQUENCE multi prem_sqnc_10_data_all data.txt',
              'prem results multi/rf/RF SEQUENCE multi prem_sqnc_20_data_all data.txt',
              'prem results multi/rf/RF SEQUENCE multi_sqnc_30data_all data.txt',
@@ -159,15 +268,14 @@ def get_files_rf_multi():
              'prem results multi/rf/RF SEQUENCE multi_sqnc_120data_all data.txt'
              ]
 
-    names = ['Persistence',
-             'RF 5 all',
-             'RF 10 all',
-             'RF 20 all',
-             'RF 30 all',
-             'RF 30 img only',
-             'RF 30 meteor only',
-             'RF 60 all',
-             'RF 120 all']
+    names = ['RF M 5 all',
+             'RF M 10 all',
+             'RF M 20 all',
+             'RF M 30 all',
+             'RF M 30 img only',
+             'RF M 30 meteor only',
+             'RF M 60 all',
+             'RF M 120 all']
 
     return files, names
 
