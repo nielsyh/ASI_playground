@@ -4,12 +4,15 @@ from keras.applications.resnet50 import ResNet50
 from keras.models import load_model
 from tqdm import tqdm
 import data.data_helper
-
+import matplotlib.pyplot as plt
 from metrics import Metrics
 import calendar
 import numpy as np
 
 class CnnNet:
+
+    history = None
+
     # windowSize minimum 32 for resnet-50
     def __init__(self, data, epochs=200, modelarch='big'):
         self.data = data
@@ -56,7 +59,8 @@ class CnnNet:
 
 
     def train(self, epochs=50, batch_size=16):
-        self.model.fit(self.data.x_train, self.data.y_train, epochs=epochs, batch_size=batch_size, validation_data=(self.data.x_val, self.data.y_val))
+        self.history = self.model.fit(self.data.x_train, self.data.y_train, epochs=epochs, batch_size=batch_size, validation_data=(self.data.x_val, self.data.y_val))
+        return self.history
 
     def predict(self):
         y_pred =  self.model.predict(self.data.mega_df_x)
@@ -82,6 +86,26 @@ class CnnNet:
             self.model = load_model(str(name))
 
 
+    def plot_history(self, settings, num, history):
+        plt.figure()
+        axes = plt.gca()
+
+        plt.plot(history.history['loss'])
+        plt.plot(history.history['val_loss'])
+        plt.title('model loss ' + str(settings))
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
+        plt.legend(['train', 'validation'], loc='upper left')
+        plt.show()
+
+        min_loss = min(self.history.history['val_loss'])
+        best_epoch = self.history.history['val_loss'].index(min_loss) + 1
+
+        plt.savefig(str(num) + '_be_' + str(best_epoch) + '.png')
+
+        plt.clf()
+        plt.close()
+
     def build_prem_models(self):
         prem = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
         for tup in tqdm(prem, total=len(prem), unit='Days to train'):
@@ -91,6 +115,9 @@ class CnnNet:
             epochs = self.epochs
             self.train(epochs=epochs)
             name = str(tup[0]) + str(tup[1])
+
+            self.plot_history(name, name, self.history)
+
             self.save_model(name)
             print('Done: ' + str(name))
 

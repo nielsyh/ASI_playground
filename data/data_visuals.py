@@ -288,6 +288,18 @@ def construct_hybrid():
 
 
 
+def plot_multiple_days():
+    t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
+    files, names = data_helper.get_files_lstm_multi()
+
+    actual, pred, times = data_helper.get_persistence_dates(t, 6, 19, 20,0)  # 24 for 5 lstm
+    actual2, pred2, times2 = get_all_TP_multi(files[0])
+
+    print(names[0])
+    plot_with_times([actual, pred, actual2[19], pred2[19]], [times,times,times2[19],times2[19]],
+                    ['true', 'persistence', 'tr', names[0]], 'title', 'GHI', xl = 'Days')
+
+
 def plot_day_multi(offset):
     files, names = data_helper.get_files_best_multi()
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
@@ -448,17 +460,14 @@ def plot_err_hor_all(model, max_models=6):
         tmape.append(mape)
 
     for i in range(0, len(trmse), max_models):
+        plot_error_per_horizons([rmse_persistence] + trmse[i:i+max_models], predictions, ['Persistence'] + names[i:i+max_models],
+                                'RMSE per prediction horizon', 'Prediction Horizon in minutes', 'Error in RMSE')
 
-        print(trmse[i:i+max_models])
+        plot_error_per_horizons([mae_persistence] + tmae[i:i+max_models], predictions, ['Persistence'] + names[i:i+max_models],
+                                'MAE per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAE')
 
-        errors_itt =  trmse[i:i+max_models]
-        names_itt = names[i:i+max_models]
-
-        errors_itt.insert(0, rmse_persistence)
-        names_itt.insert(0, 'Persistence')
-
-        plot_error_per_horizons(errors_itt, predictions, names_itt ,
-                                'RMSE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in RMSE')
+        plot_error_per_horizons([mape_persistence] + tmape[i:i+max_models], predictions, ['Persistence'] + names[i:i+max_models],
+                                'MAPE per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAPE')
 
 def plot_err_hor_multi(model):
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
