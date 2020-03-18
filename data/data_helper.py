@@ -258,9 +258,18 @@ def get_files_cnn():
     return folders
 
 def get_files_rf_multi():
-    files = ['prem results multi/rf/RF SEQUENCE multi prem_sqnc_5_data_all data.txt',
-             'prem results multi/rf/RF SEQUENCE multi prem_sqnc_10_data_all data.txt',
-             'prem results multi/rf/RF SEQUENCE multi prem_sqnc_20_data_all data.txt',
+    files = ['results_18march/multi/rf/RF SEQUENCE multi prem_sqnc_5_data_all data.txt',
+             'results_18march/multi/rf/RF SEQUENCE multi prem_sqnc_5_data_img only.txt',
+             'results_18march/multi/rf/RF SEQUENCE multi prem_sqnc_5_data_meteor only.txt',
+             'results_18march/multi/rf/RF SEQUENCE multi prem_sqnc_5_data_onsite_only.txt',
+             'results_18march/multi/rf/RF SEQUENCE multi prem_sqnc_10_data_all data.txt',
+             'results_18march/multi/rf/RF SEQUENCE multi prem_sqnc_10_data_img only.txt',
+             'results_18march/multi/rf/RF SEQUENCE multi prem_sqnc_10_data_meteor only.txt',
+             'results_18march/multi/rf/RF SEQUENCE multi prem_sqnc_10_data_onsite_only.txt',
+             'results_18march/multi/rf/RF SEQUENCE multi prem_sqnc_20_data_all data.txt',
+             'results_18march/multi/rf/RF SEQUENCE multi prem_sqnc_20_data_img only.txt',
+             'results_18march/multi/rf/RF SEQUENCE multi prem_sqnc_20_data_meteor only.txt',
+             'results_18march/multi/rf/RF SEQUENCE multi prem_sqnc_20_data_onsite_only.txt',
              'prem results multi/rf/RF SEQUENCE multi_sqnc_30data_all data.txt',
              'prem results multi/rf/RF SEQUENCE multi_sqnc_30data_img only.txt',
              'prem results multi/rf/RF SEQUENCE multi_sqnc_30data_meteor only.txt',
@@ -268,14 +277,23 @@ def get_files_rf_multi():
              'prem results multi/rf/RF SEQUENCE multi_sqnc_120data_all data.txt'
              ]
 
-    names = ['RF M 5 all',
-             'RF M 10 all',
-             'RF M 20 all',
-             'RF M 30 all',
+    names = ['RF M 5 all data',
+             'RF M 5 img',
+             'RF M 5 meteor',
+             'RF M 5 onsite',
+             'RF M 10 all data',
+             'RF M 10 img',
+             'RF M 10 meteor',
+             'RF M 10 onsite',
+             'RF M 20 all data',
+             'RF M 20 img',
+             'RF M 20 meteor',
+             'RF M 20 onsite',
+             'RF M 30 all data',
              'RF M 30 img only',
              'RF M 30 meteor only',
-             'RF M 60 all',
-             'RF M 120 all']
+             'RF M 60 all data',
+             'RF M 120 all data']
 
     return files, names
 

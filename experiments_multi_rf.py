@@ -19,14 +19,25 @@ def run_final_all_days():
     rf.run_experiment()
 
 def run_final_test_days():
-    data = DataFrameSequenceMulti(False, True, True, True)
-    data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], sequence_lenth)
-    data.normalize_mega_df()
-    name_time = '_sqnc_' + str(sequence_lenth)
-    name_data = 'data_' + 'all'
-    rf = rf_model_multi.RF_predictor(data, 'RF SEQUENCE multi testset' + name_time + name_data)
-    rf.set_days(data.get_thesis_test_days())
-    rf.run_experiment()
+    permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
+    permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
+    sqs = [5, 10, 20, 30, 40]
+    cams = [1, 2]
+    for c in cams:
+        for pidx, p in enumerate(permutations):
+            for s in sqs:
+                data = DataFrameSequenceMulti(False, p[0], p[1], p[2])
+                data.build_ts_df(start,end,[7,8,9,10,11,12],s, cams=c)
+                data.normalize_mega_df()
+
+                name_time = '_sqnc_' + str(s)
+                name_data = '_data_' + permutations_names[pidx]
+                name_cam = '_cams_' + str(c)
+
+                rf = rf_model_multi.RF_predictor(data, 'RF MULTI TESTSET' + name_cam + name_time + name_data)
+                rf.set_days(data.get_thesis_test_days())
+                rf.run_experiment()
+                print('Finish rf')
 
 def rf_experiment():
     permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
@@ -85,4 +96,5 @@ def rd_search_grid():
 
 
 # run_final_test_days()
-rf_experiment()
+# rf_experiment()
+run_final_test_days()
