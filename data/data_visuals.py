@@ -513,8 +513,6 @@ def plot_err_hor_multi(model):
     plot_error_per_horizons(tmape, predictions, names,
                             'MAPE Error per prediction horizon (multi)', 'Prediction Horizon in minutes', 'Error in MAPE')
 
-
-
 def plot_err_hor(model):
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
 
@@ -618,7 +616,6 @@ def print_error_prem_day():
         print('lstm 5')
         rmse, mae, mape = Metrics.get_error(actual6, pred6)
         print(rmse, mae, mape)
-
 
 def plot_prem_day_folder():
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]

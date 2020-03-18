@@ -35,18 +35,25 @@ def run_final_all_days():
     ann.run_experiment()
 
 def run_final_test_days():
-    data = DataFrameSequenceMulti(False, True, True, True)
-    data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], 5)
-    data.normalize_mega_df()
+    sqs = [10, 20, 40]
+    cams = [1,2]
+    permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
+    permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
+    for pidx, p in enumerate(permutations):
+        for s in sqs:
+            for c in cams:
+                data = DataFrameSequenceMulti(False, p[0], p[1], p[2])
+                data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], s, cams=c)
+                data.normalize_mega_df()
 
-    name_time = '_sqnc_' + str(5)
-    name_data = 'data_' + 'all'
-    name_epoch = 'epochs_' + str(epochs)
+                name_time = '_sqnc_' + str(s)
+                name_data = 'data_' + permutations_names[pidx]
+                name_epoch = 'epochs_' + str(epochs)
+                name_cam = '_cams_' + str(c)
 
-    ann = ann_model_multi.ANN_Multi(data, epochs,
-                                           'ANN_SEQUENCE_MULTI_testset' + name_epoch + name_time + name_data)
-    ann.set_days(data.get_thesis_test_days())
-    ann.run_experiment()
+                ann = ann_model_multi.ANN_Multi(data, epochs, 'ANN_MULTI_TESTSET' + name_epoch + name_time + name_data + name_cam )
+                ann.set_days(data.get_thesis_test_days())
+                ann.run_experiment()
 
 def run_ann_experiments():
     sqs = [20, 40, 60]
@@ -130,4 +137,5 @@ def optimize():
 
 # run_final_test_days()
 # optimize()
-run_ann_experiments()
+# run_ann_experiments()
+run_final_test_days()
