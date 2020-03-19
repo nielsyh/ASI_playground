@@ -62,7 +62,7 @@ class Metrics:
         f = open(str(model) + ".txt", "a")
         for idx, value in enumerate(x_test):
             for p in list(range(0,20)):
-                Metrics.write_to_file(f, value[-1,1], value[-1,2], value[-1,3], value[-1,4], p+1, y_actual[idx][p], y_pred[idx][p])
+                Metrics.write_to_file(f, value[-1][1], value[-1][2], value[-1][3], value[-1][4], p+1, y_actual[idx][p], y_pred[idx][p])
         f.close()
 
 

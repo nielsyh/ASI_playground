@@ -1,5 +1,5 @@
 from keras import optimizers, Sequential
-from keras.layers import Input, Dense, concatenate, MaxPool2D, GlobalAveragePooling2D, Dropout, Conv2D, Flatten, LSTM
+from keras.layers import Input, Dense, concatenate, MaxPool2D, GlobalAveragePooling2D, Dropout, Conv2D, Flatten, LSTM, CuDNNLSTM
 from keras.callbacks import Callback
 from keras import optimizers
 from metrics import Metrics
@@ -60,15 +60,15 @@ class LSTM_predictor():
         self.history = self.model.fit(self.data.train_x_df, self.data.train_y_df, epochs=epochs, batch_size=batch_size,
                                       validation_data=(self.data.val_x_df, self.data.val_y_df),
                                       callbacks=[TestCallback(self.data.test_x_df, self.data.test_y_df),
-                                                 EarlyStopping(monitor='val_loss', patience=2),
-                                                 ModelCheckpoint(filepath='best_model.h5', monitor='val_loss',
+                                                 EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True),
+                                                 ModelCheckpoint(filepath= str(self.name) + '.h5', monitor='val_loss',
                                                                  save_best_only=True)
-                                                 ]
-                                      )
+                                                 ])
         return self.history
 
 
     def predict(self):
+        self.model = load_model(str(self.name) + '.h5')
         y_pred =  self.model.predict(self.data.test_x_df)
         rmse, mae, mape = Metrics.get_error(self.data.test_y_df, y_pred)
 

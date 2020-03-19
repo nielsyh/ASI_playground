@@ -1,5 +1,3 @@
-import numpy as np
-import matplotlib.pyplot as plt
 from keras.callbacks import Callback
 from keras.regularizers import l2
 from keras import optimizers
@@ -7,8 +5,7 @@ from metrics import Metrics
 from keras.layers import Input, Dense, concatenate, MaxPool2D, GlobalAveragePooling2D, Dropout, Conv2D, Flatten
 import keras
 from keras.models import load_model
-import calendar
-
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 class TestCallback(Callback):
     def __init__(self, xtest, ytest):
@@ -63,11 +60,17 @@ class ANN_Multi():
         self.model = model
 
     def train(self,epochs=50, batch_size=128):
-        self.history = self.model.fit(self.data.train_x_df, self.data.train_y_df, epochs=epochs, batch_size=batch_size, validation_data=(self.data.val_x_df, self.data.val_y_df),
-                       callbacks=[TestCallback(self.data.test_x_df, self.data.test_y_df)])
+        self.history = self.model.fit(self.data.train_x_df, self.data.train_y_df, epochs=epochs, batch_size=batch_size,
+                                      validation_data=(self.data.val_x_df, self.data.val_y_df),
+                                      callbacks=[TestCallback(self.data.test_x_df, self.data.test_y_df),
+                                                 EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True),
+                                                 ModelCheckpoint(filepath= str(self.name) + '.h5', monitor='val_loss',
+                                                                 save_best_only=True)
+                                                 ])
         return self.history
 
     def predict(self):
+        self.model = load_model(str(self.name) + '.h5')
         y_pred =  self.model.predict(self.data.test_x_df)
         rmse, mae, mape = Metrics.get_error(self.data.test_y_df, y_pred)
         return y_pred, rmse, mae, mape

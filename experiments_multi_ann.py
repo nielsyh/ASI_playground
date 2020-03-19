@@ -1,5 +1,3 @@
-from skimage.measure.tests.test_simple_metrics import cam
-
 from data.dataframe_sequence_multi import DataFrameSequenceMulti
 from metrics import Metrics
 from models.models_ts_multi import ann_model_multi
@@ -9,7 +7,7 @@ import threading
 from data.data_helper import plot_history
 
 # init_epochs = 40
-epochs = 36
+epochs = 100 #36
 start = 6
 end = 19
 
@@ -51,7 +49,7 @@ def run_final_test_days():
                 name_epoch = 'epochs_' + str(epochs)
                 name_cam = '_cams_' + str(c)
 
-                ann = ann_model_multi.ANN_Multi(data, epochs, 'ANN_MULTI_TESTSET' + name_epoch + name_time + name_data + name_cam )
+                ann = ann_model_multi.ANN_Multi(data, epochs, 'ANN_MULTI_TESTSET gradient' + name_epoch + name_time + name_data + name_cam )
                 ann.set_days(data.get_thesis_test_days())
                 ann.run_experiment()
 
@@ -78,13 +76,13 @@ def run_ann_experiments():
 
 def ann_test():
     data = DataFrameSequenceMulti(False, True, True, True)
-    data.build_ts_df(6, 19, [8,9], 20)
+    data.build_ts_df(6, 19, [8,9,10], 20)
     data.normalize_mega_df()
     ann = ann_model_multi.ANN_Multi(data, 3, 'ANN_BETA_SEQUENCE_MUTLI_TEST')
     data.split_data_set(9, 27)
     data.flatten_data_set()
     ann.get_model()
-    ann.train(50)
+    ann.train(60)
 
     plot_history('s1',1, ann.history)
     y_pred, rmse, mae, mape = ann.predict()
@@ -139,3 +137,4 @@ def optimize():
 # optimize()
 # run_ann_experiments()
 run_final_test_days()
+# ann_test()

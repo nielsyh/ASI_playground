@@ -30,10 +30,10 @@ def run_final_all_days():
     lstm.run_experiment()
 
 def run_final_test_days():
-    sqs = [5]
-    cams = [1]
-    permutations = [(True, True, True)]
-    permutations_names = ['all data ES']
+    sqs = [5, 10]
+    cams = [1,2]
+    permutations = [(True, True, True), (True, False, False), (False, True, False)]
+    permutations_names = ['all data', 'onsite_only', 'img only']
 
     for pidx, p in enumerate(permutations):
         for s in sqs:
@@ -48,7 +48,7 @@ def run_final_test_days():
                 name_cam = '_cams_' + str(c)
 
                 lstm = lstm_model_multi.LSTM_predictor(data, epochs,
-                                                'LSTM_MULTI_TESTSET' + name_epoch + name_time + name_data + name_cam, pred_csi=False)
+                                                'LSTM_MULTI_TESTSET gradient' + name_epoch + name_time + name_data + name_cam, pred_csi=False)
                 lstm.set_days(data.get_thesis_test_days())
                 lstm.run_experiment()
 
@@ -80,22 +80,22 @@ def run_lstm_experiment():
 
 
 def LSTM_test():
-    data = DataFrameSequenceMulti(False, True, True, True)
-    data.build_ts_df(6,19, [8,9], 10, cams=1, clear_sky_label=True)
-    lstm = lstm_model_multi.LSTM_predictor(data, 100, 'LSTM_TEST', pred_csi=True)
+    data = DataFrameSequenceMulti(False, True, True, True, gradients=True)
+    data.build_ts_df(6, 19, [8,9,10], 5)
+    lstm = lstm_model_multi.LSTM_predictor(data, 100, 'LSTM_TEST')
     data.normalize_mega_df()
-    data.split_data_set(9, 15)
+    data.split_data_set(9, 27)
     data.flatten_data_set_to_3d()
     lstm.get_model()
     lstm.train(50)
     y_pred, rmse, mae, mape = lstm.predict()
     plot_history('s1', 1, lstm.history)
 
-    Metrics.write_results_multi('LSTM_TEST_MULTI csi', data.test_x_df.reshape(
+    Metrics.write_results_multi('LSTM_TEST_MULTI', data.test_x_df.reshape(
         (data.test_x_df.shape[0],
          data.sequence_len_minutes,
          data.number_of_features)),
-                                data.test_label_df, y_pred)
+                                data.test_y_df, y_pred)
 
     print(rmse)
 
@@ -167,3 +167,4 @@ def optimize():
 # optimize()
 # run_lstm_experiment()
 run_final_test_days()
+# LSTM_test()

@@ -34,7 +34,7 @@ def run_final_test_days():
                 name_data = '_data_' + permutations_names[pidx]
                 name_cam = '_cams_' + str(c)
 
-                rf = rf_model_multi.RF_predictor(data, 'RF MULTI TESTSET' + name_cam + name_time + name_data)
+                rf = rf_model_multi.RF_predictor(data, 'RF MULTI TESTSET Gradient' + name_cam + name_time + name_data)
                 rf.set_days(data.get_thesis_test_days())
                 rf.run_experiment()
                 print('Finish rf')

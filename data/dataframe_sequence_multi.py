@@ -2,7 +2,7 @@ import numpy as np
 
 from data.data_helper import month_to_year, get_df_csv_day_RP
 from pvlib_playground import PvLibPlayground
-
+import data.data_helper
 import calendar
 from tqdm import tqdm
 from sklearn.preprocessing import normalize
@@ -34,15 +34,22 @@ class DataFrameSequenceMulti:
     meteor_features = 9
     img_features = 4
     sequence_len_minutes = 60
-
+    gradients = False
     cams = 1
 
-    def __init__(self, debug, onsite_data, img_data, meteor_data):
+    def __init__(self, debug, onsite_data, img_data, meteor_data, gradients=True):
         self.debug = debug
         self.onsite_data  = onsite_data
         self.img_data = img_data
         self.meteor_data = meteor_data
         self.clear_sky_label = False
+
+        if gradients:
+            print('Gradient enabled')
+            self.onsite_features = 3*2
+            self.img_features = 4*2
+            self.gradients = True
+
 
         # first onsite
         if onsite_data:
@@ -63,6 +70,7 @@ class DataFrameSequenceMulti:
         print('Total size: ' + str(self.number_of_features))
 
     def load_features(self):
+        data.data_helper.fix_directory()
         self.features = np.load('x_22_d6to19_m7to12.npy')
 
     def get_feature_data(self, month, day, start, end):
@@ -175,8 +183,10 @@ class DataFrameSequenceMulti:
                         if v < 6:  # always day data 0:5
                             ts[0:minutes, 0:6] = day_data[i:i + minutes, 0:6]
 
-                        elif self.onsite_features and v < 9:  # onsite features
+                        elif self.onsite_data and v < 6 + self.onsite_features:  # onsite features
                             ts[0:minutes, 6:9] = day_data[i:i + minutes, 6:9]
+                            if self.gradients:
+                                ts[0:minutes, 9:12] = np.gradient(day_data[i:i + minutes, 6:9])[0]
 
                         if self.meteor_data and v >= self.meteor_idx and v < self.meteor_idx + self.meteor_features:
                             if v == self.meteor_idx:
@@ -200,12 +210,17 @@ class DataFrameSequenceMulti:
                             elif v == self.meteor_idx + 4:
                                 ts[0:minutes, v] = sun_earth_dis[i:i + minutes]
                             elif v > self.meteor_idx + 4 and v < self.meteor_idx + 9:
-                                ts[0:minutes, v] = [item[v - 14] for item in ephemeris[i:i+minutes]]
+                                x = 14
+                                if self.gradients:
+                                    x = 17
+                                ts[0:minutes, v] = [item[v - x] for item in ephemeris[i:i+minutes]]
 
                         # if img
                         if self.img_data:
                             if v == self.img_idx:
                                 ts[0:minutes, v:v+4] = f[i:i + minutes, 18:22]
+                                if self.gradients:
+                                    ts[0:minutes, v+4:v+8] = np.gradient(f[i:i + minutes, 18:22])[0]
 
 
                         if cams == 2:
@@ -214,8 +229,10 @@ class DataFrameSequenceMulti:
                                 if v < 6:  # always day data 0:5
                                     ts2[0:minutes, 0:6] = day_data2[i:i + minutes, 0:6]
 
-                                elif self.onsite_features and v < 9:  # onsite features
+                                elif self.onsite_data and v < 9:  # onsite features
                                     ts2[0:minutes, 6:9] = day_data2[i:i + minutes, 6:9]
+                                    if self.gradients:
+                                        ts2[0:minutes, 9:12] = np.gradient(day_data2[i:i + minutes, 6:9])[0]
 
                                 if self.meteor_data and v >= self.meteor_idx and v < self.meteor_idx + self.meteor_features:
                                     if v == self.meteor_idx:
@@ -239,12 +256,17 @@ class DataFrameSequenceMulti:
                                     elif v == self.meteor_idx + 4:
                                         ts2[0:minutes, v] = sun_earth_dis2[i:i + minutes]
                                     elif v > self.meteor_idx + 4 and v < self.meteor_idx + 9:
-                                        ts2[0:minutes, v] = [item[v - 14] for item in ephemeris2[i:i + minutes]]
+                                        x = 14
+                                        if self.gradients:
+                                            x = 17
+                                        ts2[0:minutes, v] = [item[v - x] for item in ephemeris2[i:i + minutes]]
 
                                 # if img
                                 if self.img_data:
                                     if v == self.img_idx:
                                         ts2[0:minutes, v:v + 4] = f2[i:i + minutes, 18:22]
+                                        if self.gradients:
+                                            ts2[0:minutes, v + 4:v + 8] = np.gradient(f2[i:i + minutes, 18:22])[0]
 
 
                     self.mega_df_x_1[day_index, i] = ts
@@ -328,7 +350,7 @@ class DataFrameSequenceMulti:
         if self.meteor_data:
             norm_metoer = [self.meteor_idx,self.meteor_idx+1, self.meteor_idx + 4, self.meteor_idx + 5, self.meteor_idx + 6, self.meteor_idx + 7, self.meteor_idx + 8] #[9, 13, 17]
         if self.img_data:
-            norm_img = [self.img_idx, self.img_idx +1 , self.img_idx+ 2, self.img_idx + 3]
+            norm_img = [self.img_idx, self.img_idx +1 , self.img_idx+ 2, self.img_idx + 3, self.img_idx + 4, self.img_idx + 5 , self.img_idx +6, self.img_idx +7]
 
         colums_to_normalize = []
         if self.onsite_data:
