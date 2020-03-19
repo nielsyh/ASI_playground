@@ -76,10 +76,11 @@ def run_ann_experiments():
 
 def ann_test():
     data = DataFrameSequenceMulti(False, True, True, True)
-    data.build_ts_df(6, 19, [8,9,10], 20)
+    data.build_ts_df(6, 19, [7,8,9], 20)
     data.normalize_mega_df()
     ann = ann_model_multi.ANN_Multi(data, 3, 'ANN_BETA_SEQUENCE_MUTLI_TEST')
-    data.split_data_set(9, 27)
+    # data.split_data_set(9, 27)
+    data.split_data_set_EXPRMTL(9, 27, 3)
     data.flatten_data_set()
     ann.get_model()
     ann.train(60)

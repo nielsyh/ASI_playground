@@ -315,6 +315,37 @@ class DataFrameSequenceMulti:
         total.extend(cloudy)
         return total
 
+    def split_data_set_EXPRMTL(self, m, d, val_days):
+        print('Splitting with train until month: ' + str(m) + ', day: ' + str(d) + '...')
+        self.month_split = m
+        self.day_split = d
+
+        day_idx = 0
+        for idx, day in enumerate(self.mega_df_x_1):  # find index month
+            if int(day[0][0][1]) == m and int(day[0][0][2]) == d and day_idx == 0:
+                day_idx = idx
+                print('found: ' + str(day_idx))
+                break
+
+        if self.cams == 1:
+            self.train_x_df = np.copy(self.mega_df_x_1[0:day_idx-val_days])
+            self.train_y_df = np.copy(self.mega_df_y_1[0:day_idx-val_days])
+
+        elif self.cams == 2:  # double training data
+            self.train_x_df = np.concatenate((np.copy(self.mega_df_x_1[0:day_idx-val_days]), np.copy(self.mega_df_x_2[0:day_idx-val_days])))
+            self.train_y_df = np.concatenate((np.copy(self.mega_df_y_1[0:day_idx-val_days]), np.copy(self.mega_df_y_2[0:day_idx-val_days])))
+
+        self.test_x_df = np.copy(self.mega_df_x_1[day_idx])
+        self.val_x_df = np.copy(self.mega_df_x_1[day_idx-val_days:day_idx])
+
+        self.test_y_df = np.copy(self.mega_df_y_1[day_idx])
+        self.val_y_df = np.copy(self.mega_df_y_1[day_idx-val_days:day_idx])
+
+        if self.clear_sky_label:
+            self.test_label_df = np.copy(self.mega_df_label[day_idx])
+
+        print('done')
+
     def split_data_set(self, m, d):
         print('Splitting with train until month: ' + str(m) + ', day: ' + str(d) + '...')
         self.month_split = m

@@ -78,7 +78,7 @@ class ANN_Multi():
     def run_experiment(self):
         for exp in self.day_month_to_predict:
             print('ANN SEQUENCE: ' + str(exp))
-            self.data.split_data_set(exp[0], exp[1])
+            self.data.split_data_set_EXPRMTL(exp[0], exp[1], 3)
 
             self.data.flatten_data_set_to_3d()
             self.data.test_x_df = self.data.test_x_df.reshape(self.data.test_x_df.shape[0], self.data.test_x_df.shape[1]*self.data.test_x_df.shape[2])
