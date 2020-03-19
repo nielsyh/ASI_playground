@@ -15,6 +15,7 @@ def plot_error_per_horizons(errors, horizons, names, title, xl, yl):
     ax = plt.axes()
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
     # plt.setp(ax.get_xticklabels(), rotation=90, horizontalalignment='right', fontsize='x-small')
+    plt.ylim(0, 150)
 
     lines = ['-','-','-','-','-','-','-',
              '--','--','--','--','--','--','--',
@@ -417,6 +418,7 @@ def plot_err_hor_all(model, max_models=6):
     rmse_persistence = []
     mae_persistence = []
     mape_persistence = []
+
     for i in range(0, 20):
         actual, pred, _ = data_helper.get_persistence_dates(t, 6, 19, i + 1)
         rmse, mae, mape = Metrics.get_error(actual, pred)

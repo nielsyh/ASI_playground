@@ -104,42 +104,21 @@ def generate_img_for_cnn(month, day, hour, minute, second, pred_horizon, model='
                 gen3 = generate_next_img_LK(frame_1, frame_2)
             return pre_process_img(gen3,400)
 
-# f1 = cv2.imread('asi_16124/20190821/20190821120115_11.jpg')
-# f2 = cv2.imread('asi_16124/20190821/20190821120130_11.jpg')
-# f3 = cv2.imread('asi_16124/20190821/20190821120145_11.jpg')
-# #
-# #preprocess
-# # a = Features()
-# opt = OpticalFlow()
-#
-# frame1 = get_full_image_by_date_time(9,9,12,0,0)
-# frame2 = get_full_image_by_date_time(9,9,12,5,0)
-# frame3 = get_full_image_by_date_time(9,9,12,10,0)
-# print(frame1, frame2)
-# gen3, hsv = generate_next_img(frame1, frame2)
-# #
-# frame1 = pre_process_img(frame1,400)
-# frame2 = pre_process_img(frame2,400)
-# frame3 = pre_process_img(frame3,400)
-# gen3 = pre_process_img(gen3,400)
-# hsv = pre_process_img(hsv,400)
-#
-# show_img(frame1)
-# show_img(frame2)
-# show_img(frame3)
-# show_img(gen3)
 
-# get_LK_flow(frame1, frame2)
+frame1 = get_full_image_by_date_time(8,21,12,0,0)
+frame2 = get_full_image_by_date_time(8,21,12,2,0)
+frame3 = get_full_image_by_date_time(8,21,12,4,0)
 
-# cv2.imshow("orig 1", frame1)
-# cv2.imshow("orig 2", frame2)
-# cv2.imshow("generated 3", gen3)
-# cv2.imshow("orig 3", frame3)
-# cv2.imshow("hsv", hsv)
-#
-# k = cv2.waitKey(0) & 0xff
-# 
-# cv2.destroyAllWindows()
+show_img(frame1)
+show_img(frame2)
+show_img(frame3)
+
+lk = generate_next_img_LK(frame1, frame2)
+fb, hsv = generate_next_img_FB(frame1, frame2)
+
+
+show_img(lk)
+show_img(fb)
 
 
 
