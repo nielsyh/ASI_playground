@@ -7,7 +7,7 @@ import keras
 from keras.models import load_model
 import calendar
 import pvlib_playground
-
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 class TestCallback(Callback):
     def __init__(self, xtest, ytest):
@@ -59,7 +59,12 @@ class LSTM_predictor():
     def train(self,epochs=50, batch_size=128):
         self.history = self.model.fit(self.data.train_x_df, self.data.train_y_df, epochs=epochs, batch_size=batch_size,
                                       validation_data=(self.data.val_x_df, self.data.val_y_df),
-                                      callbacks=[TestCallback(self.data.test_x_df, self.data.test_y_df)])
+                                      callbacks=[TestCallback(self.data.test_x_df, self.data.test_y_df),
+                                                 EarlyStopping(monitor='val_loss', patience=2),
+                                                 ModelCheckpoint(filepath='best_model.h5', monitor='val_loss',
+                                                                 save_best_only=True)
+                                                 ]
+                                      )
         return self.history
 
 

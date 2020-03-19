@@ -6,7 +6,7 @@ import sys
 from keras import optimizers
 from data.data_helper import plot_history
 
-epochs = 54
+epochs = 100
 start = 6
 end = 19
 
@@ -30,10 +30,10 @@ def run_final_all_days():
     lstm.run_experiment()
 
 def run_final_test_days():
-    sqs = [3,5,10]
-    cams = [1,2]
-    permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
-    permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
+    sqs = [5]
+    cams = [1]
+    permutations = [(True, True, True)]
+    permutations_names = ['all data ES']
 
     for pidx, p in enumerate(permutations):
         for s in sqs:

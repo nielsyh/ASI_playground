@@ -15,9 +15,9 @@ min_vals = []
 min_loss = []
 
 def run_lstm_experiments():
-    sqs = [5, 10, 20]
-    permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
-    permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
+    sqs = [5]
+    permutations = [(True, True, True)]
+    permutations_names = ['all data']
     for idx, p in enumerate(permutations):
         for s in sqs:
             for i in prediction_horizons:
@@ -33,7 +33,7 @@ def LSTM_experiment(prediction_horizon, minutes_sequence, data, data_name):
     name_data = 'data_' + str(data_name)
     name_pred = 'ph_' + str(prediction_horizon)
 
-    lstm = lstm_model.LSTM_predictor(data, epochs, epochs, 'LSTM_SEQUENCE' + name_epoch + name_time + name_data + name_pred)
+    lstm = lstm_model.LSTM_predictor(data, epochs, epochs, 'LSTM_SEQUENCE ES' + name_epoch + name_time + name_data + name_pred)
     lstm.set_days(data.get_prem_days())
     lstm.run_experiment()
 

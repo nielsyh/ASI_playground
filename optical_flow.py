@@ -76,6 +76,7 @@ def warp_flow(img, flow):
     res = cv2.remap(img, flow, None, cv2.INTER_LINEAR)
     return res
 
+
 def generate_next_img_FB(frame1, frame2):
     frame1_g = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
     frame2_g = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
@@ -106,8 +107,8 @@ def generate_img_for_cnn(month, day, hour, minute, second, pred_horizon, model='
 
 
 frame1 = get_full_image_by_date_time(8,21,12,0,0)
-frame2 = get_full_image_by_date_time(8,21,12,2,0)
-frame3 = get_full_image_by_date_time(8,21,12,4,0)
+frame2 = get_full_image_by_date_time(8,21,12,1,0)
+frame3 = get_full_image_by_date_time(8,21,12,2,0)
 
 show_img(frame1)
 show_img(frame2)
