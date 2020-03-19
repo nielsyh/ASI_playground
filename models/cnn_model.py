@@ -107,19 +107,17 @@ class CnnNet:
         plt.clf()
         plt.close()
 
-    def build_prem_models(self):
-        prem = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
-        for tup in tqdm(prem, total=len(prem), unit='Days to train'):
-            self.data.split_data_set(tup[0], tup[1])
-            self.data.flatten_data_set_CNN()
-            self.get_model(400)
-            epochs = self.epochs
-            self.train(epochs=epochs)
-            name = str(tup[0]) + str(tup[1])
-            # self.plot_history(name, name, self.history)
-            self.save_model(name)
-            print('Done: ' + str(name))
-            self.model = None
+    def build_prem_models(self, tup):
+        self.data.split_data_set(tup[0], tup[1])
+        self.data.flatten_data_set_CNN()
+        self.get_model(400)
+        epochs = self.epochs
+        self.train(epochs=epochs)
+        name = str(tup[0]) + str(tup[1])
+        # self.plot_history(name, name, self.history)
+        self.save_model(name)
+        print('Done: ' + str(name))
+        self.model = None
 
     def run_experiment(self):
         self.day_month_to_predict = []
