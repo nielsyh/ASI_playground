@@ -19,6 +19,7 @@ class CnnNet:
         self.init_train = True
         self.epochs = epochs
         self.modelarch = modelarch
+        self.model = None
 
     def get_model(self, image_res):
 
@@ -115,11 +116,10 @@ class CnnNet:
             epochs = self.epochs
             self.train(epochs=epochs)
             name = str(tup[0]) + str(tup[1])
-
-            self.plot_history(name, name, self.history)
-
+            # self.plot_history(name, name, self.history)
             self.save_model(name)
             print('Done: ' + str(name))
+            self.model = None
 
     def run_experiment(self):
         self.day_month_to_predict = []
