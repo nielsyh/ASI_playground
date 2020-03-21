@@ -298,9 +298,9 @@ class DataFrameNormal:
                 print('found: ' + str(day_idx))
                 break
 
-        self.train_df = self.mega_df[0:day_idx]
+        self.train_df = self.mega_df[0:day_idx-3]
         self.test_df = self.mega_df[day_idx]
-        self.val_df = self.mega_df[day_idx+1: len(self.mega_df)]
+        self.val_df = self.mega_df[day_idx-3: day_idx]
 
         print('done')
 
