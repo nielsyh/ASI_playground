@@ -12,6 +12,7 @@ class DataFrameSequenceMulti:
 
     meteor_data = True
     mega_df_x_1 = None
+    df_norm = None
     mega_df_y_1 = None
     mega_df_label = None
 
@@ -20,6 +21,7 @@ class DataFrameSequenceMulti:
 
     train_x_df = None
     test_x_df = None
+    test_x_norm = None
     val_x_df = None
 
     train_y_df = None
@@ -328,7 +330,8 @@ class DataFrameSequenceMulti:
                 break
 
         if self.cams == 1:
-            self.train_x_df = np.copy(self.mega_df_x_1[0:day_idx-val_days])
+            # self.train_x_df = np.copy(self.df_norm[0:day_idx-val_days])
+            self.train_x_df = np.copy(self.mega_df_x_1[0:day_idx - val_days])
             self.train_y_df = np.copy(self.mega_df_y_1[0:day_idx-val_days])
 
         elif self.cams == 2:  # double training data
@@ -336,7 +339,9 @@ class DataFrameSequenceMulti:
             self.train_y_df = np.concatenate((np.copy(self.mega_df_y_1[0:day_idx-val_days]), np.copy(self.mega_df_y_2[0:day_idx-val_days])))
 
         self.test_x_df = np.copy(self.mega_df_x_1[day_idx])
-        self.val_x_df = np.copy(self.mega_df_x_1[day_idx-val_days:day_idx])
+        # self.test_x_norm = np.copy(self.df_norm[day_idx])
+        # self.val_x_df = np.copy(self.df_norm[day_idx-val_days:day_idx])
+        self.val_x_df = np.copy(self.mega_df_x_1[day_idx - val_days:day_idx])
 
         self.test_y_df = np.copy(self.mega_df_y_1[day_idx])
         self.val_y_df = np.copy(self.mega_df_y_1[day_idx-val_days:day_idx])
@@ -376,12 +381,54 @@ class DataFrameSequenceMulti:
 
         print('done')
 
+    def scale_mega(self, model='ann'):
+        from sklearn import preprocessing
+
+        if model == 'ann':
+            ctn = [0,self.img_idx, self.img_idx +1 , self.img_idx+ 2, self.img_idx + 3]
+        if model == 'lstm':
+            # ctn = [0, 6, 7, 8, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,25]
+            ctn = [0, 6, 7, 8]
+
+        print('scaling for :')
+        print(ctn)
+
+        shape = self.mega_df_x_1.shape
+        a = np.copy(self.mega_df_x_1.reshape(shape[0] * shape[1] * shape[2], shape[3]))
+
+
+        # a[:, ctn] = preprocessing.scale(a[:, ctn])
+        min_max_scaler = preprocessing.MinMaxScaler()
+        a[:, ctn] = min_max_scaler.fit_transform(a[:, ctn])
+
+        self.mega_df_x_1 = a.reshape(shape)
+
+
+
+    def normalize_mega_EXPRTML(self, norm=True):
+        from sklearn.preprocessing import StandardScaler  # for normalization
+        from sklearn.preprocessing import MinMaxScaler
+
+        shape = self.mega_df_x_1.shape
+        a = np.copy(self.mega_df_x_1.reshape(shape[0]* shape[1]* shape[2], shape[3]))
+
+        if norm:
+            ctn = [0,1,2,3,4,5,6,7,8,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26]
+            ctn = [0]
+            a[:,ctn] = normalize(a[:, ctn], axis=0, norm='l2')
+
+        self.df_norm = a.reshape(shape)
+
     def normalize_mega_df(self):
-        norm_onsite = [1, 2, 3, 4, 5, 6, 7, 8]
+        # norm_onsite = [1, 2, 3, 4, 5, 6, 7, 8]
+        norm_onsite = [6,7,8]
+        norm_onsite = [0]
         if self.meteor_data:
-            norm_metoer = [self.meteor_idx,self.meteor_idx+1, self.meteor_idx + 4, self.meteor_idx + 5, self.meteor_idx + 6, self.meteor_idx + 7, self.meteor_idx + 8] #[9, 13, 17]
+            norm_metoer = []
+            # norm_metoer = [self.meteor_idx,self.meteor_idx+1, self.meteor_idx + 4, self.meteor_idx + 5, self.meteor_idx + 6, self.meteor_idx + 7, self.meteor_idx + 8] #[9, 13, 17]
         if self.img_data:
-            norm_img = [self.img_idx, self.img_idx +1 , self.img_idx+ 2, self.img_idx + 3, self.img_idx + 4, self.img_idx + 5 , self.img_idx +6, self.img_idx +7]
+            norm_img = [self.img_idx, self.img_idx +1 , self.img_idx+ 2, self.img_idx + 3] #, self.img_idx + 4, self.img_idx + 5 , self.img_idx +6, self.img_idx +7]
+            norm_img = []
 
         colums_to_normalize = []
         if self.onsite_data:
@@ -394,7 +441,8 @@ class DataFrameSequenceMulti:
         print('Mega normalzing for: ' + str(colums_to_normalize))
 
         shape = self.mega_df_x_1.shape
-        a = self.mega_df_x_1.reshape(shape[2], shape[0]*shape[1]*shape[3])
+        a = np.copy(self.mega_df_x_1.reshape(shape[0] * shape[1] * shape[2], shape[3]))
+        # a = self.mega_df_x_1.reshape(shape[2], shape[0]*shape[1]*shape[3])
         a[:, colums_to_normalize]  = normalize(a[:, colums_to_normalize], axis=0, norm='l2')
         self.mega_df_x_1 = a.reshape(shape)
 
@@ -421,6 +469,10 @@ class DataFrameSequenceMulti:
 
         self.test_x_df = self.test_x_df.reshape(self.test_x_df.shape[0],
                                                 self.sequence_len_minutes * self.number_of_features)
+
+        # self.test_x_norm = self.test_x_norm.reshape(self.test_x_norm.shape[0],
+        #                                         self.sequence_len_minutes * self.number_of_features)
+
 
         self.val_x_df = self.val_x_df.reshape(self.val_x_df.shape[0] * self.val_x_df.shape[1],
                                               self.sequence_len_minutes, self.number_of_features)

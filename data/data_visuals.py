@@ -11,7 +11,7 @@ style.use('seaborn-poster') #sets the size of the charts
 style.use('ggplot')
 from matplotlib.ticker import FuncFormatter, MaxNLocator
 
-def plot_error_per_horizons(errors, horizons, names, title, xl, yl):
+def plot_error_per_horizons(errors, horizons, names, title, xl, yl, save_as='none'):
     ax = plt.axes()
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
     # plt.setp(ax.get_xticklabels(), rotation=90, horizontalalignment='right', fontsize='x-small')
@@ -29,7 +29,13 @@ def plot_error_per_horizons(errors, horizons, names, title, xl, yl):
     plt.title(title)
     plt.xlabel(xl)
     plt.ylabel(yl)
-    plt.show()
+
+    if save_as != 'none':
+        data.data_helper.fix_directory()
+        plt.savefig(save_as)
+    else:
+        plt.show()
+
     plt.close()
 
 def plot_with_times(predicts, times, names, title, yl, xl = 'Days'):
@@ -385,7 +391,7 @@ def plot_err_day_split(model, prediction_horizon):
     plot_error_per_horizons(trmse, times, names, 'AVG RMSE per hour', 'hours', 'avg error in RMSE')
 
 
-def plot_err_hor_all(model, max_models=6):
+def plot_err_hor_all(model, max_models=6, save=0):
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
 
     if model == 'ann':
@@ -461,15 +467,25 @@ def plot_err_hor_all(model, max_models=6):
         tmae.append(mae)
         tmape.append(mape)
 
+    id = 0
     for i in range(0, len(trmse), max_models):
+        if save == 0:
+            save_as = ['none','none','none']
+        else:
+            name_rmse = 'final_plots_val/' + model + '_prem_rmse_' + str(id) + '.jpg'
+            name_mae = 'final_plots_val/' + model + '_prem_mae_' + str(id) + '.jpg'
+            name_mape = 'final_plots_val/' + model + '_prem_mape_' + str(id) + '.jpg'
+            save_as = [name_rmse, name_mae, name_mape]
+
         plot_error_per_horizons([rmse_persistence] + trmse[i:i+max_models], predictions, ['Persistence'] + names[i:i+max_models],
-                                'RMSE per prediction horizon', 'Prediction Horizon in minutes', 'Error in RMSE')
+                                'RMSE per prediction horizon', 'Prediction Horizon in minutes', 'Error in RMSE', save_as[0])
 
         plot_error_per_horizons([mae_persistence] + tmae[i:i+max_models], predictions, ['Persistence'] + names[i:i+max_models],
-                                'MAE per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAE')
+                                'MAE per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAE', save_as[1])
 
         plot_error_per_horizons([mape_persistence] + tmape[i:i+max_models], predictions, ['Persistence'] + names[i:i+max_models],
-                                'MAPE per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAPE')
+                                'MAPE per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAPE', save_as[2])
+        id = id + 1
 
 def plot_err_hor_multi(model):
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]

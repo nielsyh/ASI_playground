@@ -19,9 +19,9 @@ def run_final_all_days():
     rf.run_experiment()
 
 def run_final_test_days():
-    permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
-    permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
-    sqs = [5, 10, 20, 30, 40]
+    permutations = [(True, True, True), (True, False, False), (False, True, False)]
+    permutations_names = ['all data', 'onsite_only', 'img only']
+    sqs = [10, 30]
     cams = [1, 2]
     for c in cams:
         for pidx, p in enumerate(permutations):

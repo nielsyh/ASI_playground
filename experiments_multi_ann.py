@@ -33,23 +33,24 @@ def run_final_all_days():
     ann.run_experiment()
 
 def run_final_test_days():
-    sqs = [10, 20, 40]
+    sqs = [10, 20]
     cams = [1,2]
-    permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
+    permutations = [(True, True, True), (True, False, False), (False, True, False)]
     permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
     for pidx, p in enumerate(permutations):
         for s in sqs:
             for c in cams:
                 data = DataFrameSequenceMulti(False, p[0], p[1], p[2])
                 data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], s, cams=c)
-                data.normalize_mega_df()
+                # data.normalize_mega_df()
+                data.scale_mega(model='ann')
 
                 name_time = '_sqnc_' + str(s)
                 name_data = 'data_' + permutations_names[pidx]
                 name_epoch = 'epochs_' + str(epochs)
                 name_cam = '_cams_' + str(c)
 
-                ann = ann_model_multi.ANN_Multi(data, epochs, 'ANN_MULTI_TESTSET gradient' + name_epoch + name_time + name_data + name_cam )
+                ann = ann_model_multi.ANN_Multi(data, epochs, 'ANN TSET grad' + name_time + name_data + name_cam )
                 ann.set_days(data.get_thesis_test_days())
                 ann.run_experiment()
 
@@ -77,10 +78,11 @@ def run_ann_experiments():
 def ann_test():
     data = DataFrameSequenceMulti(False, True, True, True)
     data.build_ts_df(6, 19, [7,8,9], 20)
-    data.normalize_mega_df()
+    # data.normalize_mega_EXPRTML(norm=True)
+    data.scale_mega(model='ann')
     ann = ann_model_multi.ANN_Multi(data, 3, 'ANN_BETA_SEQUENCE_MUTLI_TEST')
     # data.split_data_set(9, 27)
-    data.split_data_set_EXPRMTL(9, 27, 3)
+    data.split_data_set_EXPRMTL(9, 15, 3)
     data.flatten_data_set()
     ann.get_model()
     ann.train(60)

@@ -308,14 +308,13 @@ def get_files_all_results():
 
 def get_files_test_set():
 
-    files = ['persistence','RF SEQUENCE multi testset_sqnc_30data_all.txt',
+    files = ['persistence',
+             'Results test set/RF/RF MULTI TESTSET_cams_2_sqnc_30_data_img only.txt',
              'ANN_SEQUENCE_MULTI_testsetepochs_40_sqnc_5data_all.txt',
-             'LSTM_SEQUENCE_MULTI_testsetepochs_50_sqnc_5data_all.txt',
-             'LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_all data 2 cam.txt',
-             ''
+             'Results test set/ANN/ANN_MULTI_TESTSET gradientepochs_100_sqnc_20data_all data_cams_1.txt'
              ]
 
-    names = ['Persistence', 'rf 30', 'ann 20', 'lstm 5', 'LSTM 5 2cam']
+    names = ['Persistence', 'rf 30 img', 'ann 20', 'ANN M 20 All data']
 
     return files, names
 

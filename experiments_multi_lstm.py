@@ -40,7 +40,8 @@ def run_final_test_days():
             for c in cams:
                 data = DataFrameSequenceMulti(False, p[0], p[1], p[2])
                 data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], s, cams=c, clear_sky_label=False)
-                data.normalize_mega_df()
+                # data.normalize_mega_df()
+                data.scale_mega(model='lstm')
 
                 name_time = '_sqnc_' + str(s)
                 name_data = 'data_' + permutations_names[pidx]
@@ -48,7 +49,7 @@ def run_final_test_days():
                 name_cam = '_cams_' + str(c)
 
                 lstm = lstm_model_multi.LSTM_predictor(data, epochs,
-                                                'LSTM_MULTI_TESTSET gradient' + name_epoch + name_time + name_data + name_cam, pred_csi=False)
+                                                'LSTM_TSET GRAD' + name_time + name_data + name_cam, pred_csi=False)
                 lstm.set_days(data.get_thesis_test_days())
                 lstm.run_experiment()
 
@@ -81,13 +82,15 @@ def run_lstm_experiment():
 
 def LSTM_test():
     data = DataFrameSequenceMulti(False, True, True, True, gradients=True)
-    data.build_ts_df(6, 19, [8,9,10], 5)
+    data.build_ts_df(6, 19, [7,8,9], 5)
     lstm = lstm_model_multi.LSTM_predictor(data, 100, 'LSTM_TEST')
-    data.normalize_mega_df()
-    data.split_data_set(9, 27)
+    # data.normalize_mega_df()
+    # data.normalize_mega_EXPRTML(norm=True)
+    data.split_data_set_EXPRMTL(9, 15, 3)
+    data.scale_mega(model='lstm')
     data.flatten_data_set_to_3d()
     lstm.get_model()
-    lstm.train(50)
+    lstm.train(100)
     y_pred, rmse, mae, mape = lstm.predict()
     plot_history('s1', 1, lstm.history)
 
@@ -162,9 +165,8 @@ def optimize():
     print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
 
 
-# run_final_test_days()
 # LSTM_test()
 # optimize()
 # run_lstm_experiment()
-run_final_test_days()
 # LSTM_test()
+run_final_test_days()
