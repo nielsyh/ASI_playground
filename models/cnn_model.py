@@ -76,7 +76,7 @@ class CnnNet:
     def train(self, epochs=50, batch_size=16):
         self.history = self.model.fit(self.data.x_train, self.data.y_train, epochs=epochs, batch_size=batch_size,
                                       validation_data=(self.data.x_val, self.data.y_val),
-                                      callbacks=[TestCallback(self.data.test_x_df, self.data.test_y_df),
+                                      callbacks=[TestCallback(self.data.mega_df_x, self.data.mega_df_y),
                                                  EarlyStopping(monitor='val_loss', patience=10,
                                                                restore_best_weights=True),
                                                  ModelCheckpoint(filepath='best_cnn.h5', monitor='val_loss',
