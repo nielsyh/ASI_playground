@@ -383,21 +383,22 @@ class DataFrameSequenceMulti:
 
     def scale_mega(self, model='ann'):
         from sklearn import preprocessing
+        ctn = [0]
 
         if model == 'ann':
-            ctn = [0]
+            print('scale for ann')
             if self.img_data:
                 ctn.extend([0,self.img_idx, self.img_idx +1 , self.img_idx+ 2, self.img_idx + 3])
 
         if model == 'lstm':
-            ctn = [0]
+            print('scale for lstm')
             if self.onsite_data:
                 ctn.extend([6, 7, 8])
 
         if model == 'rf':
-            cnt = [0]
+            print('scale for rf')
 
-        print('scaling for :')
+        print('scaling features :')
         print(ctn)
 
         shape = self.mega_df_x_1.shape
