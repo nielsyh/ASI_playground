@@ -19,8 +19,8 @@ def run_final_all_days():
     rf.run_experiment()
 
 def run_final_test_days():
-    permutations = [(True, True, True), (True, False, False), (False, True, False)]
-    permutations_names = ['all data', 'onsite_only', 'img only']
+    permutations = [(True, False, False), (False, True, False)]
+    permutations_names = ['onsite_only', 'img only']
     sqs = [10, 30]
     cams = [1, 2]
     for c in cams:
@@ -28,7 +28,7 @@ def run_final_test_days():
             for s in sqs:
                 data = DataFrameSequenceMulti(False, p[0], p[1], p[2])
                 data.build_ts_df(start,end,[7,8,9,10,11,12],s, cams=c)
-                data.normalize_mega_df()
+                data.scale_mega(model='rf')
 
                 name_time = '_sqnc_' + str(s)
                 name_data = '_data_' + permutations_names[pidx]

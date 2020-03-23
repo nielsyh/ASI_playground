@@ -385,39 +385,33 @@ class DataFrameSequenceMulti:
         from sklearn import preprocessing
 
         if model == 'ann':
-            ctn = [0,self.img_idx, self.img_idx +1 , self.img_idx+ 2, self.img_idx + 3]
+            ctn = [0]
+            if self.img_data:
+                ctn.extend([0,self.img_idx, self.img_idx +1 , self.img_idx+ 2, self.img_idx + 3])
+
         if model == 'lstm':
-            # ctn = [0, 6, 7, 8, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,25]
-            ctn = [0, 6, 7, 8]
+            ctn = [0]
+            if self.onsite_data:
+                ctn.extend([6, 7, 8])
+
+        if model == 'rf':
+            cnt = [0]
 
         print('scaling for :')
         print(ctn)
 
         shape = self.mega_df_x_1.shape
         a = np.copy(self.mega_df_x_1.reshape(shape[0] * shape[1] * shape[2], shape[3]))
-
-
-        # a[:, ctn] = preprocessing.scale(a[:, ctn])
         min_max_scaler = preprocessing.MinMaxScaler()
         a[:, ctn] = min_max_scaler.fit_transform(a[:, ctn])
-
         self.mega_df_x_1 = a.reshape(shape)
 
+        if self.cams == 2:
+            shape = self.mega_df_x_2.shape
+            b = self.mega_df_x_2.reshape(shape[0] * shape[1] * shape[2], shape[3])
+            b[:, ctn] = min_max_scaler.fit_transform(b[:, ctn])
+            self.mega_df_x_2 = b.reshape(shape)
 
-
-    def normalize_mega_EXPRTML(self, norm=True):
-        from sklearn.preprocessing import StandardScaler  # for normalization
-        from sklearn.preprocessing import MinMaxScaler
-
-        shape = self.mega_df_x_1.shape
-        a = np.copy(self.mega_df_x_1.reshape(shape[0]* shape[1]* shape[2], shape[3]))
-
-        if norm:
-            ctn = [0,1,2,3,4,5,6,7,8,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26]
-            ctn = [0]
-            a[:,ctn] = normalize(a[:, ctn], axis=0, norm='l2')
-
-        self.df_norm = a.reshape(shape)
 
     def normalize_mega_df(self):
         # norm_onsite = [1, 2, 3, 4, 5, 6, 7, 8]
