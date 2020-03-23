@@ -20,6 +20,9 @@ import calendar
 import pickle
 
 
+
+
+
 def get_folders_ann():
     folders = [
                 # 'results_18march/single/ann/ANN_SEQUENCEepochs_40_sqnc_5data_all dataph_',
@@ -233,7 +236,6 @@ def get_files_lstm_multi():
             tmp_name = tmp_name + ' 5'
         elif 'sqnc_10' in f:
             tmp_name = tmp_name + ' 10'
-
         if 'all data' in f:  # data type
             tmp_name = tmp_name + ' all data'
         elif 'onsite' in f:
@@ -242,10 +244,8 @@ def get_files_lstm_multi():
             tmp_name = tmp_name + ' img'
         elif 'meteor' in f:
             tmp_name = tmp_name + ' meteor'
-
         if 'cams_2' in f:  # 2 cam?
             tmp_name = tmp_name + ' 2CAM'
-
         if 'clrsky' in f:
             tmp_name = tmp_name + ' Prz'
 
@@ -297,26 +297,52 @@ def get_files_rf_multi():
 
     return files, names
 
-def get_files_all_results():
-    files = ['RF SEQUENCE multi_sqnc_30data_all.txt',
-             'LSTM_SEQUENCE_MULTI_alldata_epochs_50_sqnc_5data_all.txt'
-             ]
+def build_name(arr):
+    names = []
 
-    names = ['RF 30 all data','LSTM 5 all data']
+    for str in arr:
+        tmp_name = ''
+        if 'RF' in str:
+            tmp_name = 'RF M'
+        elif 'ANN' in str:
+            tmp_name = 'ANN M'
+        elif 'LSTM' in str:
+            tmp_name = 'LSTM M'
 
+        if 'sqnc_3' in str:  # seq length
+            tmp_name = tmp_name + ' 3'
+        elif 'sqnc_5' in str:
+            tmp_name = tmp_name + ' 5'
+        elif 'sqnc_10' in str:
+            tmp_name = tmp_name + ' 10'
+
+        if 'all data' in str:  # data type
+            tmp_name = tmp_name + ' all data'
+        elif 'onsite' in str:
+            tmp_name = tmp_name + ' onsite'
+        elif 'img only' in str:
+            tmp_name = tmp_name + ' img'
+        elif 'meteor' in str:
+            tmp_name = tmp_name + ' meteor'
+
+        if 'cams_2' in str:  # 2 cam?
+            tmp_name = tmp_name + ' 2CAM'
+        if 'clrsky' in str:
+            tmp_name = tmp_name + ' Prz'
+
+        names.append(tmp_name)
+
+    return names
+
+def get_files_lstm_test():
+    files = [
+       'Results test set/LSTM/LSTM_TSET GRAD_sqnc_5data_all data_cams_1.txt',
+       'Results test set/LSTM/LSTM_MULTI_TESTSET gradient_epochs_100_sqnc_5data_all data_cams_1.txt',
+       'Results test set/LSTM/LSTM_MULTI_TESTSET gradient_epochs_100_sqnc_10data_all data_cams_1.txt'
+    ]
+    names = build_name(files)
     return files, names
 
-def get_files_test_set():
-
-    files = ['persistence',
-             'Results test set/RF/RF MULTI TESTSET_cams_2_sqnc_30_data_img only.txt',
-             'ANN_SEQUENCE_MULTI_testsetepochs_40_sqnc_5data_all.txt',
-             'Results test set/ANN/ANN_MULTI_TESTSET gradientepochs_100_sqnc_20data_all data_cams_1.txt'
-             ]
-
-    names = ['Persistence', 'rf 30 img', 'ann 20', 'ANN M 20 All data']
-
-    return files, names
 
 def dump_list(nm, ls):
     with open('persistence/' + nm, 'wb') as filehandle:
@@ -904,7 +930,7 @@ def get_persistence_dates(tups, start, end, pred_hor, offset=0):
 
 def get_thesis_test_days():  # test days personal research
     sunny = [(9, 15), (10, 15), (11, 15), (12, 15)]
-    pcloudy = [(10, 20), (11, 17), (12, 16)]
+    pcloudy = [(10, 21), (11, 17), (12, 16)]
     cloudy = [(10, 22), (12, 3)]
     total = []
     total.extend(sunny)

@@ -82,13 +82,14 @@ def run_lstm_experiment():
 
 def LSTM_test():
     data = DataFrameSequenceMulti(False, True, True, True, gradients=True)
+
     data.build_ts_df(6, 19, [7,8,9], 5)
     lstm = lstm_model_multi.LSTM_predictor(data, 100, 'LSTM_TEST')
-    # data.normalize_mega_df()
-    # data.normalize_mega_EXPRTML(norm=True)
+
     data.split_data_set_EXPRMTL(9, 15, 3)
     data.scale_mega(model='lstm')
     data.flatten_data_set_to_3d()
+
     lstm.get_model()
     lstm.train(100)
     y_pred, rmse, mae, mape = lstm.predict()

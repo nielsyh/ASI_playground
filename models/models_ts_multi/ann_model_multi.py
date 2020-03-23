@@ -79,18 +79,15 @@ class ANN_Multi():
         for exp in self.day_month_to_predict:
             print('ANN SEQUENCE: ' + str(exp))
             self.data.split_data_set_EXPRMTL(exp[0], exp[1], 3)
-
-            self.data.flatten_data_set_to_3d()
-            self.data.test_x_df = self.data.test_x_df.reshape(self.data.test_x_df.shape[0], self.data.test_x_df.shape[1]*self.data.test_x_df.shape[2])
-            self.data.train_x_df = self.data.train_x_df.reshape(self.data.train_x_df.shape[0], self.data.train_x_df.shape[1]*self.data.train_x_df.shape[2])
-            self.data.val_x_df = self.data.val_x_df.reshape(self.data.val_x_df.shape[0], self.data.val_x_df.shape[1]*self.data.val_x_df.shape[2])
+            self.data.flatten_data_set()
 
             self.get_model()
 
             epochs = self.epochs
             self.train(epochs=epochs)
-            # self.plot_history()
             y_pred, rmse, mae, mape = self.predict()
+            print('RMSE:')
+            print(rmse)
 
             Metrics.write_results_multi(str(self.name), self.data.test_x_df.reshape(
                 (self.data.test_x_df.shape[0],

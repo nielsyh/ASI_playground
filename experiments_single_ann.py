@@ -113,6 +113,6 @@ def optimize():
     print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
 
 
-run_ann_experiments()
-
+# run_ann_experiments()
+ann
 

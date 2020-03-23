@@ -96,7 +96,13 @@ def get_all_TP(file):
 
     return actual, predicted
 
-def get_all_TP_multi(file, split=False):
+def get_all_TP_multi(file, split=False, md_split=False):
+
+    if split:
+        print('SPLIT')
+    if md_split:
+        print('MD SPLIT: ' + str(md_split))
+
     actual = [[] for x in range(20)]
     predicted = [[] for x in range(20)]
     times = [[] for x in range(20)]
@@ -117,6 +123,11 @@ def get_all_TP_multi(file, split=False):
 
             if split:
                 if hour < split[0] or hour > split[1]:
+                    continue
+            if md_split:
+                if md_split[0] != month:
+                    continue
+                if md_split[1] != day:
                     continue
 
             a = datetime.datetime(year=2019, month=int(month), day=int(day), hour=int(hour), minute=int(minute))
@@ -293,8 +304,6 @@ def construct_hybrid():
     #                         'MAPE Error per prediction horizon (multi)', 'Prediction Horizon in minutes',
     #                         'Error in MAPE')
 
-
-
 def plot_multiple_days():
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
     files, names = data_helper.get_files_lstm_multi()
@@ -389,6 +398,9 @@ def plot_err_day_split(model, prediction_horizon):
         trmse.append(tmp_rmse)
 
     plot_error_per_horizons(trmse, times, names, 'AVG RMSE per hour', 'hours', 'avg error in RMSE')
+
+
+
 
 
 def plot_err_hor_all(model, max_models=6, save=0):

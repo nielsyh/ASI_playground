@@ -94,9 +94,11 @@ class LSTM_predictor():
             self.get_model()
 
             epochs = self.epochs
-            self.train(epochs=epochs)
+            self.train(epochs=100)
 
             y_pred, rmse, mae, mape = self.predict()
+            print('RMSE:')
+            print(rmse)
 
             if self.data.clear_sky_label:
                 Metrics.write_results_multi(str(self.name) + '_clrsky_' , self.data.test_x_df.reshape(

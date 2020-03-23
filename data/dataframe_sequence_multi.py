@@ -387,13 +387,22 @@ class DataFrameSequenceMulti:
 
         if model == 'ann':
             print('scale for ann')
+            if self.onsite_data:
+                ctn.extend([6, 7, 8, 9, 10, 11])
+            if self.meteor_data:
+                ctn.extend([self.meteor_idx, self.meteor_idx + 1, self.meteor_idx + 5, self.meteor_idx + 9])
             if self.img_data:
-                ctn.extend([0,self.img_idx, self.img_idx +1 , self.img_idx+ 2, self.img_idx + 3])
+                ctn.extend([self.img_idx, self.img_idx +1 , self.img_idx+ 2, self.img_idx + 3, self.img_idx + 4, self.img_idx + 5, self.img_idx + 6, self.img_idx + 7])
 
         if model == 'lstm':
             print('scale for lstm')
-            if self.onsite_data:
-                ctn.extend([6, 7, 8])
+            # if self.onsite_data:
+            #     ctn.extend([8])
+            # if self.meteor_data:
+            #     ctn.extend([self.meteor_idx, self.meteor_idx + 1, self.meteor_idx + 5, self.meteor_idx + 9])
+            if self.img_data:
+                ctn.extend([self.img_idx, self.img_idx +1 , self.img_idx+ 2, self.img_idx + 3])
+
 
         if model == 'rf':
             print('scale for rf')
