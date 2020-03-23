@@ -106,20 +106,20 @@ def generate_img_for_cnn(month, day, hour, minute, second, pred_horizon, model='
             return pre_process_img(gen3,400)
 
 
-frame1 = get_full_image_by_date_time(8,21,12,0,0)
-frame2 = get_full_image_by_date_time(8,21,12,1,0)
-frame3 = get_full_image_by_date_time(8,21,12,2,0)
-
-show_img(frame1)
-show_img(frame2)
-show_img(frame3)
-
-lk = generate_next_img_LK(frame1, frame2)
-fb, hsv = generate_next_img_FB(frame1, frame2)
-
-
-show_img(lk)
-show_img(fb)
+# frame1 = get_full_image_by_date_time(8,21,12,0,0)
+# frame2 = get_full_image_by_date_time(8,21,12,1,0)
+# frame3 = get_full_image_by_date_time(8,21,12,2,0)
+#
+# show_img(frame1)
+# show_img(frame2)
+# show_img(frame3)
+#
+# lk = generate_next_img_LK(frame1, frame2)
+# fb, hsv = generate_next_img_FB(frame1, frame2)
+#
+#
+# show_img(lk)
+# show_img(fb)
 
 
 

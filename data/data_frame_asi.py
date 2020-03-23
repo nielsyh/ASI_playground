@@ -48,7 +48,7 @@ class DataFrameIMG:
 
         for i in tqdm(range(0, time_steps), total=time_steps, unit='Timesteps progress'):
             year, month, day, hour, minute, ghi = day_data[i][0], day_data[i][1], day_data[i][2], day_data[i][3], day_data[i][4], day_data[i+self.pred_horizon][8]
-            img = generate_img_for_cnn(month, day, hour, minute, 0, self.pred_horizon, model='lk')
+            img = generate_img_for_cnn(month, day, hour, minute, 0, self.pred_horizon)
 
 
             self.mega_df_x[i] = img
