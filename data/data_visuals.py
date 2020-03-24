@@ -10,20 +10,16 @@ import data.data_helper
 style.use('seaborn-poster') #sets the size of the charts
 style.use('ggplot')
 from matplotlib.ticker import FuncFormatter, MaxNLocator
+from matplotlib import cm, colors
+
 
 def plot_error_per_horizons(errors, horizons, names, title, xl, yl, save_as='none'):
     ax = plt.axes()
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-    # plt.setp(ax.get_xticklabels(), rotation=90, horizontalalignment='right', fontsize='x-small')
     plt.ylim(0, 150)
 
-    lines = ['-','-','-','-','-','-','-',
-             '--','--','--','--','--','--','--',
-             '-.','-.','-.','-.','-.','-.','-.',
-             ':',':',':',':',':',':',':']
-
     for idx, i in enumerate(errors):
-        plt.plot(horizons, i, linestyle=lines[idx], label=names[idx])
+        plt.plot(horizons, i, color=data_helper.getColor_racket(len(errors), idx), linestyle='-', label=names[idx])
 
     plt.legend()
     plt.title(title)

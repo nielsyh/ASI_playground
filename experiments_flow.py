@@ -16,13 +16,13 @@ def experiment(prediction_horizon):
     prem = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
     for tup in tqdm(prem, total=len(prem), unit='Days to predict'):
         data = DataFrameIMG(False, prediction_horizon)
-        # data.build_img_df(7, 17, tup[0], tup[1])
+        data.build_img_df(7, 17, tup[0], tup[1])
         cnn = cnn_model.CnnNet(data, modelarch='small')
         cnn.get_model(400)
         cnn.load_model_files(str(tup[0]) + str(tup[1]) + '.h5')
-        # y_pred, rmse, mae, mape = cnn.predict()
+        y_pred, rmse, mae, mape = cnn.predict()
         name = 'CNN_predhor_LK' + str(prediction_horizon)
-        # metrics.Metrics.write_results(name, data.mega_df_times, data.mega_df_y, y_pred.ravel(), prediction_horizon)
+        metrics.Metrics.write_results(name, data.mega_df_times, data.mega_df_y, y_pred.ravel(), prediction_horizon)
 
 def cnn_test():
     prem = [(10, 5)]

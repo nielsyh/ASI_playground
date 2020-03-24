@@ -236,10 +236,10 @@ class DataFrameSequence:
             self.train_y_df = np.concatenate((np.copy(self.mega_df_y_1[0:day_idx]), np.copy(self.mega_df_y_2[0:day_idx])))
 
         self.test_x_df = np.copy(self.mega_df_x_1[day_idx])
-        self.val_x_df = np.copy(self.mega_df_x_1[day_idx + 1:self.mega_df_x_1.shape[0]])
+        self.val_x_df = np.copy(self.mega_df_x_1[day_idx - 3:day_idx])
 
         self.test_y_df = np.copy(self.mega_df_y_1[day_idx])
-        self.val_y_df = np.copy(self.mega_df_y_1[day_idx + 1:self.mega_df_x_1.shape[0]])
+        self.val_y_df = np.copy(self.mega_df_y_1[day_idx - 3:day_idx])
 
         print('done')
 

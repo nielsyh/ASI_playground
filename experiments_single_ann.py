@@ -5,7 +5,7 @@ from keras import optimizers
 from data.data_helper import plot_history
 
 init_epochs = 40
-epochs = 40
+epochs = 100
 start = 6
 end = 19
 
@@ -18,7 +18,7 @@ prediction_horizons = list(range(1, 21))
 
 def run_ann_experiments():
     sqs = [5, 10, 20]
-    permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
+    permutations = [(True, True, True), (True, False, False), (False, True, False)]
     permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
     for idx, p in enumerate(permutations):
         for s in sqs:
@@ -35,10 +35,9 @@ def ANN_experiment(prediction_horizon, minutes_sequence, d, data_name):
     name_data = 'data_' + str(data_name)
     name_pred = 'ph_' + str(prediction_horizon)
 
-    ann = ann_model.ANN(data, epochs, epochs, 'ANN_SEQUENCE' + name_epoch + name_time + name_data + name_pred)
+    ann = ann_model.ANN(data, epochs, epochs, 'ANN_SINGLE' + name_epoch + name_time + name_data + name_pred)
     ann.set_days(data.get_prem_days())
     ann.run_experiment()
-
 
 def ann_test():
     # debug, pred_horizon, onsite_data, img_data, meteor_data
@@ -113,6 +112,6 @@ def optimize():
     print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
 
 
-# run_ann_experiments()
-ann
+run_ann_experiments()
+
 

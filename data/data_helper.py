@@ -19,8 +19,22 @@ from tqdm import tqdm
 import calendar
 import pickle
 
+from os import listdir
+from os.path import isfile, join
 
+def getColor_binairy(N, idx):
+    import matplotlib as mpl
+    c = 'binary'
+    cmap = mpl.cm.get_cmap(c)
+    norm = mpl.colors.Normalize(vmin=0.0, vmax=N - 1)
+    return cmap(norm(idx))
 
+def getColor_racket(N, idx):
+    import matplotlib as mpl
+    c = 'jet'
+    cmap = mpl.cm.get_cmap(c)
+    norm = mpl.colors.Normalize(vmin=0.0, vmax=N - 1)
+    return cmap(norm(idx))
 
 
 def get_folders_ann():
@@ -315,6 +329,10 @@ def build_name(arr):
             tmp_name = tmp_name + ' 5'
         elif 'sqnc_10' in str:
             tmp_name = tmp_name + ' 10'
+        elif 'sqnc_20' in str:
+            tmp_name = tmp_name + ' 20'
+        elif 'sqnc_30' in str:
+            tmp_name = tmp_name + ' 30'
 
         if 'all data' in str:  # data type
             tmp_name = tmp_name + ' all data'
@@ -334,12 +352,28 @@ def build_name(arr):
 
     return names
 
+def get_files_ann_test():
+
+    files = ls_dir('Results test set/ANN')
+    # files = ['Results test set/ANN/ANN TSET grad_sqnc_10data_all data_cams_1.txt',
+    #          'Results test set/ANN/ANN TSET grad_sqnc_10data_all data_cams_2.txt',
+    #          'Results test set/ANN/ANN TSET grad_sqnc_20data_all data_cams_1.txt']
+    names = build_name(files)
+
+    return files,names
+
+def get_files_rf_test():
+    files = ls_dir('Results test set/RF/grad')
+    names = build_name(files)
+    return files, names
+
+
+def ls_dir(dir):
+    fix_directory()
+    return [dir + '/' + f for f in listdir(dir) if isfile(join(dir, f))]
+
 def get_files_lstm_test():
-    files = [
-       'Results test set/LSTM/LSTM_TSET GRAD_sqnc_5data_all data_cams_1.txt',
-       'Results test set/LSTM/LSTM_MULTI_TESTSET gradient_epochs_100_sqnc_5data_all data_cams_1.txt',
-       'Results test set/LSTM/LSTM_MULTI_TESTSET gradient_epochs_100_sqnc_10data_all data_cams_1.txt'
-    ]
+    files = ls_dir('Results test set/LSTM')
     names = build_name(files)
     return files, names
 

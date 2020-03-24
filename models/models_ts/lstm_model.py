@@ -8,6 +8,8 @@ from keras.models import load_model
 import calendar
 import pvlib_playground
 from keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras.callbacks import Callback
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 
 class TestCallback(Callback):
@@ -64,13 +66,14 @@ class LSTM_predictor():
         self.history = self.model.fit(self.data.train_x_df, self.data.train_y_df, epochs=epochs, batch_size=batch_size,
                                       validation_data=(self.data.val_x_df, self.data.val_y_df),
                                       callbacks=[TestCallback(self.data.test_x_df, self.data.test_y_df),
-                                                 EarlyStopping(monitor='val_loss', patience=2),
-                                                 ModelCheckpoint(filepath='best_model.h5', monitor='val_loss', save_best_only=True)
+                                                 EarlyStopping(monitor='val_loss', patience=15),
+                                                 ModelCheckpoint(filepath=str(self.name) + '.h5', monitor='val_loss', save_best_only=True)
                                                  ])
         return self.history
 
 
     def predict(self):
+        self.model = load_model(str(self.name) + '.h5')
         y_pred =  self.model.predict(self.data.test_x_df)
         rmse, mae, mape = Metrics.get_error(self.data.test_y_df, y_pred)
 
@@ -79,8 +82,6 @@ class LSTM_predictor():
             pred_ghi  = []
             for idx, i in enumerate(y_pred):
                 print('csi: ' + str(i))
-                # print(int(self.data.test_x_df[idx][-1][4]))
-
                 ghi  = pvlib_playground.PvLibPlayground.csi_to_ghi(i, int(self.data.test_x_df[idx][-1][1]),
                                                                    int(self.data.test_x_df[idx][-1][2]), int(self.data.test_x_df[idx][-1][3]),
                                                                    int(self.data.test_x_df[idx][-1][4]))

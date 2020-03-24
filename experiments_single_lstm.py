@@ -4,8 +4,8 @@ from models.models_ts import lstm_model
 from keras import optimizers
 from data.data_helper import plot_history
 
-init_epochs = 40
-epochs = 40
+init_epochs = 100
+epochs = 100
 start = 6
 end = 19
 prediction_horizons = list(range(1, 21))
@@ -33,7 +33,7 @@ def LSTM_experiment(prediction_horizon, minutes_sequence, data, data_name):
     name_data = 'data_' + str(data_name)
     name_pred = 'ph_' + str(prediction_horizon)
 
-    lstm = lstm_model.LSTM_predictor(data, epochs, epochs, 'LSTM_SEQUENCE ES' + name_epoch + name_time + name_data + name_pred)
+    lstm = lstm_model.LSTM_predictor(data, epochs, epochs, 'LSTM_SEQUENCE SINGLE' + name_epoch + name_time + name_data + name_pred)
     lstm.set_days(data.get_prem_days())
     lstm.run_experiment()
 

@@ -76,10 +76,10 @@ def run_ann_experiments():
                 ann.run_experiment()
 
 def ann_test():
-    data = DataFrameSequenceMulti(False, True, True, True)
-    data.build_ts_df(6, 19, [7,8,9], 20, cams=2)
+    data = DataFrameSequenceMulti(False, True, False, False)
+    data.build_ts_df(6, 19, [8,9,10], 10, cams=1)
     # data.normalize_mega_EXPRTML(norm=True)
-    data.split_data_set_EXPRMTL(9, 15, 3)
+    data.split_data_set_EXPRMTL(10, 21, 3)
     data.scale_mega(model='ann')
     ann = ann_model_multi.ANN_Multi(data, 3, 'ANN_BETA_SEQUENCE_MUTLI_TEST')
     data.flatten_data_set()
@@ -138,5 +138,5 @@ def optimize():
 # run_final_test_days()
 # optimize()
 # run_ann_experiments()
-run_final_test_days()
-# ann_test()
+# run_final_test_days()
+ann_test()
