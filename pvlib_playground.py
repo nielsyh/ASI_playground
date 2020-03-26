@@ -4,7 +4,7 @@ import pandas as pd
 import pvlib
 from pvlib.location import Location
 import math
-
+import numpy as np
 class PvLibPlayground:
 
     cam = 1
@@ -98,10 +98,22 @@ class PvLibPlayground:
 
             tmp_dt = datetime(year=2019, month=month, day=day, hour=hour, minute= minute)
             new_dt = tmp_dt + timedelta(minutes=(i+1))
-
-            res.append(PvLibPlayground.csi_to_ghi(csi[i], new_dt.month, new_dt.day, new_dt.hour, new_dt.minute))
+            res.append(PvLibPlayground.csi_to_ghi_EXPRMT_ls(csi[i], new_dt.month, new_dt.day, new_dt.hour, new_dt.minute))
+            # res.append(PvLibPlayground.csi_to_ghi(csi[i], new_dt.month, new_dt.day, new_dt.hour, new_dt.minute))
 
         return res
+
+    @staticmethod
+    def get_ghi_by_csi(csi, month, day, hour, minute):
+        current_time = PvLibPlayground.get_pd_time(month=month, day=day, hour=hour, minute=minute)
+        next_time = current_time + timedelta(minutes=(len(csi)-1))
+        times = PvLibPlayground.get_df_times(current_time, next_time)
+        ghi_clr = PvLibPlayground.get_clear_sky_irradiance(times)
+
+        return np.multiply(csi, ghi_clr)
+
+
+
 
     @staticmethod
     def csi_to_ghi(csi, month, day, hour, minute):
@@ -113,6 +125,18 @@ class PvLibPlayground:
         zsa = math.cos(math.radians(PvLibPlayground.get_solar_zenith_angle(times)[0]))
 
         return csi * abs(dni_extra * math.pow( (PvLibPlayground.get_mean_sun_earth_distance() / sun_earth_dist), 2) * zsa)
+
+    @staticmethod
+    def csi_to_ghi_EXPRMT_ls(csi, month, day, hour, minute):
+
+        current_time = PvLibPlayground.get_pd_time(month=month, day=day, hour=hour, minute=minute)
+        next_time = PvLibPlayground.get_pd_time(month=month, day=day, hour=hour, minute=minute)
+        times = PvLibPlayground.get_df_times(current_time, next_time)
+
+        ghi_clr = PvLibPlayground.get_clear_sky_irradiance(times)[0]
+        return  ghi_clr * csi
+
+
 
     @staticmethod
     def get_solar_zenith_angle(times):

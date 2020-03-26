@@ -30,16 +30,18 @@ def run_final_all_days():
     lstm.run_experiment()
 
 def run_final_test_days():
-    sqs = [5, 10]
-    cams = [1,2]
-    permutations = [(True, True, True), (True, False, False), (False, True, False)]
-    permutations_names = ['all data', 'onsite_only', 'img only']
-
+    # sqs = [5, 10]
+    sqs=[5]
+    cams = [1]
+    permutations = [(True,True,True)]
+    # permutations = [(True, True, True), (True, False, False), (False, True, False)]
+    # permutations_names = ['all data', 'onsite_only', 'img only']
+    permutations_names = ['all data perez']
     for pidx, p in enumerate(permutations):
         for s in sqs:
             for c in cams:
                 data = DataFrameSequenceMulti(False, p[0], p[1], p[2])
-                data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], s, cams=c, clear_sky_label=False)
+                data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], s, cams=c, clear_sky_label=True)
                 # data.normalize_mega_df()
                 data.scale_mega(model='lstm')
 
@@ -49,24 +51,24 @@ def run_final_test_days():
                 name_cam = '_cams_' + str(c)
 
                 lstm = lstm_model_multi.LSTM_predictor(data, epochs,
-                                                'LSTM_TSET GRAD' + name_time + name_data + name_cam, pred_csi=False)
+                                                'LSTM_TSET GRAD prz' + name_time + name_data + name_cam, pred_csi=True)
                 lstm.set_days(data.get_thesis_test_days())
                 lstm.run_experiment()
 
 
 def run_lstm_experiment():
-    sqs = [5,10]
-    cams = [1,2]
-    permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
+    sqs = [5]
+    cams = [1]
+    permutations = [(True, True, True)]
     # permutations = [(True, True, True)]
-    permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
-    # permutations_names = ['all data clrsky']
+    # permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
+    permutations_names = ['all data clrsky']
 
     for pidx, p in enumerate(permutations):
         for s in sqs:
             for c in cams:
                 data = DataFrameSequenceMulti(False, p[0], p[1], p[2])
-                data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], s, cams=c, clear_sky_label=False)
+                data.build_ts_df(start, end, [7, 8, 9, 10], s, cams=c, clear_sky_label=True)
                 data.scale_mega('lstm')
 
                 name_time = '_sqnc_' + str(s)
@@ -75,16 +77,16 @@ def run_lstm_experiment():
                 name_cam = '_cams_' + str(c)
 
                 lstm = lstm_model_multi.LSTM_predictor(data, 100,
-                                                'LSTM_MULTI PREM' + name_epoch + name_time + name_data + name_cam, pred_csi=False)
+                                                'LSTM_MULTI PREM prz' + name_epoch + name_time + name_data + name_cam, pred_csi=True)
                 lstm.set_days(data.get_prem_days())
                 lstm.run_experiment()
 
 
 def LSTM_test():
-    data = DataFrameSequenceMulti(False, True, True, True, gradients=True)
+    data = DataFrameSequenceMulti(False, True, True, True)
 
-    data.build_ts_df(6, 19, [7,8,9], 5)
-    lstm = lstm_model_multi.LSTM_predictor(data, 100, 'LSTM_TEST')
+    data.build_ts_df(6, 19, [8,9], 5, clear_sky_label=True)
+    lstm = lstm_model_multi.LSTM_predictor(data, 100, 'LSTM_TEST', pred_csi=True)
 
     data.split_data_set_EXPRMTL(9, 15, 3)
     data.scale_mega(model='lstm')

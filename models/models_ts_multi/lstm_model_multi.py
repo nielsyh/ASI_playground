@@ -69,7 +69,9 @@ class LSTM_predictor():
 
     def predict(self):
         self.model = load_model(str(self.name) + '.h5')
+
         y_pred =  self.model.predict(self.data.test_x_df)
+
         rmse, mae, mape = Metrics.get_error(self.data.test_y_df, y_pred)
 
         if self.pred_csi:
@@ -77,12 +79,22 @@ class LSTM_predictor():
             pred_ghi  = []
             for idx, i in enumerate(y_pred):
                 # csi, month, day, hour, minute
-                ghi = pvlib_playground.PvLibPlayground.csi_to_ghi_ls(i, int(self.data.test_x_df[idx][-1][1]),  # month
+                ghi = pvlib_playground.PvLibPlayground.csi_to_ghi_EXPRMT_ls(i, int(self.data.test_x_df[idx][-1][1]),  # month
                                                                      int(self.data.test_x_df[idx][-1][2]),     # day
                                                                      int(self.data.test_x_df[idx][-1][3]),     # hour
                                                                      int(self.data.test_x_df[idx][-1][4]))     # minute
+
+                # ghi = pvlib_playground.PvLibPlayground.csi_to_ghi_ls(i, int(self.data.test_x_df[idx][-1][1]),  # month
+                #                                                      int(self.data.test_x_df[idx][-1][2]),     # day
+                #                                                      int(self.data.test_x_df[idx][-1][3]),     # hour
+                #                                                      int(self.data.test_x_df[idx][-1][4]))     # minute
                 pred_ghi.append(ghi)
+
+            realrmse, mae, mape = Metrics.get_error(self.data.test_label_df, pred_ghi)
+            print('REAL RMSE')
+            print(realrmse)
             return pred_ghi, rmse, mae, mape
+
 
         return y_pred, rmse, mae, mape
 
