@@ -42,7 +42,7 @@ def run_final_test_days():
 def rf_experiment():
     permutations = [(True, True, True), (True, False, False), (False, True, False), (False, False, True)]
     permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
-    sqs = [5, 10, 20]
+    sqs = [10, 20,30]
     for pidx, p in enumerate(permutations):
         for s in sqs:
             data = DataFrameSequenceMulti(False, p[0], p[1], p[2])
@@ -96,5 +96,5 @@ def rd_search_grid():
 
 
 # run_final_test_days()
-# rf_experiment()
-run_final_test_days()
+rf_experiment()
+# run_final_test_days()

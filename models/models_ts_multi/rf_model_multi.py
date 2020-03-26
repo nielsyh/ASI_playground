@@ -33,7 +33,7 @@ class RF_predictor():
 
     def train(self):
         print('RF: Training..')
-        self.model = RandomForestRegressor(n_estimators = 200,max_depth=100, min_samples_leaf=1, random_state = 0, n_jobs=1)
+        self.model = RandomForestRegressor(n_estimators = 200,max_depth=100, min_samples_leaf=1, random_state = 0, n_jobs=-1)
         self.model.fit(self.data.train_x_df, self.data.train_y_df)
         print('done..')
 

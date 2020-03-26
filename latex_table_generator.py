@@ -37,77 +37,6 @@ def print_table(model_names, rmse, mae, mape, ss_rmse, ss_mae, ss_mape, caption,
     print('\\label{tab:'+str(label)+'}')
     print('\\end{table}')
 
-folders_ann = ['prem results/ANN 5 IMG/ANN_SEQUENCE_epochs_40_sequence_5CAM_1_img_Truepredhor_',
-           'prem results/ANN 5 NOIMG/ANN_SEQUENCE_epochs_40_sequence_5CAM_1_img_Falsepredhor_',
-           'prem results/ANN 10 IMG/ANN_SEQUENCE_epochs_40_sequence_10CAM_1_img_Truepredhor_',
-           'prem results/ANN 20 IMG/ANN_SEQUENCE_epochs_40_sequence_20CAM_1_img_Truepredhor_',
-           'prem results/ANN 20 NOIMG/ANN_SEQUENCE_epochs_40_sequence_20CAM_1_img_Falsepredhor_',
-           'prem results/ANN 50 IMG/ANN_SEQUENCE_epochs_40_sequence_50CAM_1_img_Truepredhor_',
-           'prem results/ANN 60 NOIMG NOMETEOR/ANN_SEQUENCE_NOMETEORepochs_40_sequence_60CAM_1_img_Falsepredhor_'
-               ]
-
-folders_rf = ['prem results/RF 5 IMG/RF SEQUENCE PREM__sequence_5CAM_1_img_Truepredhor_',
-           'prem results/RF 5 NOIMG/RF SEQUENCE PREM__sequence_5CAM_1_img_Falsepredhor_',
-           'prem results/RF 10 IMG/RF SEQUENCE PREM__sequence_10CAM_1_img_Truepredhor_',
-           'prem results/RF 10 NOIMG/RF SEQUENCE PREM__sequence_10CAM_1_img_Falsepredhor_',
-           'prem results/RF 20 IMG/RF SEQUENCE PREM__sequence_20CAM_1_img_Truepredhor_',
-           'prem results/RF 20 NOIMG/RF SEQUENCE PREM__sequence_20CAM_1_img_Falsepredhor_',
-           'prem results/RF 30 IMG/RF SEQUENCE PREM__sequence_30CAM_1_img_Truepredhor_',
-           'prem results/RF 30 NOIMG/RF SEQUENCE PREM__sequence_30CAM_1_img_Falsepredhor_',
-           'prem results/RF 60 IMG/RF SEQUENCE PREM__sequence_60CAM_1_img_Truepredhor_',
-           'prem results/RF 60 NOIMG/RF SEQUENCE PREM__sequence_60CAM_1_img_Falsepredhor_',
-            'prem results/RF 120 IMG/RF SEQUENCE PREM__sequence_120CAM_1_img_Truepredhor_',
-          'prem results/RF 120 NOIMG/RF SEQUENCE PREM__sequence_120CAM_1_img_Falsepredhor_'
-              ]
-
-folders_lstm = ['prem results/LSTM 5 IMG/LSTM_SEQUENCE_epochs_40_sequence_5CAM_1_img_Truepredhor_',
-           'prem results/LSTM 10 IMG/LSTM_SEQUENCE_epochs_40_sequence_10CAM_1_img_Truepredhor_',
-            'prem results/LSTM 10 NOIMG/LSTM_BETA_SEQUENCE_epochs_40CAM_1_sequence_10predhor_',
-           'prem results/LSTM 20 IMG/LSTM_SEQUENCE_epochs_40_sequence_20CAM_1_img_Truepredhor_',
-           'prem results/LSTM 20 NOIMG/LSTM_SEQUENCE_epochs_40_sequence_20CAM_1_img_Falsepredhor_']
-
-folders_rf_multi = ['prem results multi/rf/RF SEQUENCE multi_sqnc_120data_onsite_only.txt',
-                    'prem results multi/rf/RF SEQUENCE multi_sqnc_30data_img only.txt',
-                    'prem results multi/rf/RF SEQUENCE multi_sqnc_30data_meteor only.txt',
-                    'prem results multi/rf/RF SEQUENCE multi_sqnc_120data_all data.txt',
-                    'prem results multi/rf/RF SEQUENCE multi_sqnc_120data_img only.txt',
-                    'prem results multi/rf/RF SEQUENCE multi_sqnc_30data_onsite_only.txt',
-                    'prem results multi/rf/RF SEQUENCE multi_sqnc_60data_all data.txt',
-                    'prem results multi/rf/RF SEQUENCE multi_sqnc_60data_meteor only.txt',
-                    'prem results multi/rf/RF SEQUENCE multi_sqnc_60data_img only.txt',
-                    'prem results multi/rf/RF SEQUENCE multi_sqnc_30data_all data.txt',
-                    'prem results multi/rf/RF SEQUENCE multi_sqnc_120data_meteor only.txt',
-                    'prem results multi/rf/RF SEQUENCE multi_sqnc_60data_onsite_only.txt']
-
-folders_lstm_multi = [
-                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_20data_onsite_only.txt',
-                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_20data_meteor only.txt',
-                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_10data_meteor only.txt',
-                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_20data_all data.txt',
-                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_meteor only.txt',
-                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_10data_onsite_only.txt',
-                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_onsite_only.txt',
-                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_10data_img only.txt',
-                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_10data_all data.txt',
-                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_all data.txt',
-                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_20data_img only.txt',
-                        'prem results multi/lstm/LSTM_SEQUENCE_MULTIepochs_50_sqnc_5data_img only.txt'
-]
-
-folders_ann_multi = [
-                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_all data.txt',
-                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_all data.txt',
-                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_meteor only.txt',
-                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_meteor only.txt',
-                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_60data_all data.txt',
-                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_img only.txt',
-                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_60data_onsite_only.txt',
-                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_40data_onsite_only.txt',
-                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_onsite_only.txt',
-                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_60data_img only.txt',
-                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_20data_img only.txt',
-                        'prem results multi/ann/ANN_SEQUENCE_MULTIepochs_40_sqnc_60data_meteor only.txt'
-]
 
 armse = []
 amae = []
@@ -117,7 +46,7 @@ ass_mae = ['NA']
 ass_mape = ['NA']
 all_model_names = []
 
-def print_results(model):
+def print_results_val(model):
     # prediction_horizons = list(range(1,21))
     prediction_horizons = [5, 15, 20]
 
@@ -132,10 +61,6 @@ def print_results(model):
     elif model == 'lstm':
         files, names = data.data_helper.get_files_lstm_multi()
         folders, names_ = data.data_helper.get_folders_lstm()
-    elif model == 'best':
-        files, names = data.data_helper.get_files_best_multi()
-        folders, names_ = data.data_helper.get_folders_best()
-
 
     for i in prediction_horizons:
         model_names = []

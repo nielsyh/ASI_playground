@@ -21,9 +21,31 @@ class Metrics:
         return mean_absolute_error(y_observed, y_predicted)
 
     @staticmethod
+    def percentage_error(actual, predicted):
+        res = np.empty(actual.shape)
+        for j in range(actual.shape[0]):
+            if actual[j] != 0:
+                res[j] = (actual[j] - predicted[j]) / actual[j]
+            else:
+                res[j] = predicted[j] / np.mean(actual)
+        return res
+
+    @staticmethod
+    def mean_absolute_percentage_error(y_true, y_pred):
+        y_true, y_pred = np.array(y_true), np.array(y_pred)
+        return np.mean(np.abs(Metrics.percentage_error(np.asarray(y_true), np.asarray(y_pred)))) * 100
+
+    @staticmethod
+    def mape_vectorized_v2(a, b):
+        a, b = np.array(a), np.array(b)
+        mask = a != 0
+        return (np.fabs(a - b) / a)[mask].mean() * 100
+
+    @staticmethod
     def mape(y_observed, y_predicted):
         y_observed, y_pred = np.array(y_observed), np.array(y_predicted)
-        return np.mean(np.abs((y_observed - y_predicted) / (y_observed +1) )) * 100
+        return np.mean(np.abs((y_observed - y_predicted) / y_observed)) * 100
+        # return np.mean(np.abs((y_observed - y_predicted) / (y_observed +1) )) * 100
 
 
     @staticmethod
@@ -35,7 +57,7 @@ class Metrics:
         mae = Metrics.mae(y_observed, y_predicted)
         # print(mae)
         # print('MAPE')
-        mape = Metrics.mape(y_observed, y_predicted)
+        mape = Metrics.mean_absolute_percentage_error(y_observed, y_predicted)
         # print(mape)
         return rmse, mae, mape
 

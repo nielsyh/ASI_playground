@@ -38,7 +38,7 @@ def getColor_racket(N, idx):
 
 
 def get_folders_ann():
-    folders = ls_dir_folder('results_18march/single/ann/')
+    folders = ls_dir_folder('results 26 march/ann single/')
     names = build_name(folders)
     return folders, names
 
@@ -49,7 +49,7 @@ def get_folders_rf():
     return folders, names
 
 def get_folders_lstm():
-    folders = ls_dir_folder('results_18march/single/lstm/')
+    folders = ls_dir_folder('results 26 march/lstm single/')
     names = build_name(folders)
     return folders, names
 
@@ -172,12 +172,14 @@ def get_files_rf_test():
 
 def ls_dir_folder(dir):
     fix_directory()
-    return [dir + '/' + f[0:f.find('ph_')+3] for f in listdir(dir) if isfile(join(dir, f))]
+    ls =  [dir + '/' + f[0:f.find('ph_')+3] for f in listdir(dir) if isfile(join(dir, f))]
+    return [i for n, i in enumerate(ls) if i not in ls[:n]]
 
 
 def ls_dir(dir):
     fix_directory()
     return [dir + '/' + f for f in listdir(dir) if isfile(join(dir, f))]
+
 
 def get_files_lstm_test():
     files = ls_dir('Results test set/LSTM')

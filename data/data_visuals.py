@@ -12,17 +12,46 @@ style.use('ggplot')
 from matplotlib.ticker import FuncFormatter, MaxNLocator
 from matplotlib import cm, colors
 
-
-def plot_error_per_horizons(errors, horizons, names, title, xl, yl, save_as='none'):
+def plot_per_weather_circ(errors, horizons, names, title, xl, yl, save_as='none'):
     ax = plt.axes()
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-    plt.ylim(0, 150)
+    # plt.ylim(0, 150)
+
 
     plt.plot(horizons, errors[0], 'r', linestyle='-', label=names[0])
+    plt.plot(horizons, errors[1], 'r', linestyle=':', label=names[1])
+    plt.plot(horizons, errors[2], 'r', linestyle='--', label=names[2])
+
+    plt.plot(horizons, errors[3], 'b', linestyle='-', label=names[3])
+    plt.plot(horizons, errors[4], 'b', linestyle=':', label=names[4])
+    plt.plot(horizons, errors[5], 'b', linestyle='--', label=names[5])
+
+    plt.legend()
+    plt.title(title)
+    plt.xlabel(xl)
+    plt.ylabel(yl)
+
+    if save_as != 'none':
+        data.data_helper.fix_directory()
+        plt.savefig(save_as)
+    else:
+        plt.show()
+
+    plt.close()
+
+
+
+def plot_error_per_horizons(errors, horizons, names, title, xl, yl, save_as='none', y_lim=100):
+    ax = plt.axes()
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+    plt.ylim(0, y_lim)
+
+    plt.plot(horizons, errors[0], color='grey', linewidth=2, alpha=0.5)
+    plt.plot(horizons, errors[0], 'r', linestyle='-', label=names[0], linewidth=4, alpha=0.5)
 
     for idx, i in enumerate(errors):
         if idx>0:
-            plt.plot(horizons, i, color=data_helper.getColor_racket(len(errors)-1, idx-1), linestyle=':', label=names[idx])
+            plt.plot(horizons, i, color=data_helper.getColor_racket(len(errors)-1, idx-1), linestyle='-', label=names[idx], linewidth=2)
 
     plt.legend()
     plt.title(title)
@@ -403,7 +432,7 @@ def plot_err_day_split(model, prediction_horizon):
 
 
 
-def plot_err_hor_all(model, max_models=6, save=0):
+def plot_err_hor_all(model, max_models=8, save=0):
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
 
     if model == 'ann':
@@ -418,9 +447,6 @@ def plot_err_hor_all(model, max_models=6, save=0):
     elif model == 'best':
         files, names = data_helper.get_files_best_multi()
         folders, names_ = data_helper.get_folders_best()
-    elif model == 'test':
-        files, names = data_helper.get_files_test_set()
-        t = data_helper.get_thesis_test_days()
     elif model == 'cnn':
         # files, names = [],[]
         folders = data_helper.get_files_cnn()
@@ -490,13 +516,13 @@ def plot_err_hor_all(model, max_models=6, save=0):
             save_as = [name_rmse, name_mae, name_mape]
 
         plot_error_per_horizons([rmse_persistence] + trmse[i:i+max_models], predictions, ['Persistence'] + names[i:i+max_models],
-                                'RMSE per prediction horizon', 'Prediction Horizon in minutes', 'Error in RMSE', save_as[0])
+                                'RMSE per prediction horizon', 'Prediction Horizon in minutes', 'Root mean squared error', save_as[0], y_lim=140)
 
         plot_error_per_horizons([mae_persistence] + tmae[i:i+max_models], predictions, ['Persistence'] + names[i:i+max_models],
-                                'MAE per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAE', save_as[1])
+                                'MAE per prediction horizon', 'Prediction Horizon in minutes', 'Mean average error', save_as[1], y_lim=140)
 
         plot_error_per_horizons([mape_persistence] + tmape[i:i+max_models], predictions, ['Persistence'] + names[i:i+max_models],
-                                'MAPE per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAPE', save_as[2])
+                                'MAPE per prediction horizon', 'Prediction Horizon in minutes', 'Mean average percentage error', save_as[2], y_lim=140)
         id = id + 1
 
 def plot_err_hor_multi(model):
