@@ -64,14 +64,14 @@ def run_ann_experiments():
             for c in cams:
                 data = DataFrameSequenceMulti(False, p[0], p[1], p[2])
                 data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], s, cams=c)
-                data.normalize_mega_df()
+                data.scale_mega('ann')
 
                 name_time = '_sqnc_' + str(s)
                 name_data = 'data_' + permutations_names[pidx]
                 name_epoch = 'epochs_' + str(epochs)
                 name_cam = '_cams_' + str(c)
 
-                ann = ann_model_multi.ANN_Multi(data, epochs, 'ANN_SEQUENCE_MULTI' + name_epoch + name_time + name_data + name_cam )
+                ann = ann_model_multi.ANN_Multi(data, epochs, 'ANN_MULTI_PREM' + name_epoch + name_time + name_data + name_cam )
                 ann.set_days(data.get_prem_days())
                 ann.run_experiment()
 
@@ -137,6 +137,6 @@ def optimize():
 
 # run_final_test_days()
 # optimize()
-# run_ann_experiments()
+run_ann_experiments()
 # run_final_test_days()
-ann_test()
+# ann_test()

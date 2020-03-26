@@ -115,9 +115,18 @@ def plot_bar(model, save_as=0):
         plt.ylim(0, 100)
         plt.ylabel('Error RMSE')
         plt.title('Average error per weather circumstance for '+ str(names[idx]))
-        plt.show()
 
-def plot_all_days(model):
+        if save_as != 'none':
+            data_helper.fix_directory()
+            dir = 'Results test set/'
+            name = names[idx]
+            plt.savefig(dir + name)
+        else:
+            plt.show()
+
+        plt.close()
+
+def plot_days_sep_bar(model):
     days = data_helper.get_thesis_test_days()
     files, names = get_files_names(model)
     file = files[0]
@@ -236,59 +245,81 @@ def plot_err_hor_test(model, max_models=9, save=0):
         #                         save_as[2])
         id = id + 1
 
-# model = 'lstm'
-# days = data_helper.get_thesis_test_days()
-# files, names = get_files_names(model)
-# file = files[0]
-# name = names[0]
-#
-#
-# for t in days:
-#     # merge names
-#     trmse, tmae, tmape = [[] for x in range(3)]
-#     predictions = list(range(1, 21))
-#
-#     if model == 'p':
-#         # get persistence errors:
-#         rmse_persistence, mae_persistence, mape_persistence = [[] for x in range(3)]
-#         # get persistence
-#         for i in range(0, 20):
-#             actual, pred, _ = data_helper.get_persistence_df(t[0], t[1], 7, 17, i + 1)
-#             rmse, mae, mape = Metrics.get_error(actual, pred)
-#             rmse_persistence.append(rmse)
-#             mae_persistence.append(mae)
-#             mape_persistence.append(mape)
-#
-#     else:
-#         tmp_rmse = []
-#         tmp_mae = []
-#         tmp_mape = []
-#         actual, pred, _ = data_visuals.get_all_TP_multi(file, md_split=t)
-#
-#         for i in range(0, 20):
-#             rmse, mae, mape = Metrics.get_error(actual[i], pred[i])
-#             tmp_rmse.append(rmse)
-#             tmp_mae.append(mae)
-#             tmp_mape.append(mape)
-#
-#         labels = ['model']
-#         y_pos = np.arange(len(labels))
-#         r = list(range(0, len(labels)))
-#
-#         # process for bar
-#         tmp_rmse = proces_lists_stack([tmp_rmse])
-#         plt.bar(r, [item[0] for item in tmp_rmse], color=getColor(20, 0), edgecolor='white', width=1, label='PH 1')
-#         for i in range(1, 20):
-#             plt.bar(r, [item[i] for item in tmp_rmse], bottom=[item[i - 1] for item in tmp_rmse], color=getColor(20, i),
-#                     edgecolor='white', width=1, label='PH ' + str(i + 1))
-#
-#
-#         # Custom X axis
-#         plt.xticks(r, labels, fontweight='bold')
-#         plt.xlabel("Weather circumstances")
-#         plt.legend()
-#
-#         plt.ylim(0, 200)
-#         plt.ylabel('Error RMSE')
-#         plt.title(str(t))
-#         plt.show()
+
+def plot_day_multi(model, ph):
+    t = data_helper.get_thesis_test_days()
+    files, names = get_files_names(model)
+
+    for idx, file in enumerate(files):
+        if '5' in names[idx]:
+            offset = 5
+        if '10' in names[idx]:
+            offset = 10
+        if '20' in names[idx]:
+            offset = 20
+
+
+        actual, pred, times = data_helper.get_persistence_dates(t, 6, 19, ph, offset=offset)
+        actual2, pred2, times2 = data_visuals.get_all_TP_multi(file)
+        plt.plot(actual, linestyle='-', label='Actual')
+        plt.plot(pred, linestyle=':', label='Persistence')
+        plt.plot(pred2[ph-1], linestyle=':', label=names[idx])
+        plt.legend()
+        plt.show()
+        plt.close()
+
+def get_statistical_sig(model, ph):
+    t = data_helper.get_thesis_test_days()
+    files, names = get_files_names(model)
+
+    for idx, file in enumerate(files):
+        if '5' in names[idx]:
+            offset = 5
+        if '10' in names[idx]:
+            offset = 10
+        if '20' in names[idx]:
+            offset = 20
+
+        actual, pred, _ = data_helper.get_persistence_dates(t, 6, 19, ph, offset=offset)
+        actual2, pred2, _ = data_visuals.get_all_TP_multi(file)
+
+        # remove 0
+        remove_list = []
+        first = 0
+        last = 0
+        for idxs, val in enumerate(actual):
+            if val == 0:
+                first = idxs
+            else:
+                break
+
+        for idxs, val in enumerate(reversed(actual)):
+            if val == 0:
+                last = idxs
+            else:
+                break
+
+        last = len(actual) - last
+
+        print(actual[first:last])
+
+        actual = actual[first:last]
+        actual2[ph - 1] = actual2[ph-1][first:last]
+        pred = pred[first:last]
+        pred2[ph - 1] = pred2[ph-1][first:last]
+
+
+        if len(actual) != len(actual2[ph-1]):
+            print('LEN ERROR')
+            print(len(actual))
+            print(len(actual2[19]))
+
+        if actual[0:10] != [int(x) for x in actual2[ph-1][0:10]]:
+            print('SYNC ERROR')
+
+        # print(actual)
+        # print(pred)
+        # print(pred2)
+
+        print(names[idx])
+        print(Metrics.dm_test(actual, pred, pred2[ph-1], h=ph, crit="MSE", power=2))

@@ -18,8 +18,11 @@ def plot_error_per_horizons(errors, horizons, names, title, xl, yl, save_as='non
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
     plt.ylim(0, 150)
 
+    plt.plot(horizons, errors[0], 'r', linestyle='-', label=names[0])
+
     for idx, i in enumerate(errors):
-        plt.plot(horizons, i, color=data_helper.getColor_racket(len(errors), idx), linestyle='-', label=names[idx])
+        if idx>0:
+            plt.plot(horizons, i, color=data_helper.getColor_racket(len(errors)-1, idx-1), linestyle=':', label=names[idx])
 
     plt.legend()
     plt.title(title)
@@ -313,26 +316,27 @@ def plot_multiple_days():
 
 
 def plot_day_multi(offset):
-    files, names = data_helper.get_files_best_multi()
-    t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
-    add = 'prem results multi/'
+    files, names = data_helper.get_files_lstm_test()
+    t = data_helper.get_thesis_test_days()
     actual, pred, times = data_helper.get_persistence_dates(t, 6, 19, 20, offset=offset) #24 for 5 lstm
-    actual2, pred2, times2 = get_all_TP_multi(str(add + files[2]))
+    actual2, pred2, times2 = get_all_TP_multi(files[0])
 
-    plt.plot(actual, linestyle='-', label='1')
-    plt.plot(actual2[19], linestyle='-', label='2')
+    plt.plot(actual, linestyle='-', label='Persistece')
+    plt.plot(actual2[19], linestyle='-', label='Competing model')
     plt.legend()
     plt.show()
     plt.close()
 
 def get_statistical_sig():
-    files, names = data_helper.get_files_best_multi()
-    add = 'prem results multi/'
-    print(str(add + files[0]))
-    t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
-    actual, pred, _ = data_helper.get_persistence_dates(t, 6, 19, 20, 24)
-    actual2, pred2, _ = get_all_TP_multi(str(add + files[2]))
+    files, names = data_helper.get_files_lstm_test()
+    t = data_helper.get_thesis_test_days()
+    actual, pred, _ = data_helper.get_persistence_dates(t, 6, 19, 20, 20)
+    actual2, pred2, _ = get_all_TP_multi(files[0])
 
+    print(len(actual))
+    print(len(actual2[19]))
+
+    plot_day_multi(24)
     print(Metrics.dm_test(actual, pred, pred2[19], h=20, crit="MSE", power=2))
 
 
