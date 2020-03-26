@@ -40,9 +40,10 @@ class RF_predictor():
     def predict(self):
         print('RF: Predicting..')
         y_pred = self.model.predict(self.data.test_x_df)
-        rmse, mae, mape = Metrics.get_error(self.data.test_y_df, y_pred)
+        # rmse, mae, mape = Metrics.get_error(self.data.test_y_df, y_pred)
+        rmse, mae = Metrics.get_error(self.data.test_y_df, y_pred)
         sys.stdout.write(str(rmse))
-        return y_pred, rmse, mae, mape
+        return y_pred, rmse, mae#, mape
 
 
 # a = Regression_predictor()

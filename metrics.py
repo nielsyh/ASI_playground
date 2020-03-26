@@ -57,9 +57,9 @@ class Metrics:
         mae = Metrics.mae(y_observed, y_predicted)
         # print(mae)
         # print('MAPE')
-        mape = Metrics.mean_absolute_percentage_error(y_observed, y_predicted)
+        # mape = Metrics.mean_absolute_percentage_error(y_observed, y_predicted)
         # print(mape)
-        return rmse, mae, mape
+        return rmse, mae#, mape
 
     @staticmethod
     def print_error(y_observed, y_predicted):

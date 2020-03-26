@@ -33,7 +33,7 @@ def run_final_all_days():
     ann.run_experiment()
 
 def run_final_test_days():
-    sqs = [10, 20]
+    sqs = [10, 20, 40, 60]
     cams = [1,2]
     permutations = [(True, True, True), (True, False, False), (False, True, False)]
     permutations_names = ['all data', 'onsite_only', 'img only', 'meteor only']
@@ -50,7 +50,7 @@ def run_final_test_days():
                 name_epoch = 'epochs_' + str(epochs)
                 name_cam = '_cams_' + str(c)
 
-                ann = ann_model_multi.ANN_Multi(data, epochs, 'ANN TSET grad' + name_time + name_data + name_cam )
+                ann = ann_model_multi.ANN_Multi(data, epochs, 'ANN MUTLI TSET grad' + name_time + name_data + name_cam )
                 ann.set_days(data.get_thesis_test_days())
                 ann.run_experiment()
 
@@ -77,9 +77,9 @@ def run_ann_experiments():
 
 def ann_test():
     data = DataFrameSequenceMulti(False, True, False, False)
-    data.build_ts_df(6, 19, [8,9,10], 10, cams=1)
+    data.build_ts_df(6, 19, [8], 10, cams=1)
     # data.normalize_mega_EXPRTML(norm=True)
-    data.split_data_set_EXPRMTL(10, 21, 3)
+    data.split_data_set_EXPRMTL(7, 27, 1)
     data.scale_mega(model='ann')
     ann = ann_model_multi.ANN_Multi(data, 3, 'ANN_BETA_SEQUENCE_MUTLI_TEST')
     data.flatten_data_set()
@@ -135,8 +135,7 @@ def optimize():
     print('epoch: ')
     print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
 
-# run_final_test_days()
 # optimize()
-run_ann_experiments()
-# run_final_test_days()
+# run_ann_experiments()
+run_final_test_days()
 # ann_test()

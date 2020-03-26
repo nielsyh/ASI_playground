@@ -19,9 +19,9 @@ def run_final_all_days():
     rf.run_experiment()
 
 def run_final_test_days():
-    permutations = [(True, False, False), (False, True, False)]
-    permutations_names = ['onsite_only', 'img only']
-    sqs = [10, 30]
+    permutations = [(True, True, True),(True, False, False), (False, True, False)]
+    permutations_names = ['all data','onsite_only', 'img only']
+    sqs = [5,10,20,30,60]
     cams = [1, 2]
     for c in cams:
         for pidx, p in enumerate(permutations):
@@ -60,14 +60,14 @@ def rf_experiment():
 def rf_test():
     data = DataFrameSequenceMulti(False, True, True, True)
     # a = data.get_prem_days()
-    data.build_ts_df(7, 10, [8,9], 5)
+    data.build_ts_df(7, 10, [7], 5)
     data.normalize_mega_df()
     rf = rf_model_multi.RF_predictor(data, 'RF SEQUENCE multi PREM_ NO METOER')
     # rf.set_days(a)
-    data.split_data_set(9, 27)
+    data.split_data_set(7, 27)
     data.flatten_data_set()
     rf.train()
-    y_pred, rmse, mae, mape = rf.predict()
+    y_pred, rmse, mae = rf.predict()
 
     Metrics.write_results_multi('RF MULTI TEST', data.test_x_df.reshape(
         (data.test_x_df.shape[0],
@@ -95,6 +95,7 @@ def rd_search_grid():
     print("grid.best_params_ {}".format(grid.best_params_))
 
 
-# run_final_test_days()
-rf_experiment()
+run_final_test_days()
+# rf_experiment()
+# rf_test()
 # run_final_test_days()

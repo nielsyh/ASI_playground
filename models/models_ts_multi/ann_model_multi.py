@@ -72,8 +72,8 @@ class ANN_Multi():
     def predict(self):
         self.model = load_model(str(self.name) + '.h5')
         y_pred =  self.model.predict(self.data.test_x_df)
-        rmse, mae, mape = Metrics.get_error(self.data.test_y_df, y_pred)
-        return y_pred, rmse, mae, mape
+        rmse, mae = Metrics.get_error(self.data.test_y_df, y_pred)
+        return y_pred, rmse, mae
 
     def run_experiment(self):
         for exp in self.day_month_to_predict:
@@ -85,7 +85,8 @@ class ANN_Multi():
 
             epochs = self.epochs
             self.train(epochs=epochs)
-            y_pred, rmse, mae, mape = self.predict()
+            # y_pred, rmse, mae, mape = self.predict()
+            y_pred, rmse = self.predict()
             print('RMSE:')
             print(rmse)
 
