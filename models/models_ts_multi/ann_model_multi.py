@@ -86,7 +86,7 @@ class ANN_Multi():
             epochs = self.epochs
             self.train(epochs=epochs)
             # y_pred, rmse, mae, mape = self.predict()
-            y_pred, rmse = self.predict()
+            y_pred, rmse, mae = self.predict()
             print('RMSE:')
             print(rmse)
 

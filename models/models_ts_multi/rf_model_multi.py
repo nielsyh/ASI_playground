@@ -23,7 +23,7 @@ class RF_predictor():
             self.data.split_data_set(exp[0], exp[1])
             self.data.flatten_data_set()
             self.train()
-            y_pred, rmse, mae, mape = self.predict()
+            y_pred, rmse, mae = self.predict()
 
             Metrics.write_results_multi(str(self.name), self.data.test_x_df.reshape(
                 (self.data.test_x_df.shape[0],
@@ -43,7 +43,7 @@ class RF_predictor():
         # rmse, mae, mape = Metrics.get_error(self.data.test_y_df, y_pred)
         rmse, mae = Metrics.get_error(self.data.test_y_df, y_pred)
         sys.stdout.write(str(rmse))
-        return y_pred, rmse, mae#, mape
+        return y_pred, rmse, mae
 
 
 # a = Regression_predictor()
