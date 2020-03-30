@@ -1,4 +1,5 @@
 from data.data_helper import getColor_binairy
+from data.data_visuals import plot_error_per_horizons, get_all_TP_multi
 from metrics import *
 from data import data_visuals, data_helper
 import matplotlib.pyplot as plt
@@ -182,70 +183,79 @@ def plot_days_sep_bar(model):
 
 
 def plot_err_hor_test(model, max_models=9, save=0):
-    t = data_helper.get_thesis_test_days()
+    days_cloudy = data_helper.get_thesis_test_days(in_cloudy=True, in_parcloudy=False, in_sunny=False)
+    days_pcloudy = data_helper.get_thesis_test_days(in_cloudy=False, in_parcloudy=True, in_sunny=False)
+    days_sunny = data_helper.get_thesis_test_days(in_cloudy=False, in_parcloudy=False, in_sunny=True)
+    weather_circumstances = [days_sunny, days_pcloudy, days_cloudy]
+    weather_names = ['sunny', 'partially cloudy', 'cloudy']
+
     files, names = get_files_names(model)
 
-    # merge names
-    trmse = []
-    tmae = []
-    tmape = []
-    predictions = list(range(1, 21))
 
-    # get persistence errors:
-    rmse_persistence = []
-    mae_persistence = []
-    mape_persistence = []
+    for idx, t in enumerate(weather_circumstances):
 
-    for i in range(0, 20):
 
-        actual, pred, _ = data_helper.get_persistence_dates(t, 7, 17, i + 1)
-        rmse, mae, mape = Metrics.get_error(actual, pred)
-        rmse_persistence.append(rmse)
-        mae_persistence.append(mae)
-        mape_persistence.append(mape)
+        # merge names
+        trmse = []
+        tmae = []
+        tmape = []
+        predictions = list(range(1, 21))
 
-    for file in files:  # get multi model data
-        tmp_rmse = []
-        tmp_mae = []
-        tmp_mape = []
-        actual, pred, _ = data_visuals.get_all_TP_multi(file)
+        # get persistence errors:
+        rmse_persistence = []
+        mae_persistence = []
+        mape_persistence = []
 
         for i in range(0, 20):
 
-            rmse, mae, mape = Metrics.get_error(actual[i], pred[i])
-            tmp_rmse.append(rmse)
-            tmp_mae.append(mae)
-            tmp_mape.append(mape)
+            actual, pred, _ = data_helper.get_persistence_dates(t, 7, 17, i + 1)
+            rmse, mae, mape = Metrics.get_error(actual, pred)
+            rmse_persistence.append(rmse)
+            mae_persistence.append(mae)
+            mape_persistence.append(mape)
 
-        trmse.append(tmp_rmse)
-        tmae.append(tmp_mae)
-        tmape.append(tmp_mape)
+        for file in files:  # get multi model data
+            tmp_rmse = []
+            tmp_mae = []
+            tmp_mape = []
+            actual, pred, _ = data_visuals.get_all_TP_multi(file, md_list_split=t)
 
-    id = 0
-    for i in range(0, len(trmse), max_models):
-        if save == 0:
-            save_as = ['none', 'none', 'none']
-        else:
-            name_rmse = 'final_plots_test/' + model + '_prem_rmse_' + str(id) + '.jpg'
-            name_mae = 'final_plots_test/' + model + '_prem_mae_' + str(id) + '.jpg'
-            name_mape = 'final_plots_test/' + model + '_prem_mape_' + str(id) + '.jpg'
-            save_as = [name_rmse, name_mae, name_mape]
+            for i in range(0, 20):
 
-        data_visuals.plot_error_per_horizons([rmse_persistence] + trmse[i:i + max_models], predictions,
-                                ['Persistence'] + names[i:i + max_models],
-                                'RMSE per prediction horizon', 'Prediction Horizon in minutes', 'Root mean squared error',
-                                save_as[0])
+                rmse, mae, mape = Metrics.get_error(actual[i], pred[i])
+                tmp_rmse.append(rmse)
+                tmp_mae.append(mae)
+                tmp_mape.append(mape)
 
-        data_visuals.plot_error_per_horizons([mae_persistence] + tmae[i:i + max_models], predictions,
-                                ['Persistence'] + names[i:i + max_models],
-                                'MAE per prediction horizon', 'Prediction Horizon in minutes', 'Mean average error',
-                                save_as[1])
+            trmse.append(tmp_rmse)
+            tmae.append(tmp_mae)
+            tmape.append(tmp_mape)
 
-        data_visuals.plot_error_per_horizons([mape_persistence] + tmape[i:i + max_models], predictions,
-                                ['Persistence'] + names[i:i + max_models],
-                                'MAPE per prediction horizon', 'Prediction Horizon in minutes', 'Mean average percentage error',
-                                save_as[2])
-        id = id + 1
+        id = 0
+        for i in range(0, len(trmse), max_models):
+            if save == 0:
+                save_as = ['none', 'none', 'none']
+            else:
+                name_rmse = 'final_plots_test/' + model + '_' + weather_names[idx] + '_prem_rmse_' + str(id) + '.jpg'
+                name_mae = 'final_plots_test/' + model + '_' + weather_names[idx] + '_prem_mae_' + str(id) + '.jpg'
+                name_mape = 'final_plots_test/' + model + '_' + weather_names[idx] + '_prem_mape_' + str(id) + '.jpg'
+                save_as = [name_rmse, name_mae, name_mape]
+
+            data_visuals.plot_error_per_horizons([rmse_persistence] + trmse[i:i + max_models], predictions,
+                                    ['Persistence'] + names[i:i + max_models],
+                                    'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Root mean squared error',
+                                    save_as[0])
+
+            data_visuals.plot_error_per_horizons([mae_persistence] + tmae[i:i + max_models], predictions,
+                                    ['Persistence'] + names[i:i + max_models],
+                                    'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Mean average error',
+                                    save_as[1])
+
+            data_visuals.plot_error_per_horizons([mape_persistence] + tmape[i:i + max_models], predictions,
+                                    ['Persistence'] + names[i:i + max_models],
+                                    'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Mean average percentage error',
+                                    save_as[2])
+            id = id + 1
 
 
 def plot_day_multi(model, ph):
@@ -270,26 +280,36 @@ def plot_day_multi(model, ph):
         plt.show()
         plt.close()
 
-def get_statistical_sig(model, ph):
-    t = data_helper.get_thesis_test_days()
+def get_statistical_sig(model, ph, days=False):
+    if days:
+        t = days
+    else:
+        t = data_helper.get_thesis_test_days()
+
     files, names = get_files_names(model)
-
-    # print(files)
-
+    sigs = []
 
     for idx, file in enumerate(files):
 
-        print(names[idx])
+        # print(names[idx])
 
         if '5' in names[idx]:
             offset = 5
-        if '10' in names[idx]:
+        elif '10' in names[idx]:
             offset = 10
-        if '20' in names[idx]:
+        elif '20' in names[idx]:
             offset = 20
+        elif '30' in names[idx]:
+            offset = 30
+        elif '40' in names[idx]:
+            offset = 40
+        elif '60' in names[idx]:
+            offset = 60
+        elif '3' in names[idx]:
+            offset = 3
 
         actual, pred, _ = data_helper.get_persistence_dates(t, 6, 19, ph, offset=offset)
-        actual2, pred2, _ = data_visuals.get_all_TP_multi(file)
+        actual2, pred2, _ = data_visuals.get_all_TP_multi(file, md_list_split=t)
 
         # remove 0
         remove_list = []
@@ -308,27 +328,36 @@ def get_statistical_sig(model, ph):
                 break
 
         last = len(actual) - last
+
+        actual = [float(i) if i > 0 else 0 for i in actual[first:last]]
+        actual2[ph - 1] = [float(i) if i > 0 else 0 for i in actual2[ph - 1][first:last]]
+        pred = [float(i) if i > 0 else 0 for i in pred[first:last]]
+        pred2[ph - 1] = [float(i) if i > 0 else 0 for i in pred2[ph - 1][first:last]]
+
         # print(actual[first:last])
+        # print(pred[first:last])
+        # print(pred2[ph - 1][first:last])
 
-        actual = actual[first:last]
-        actual2[ph - 1] = actual2[ph-1][first:last]
-        pred = pred[first:last]
-        pred2[ph - 1] = pred2[ph-1][first:last]
-
-
-        if len(actual) != len(actual2[ph-1]):
+        if len(actual) != len(actual2[ph - 1]):
             print('LEN ERROR')
             print(len(actual))
             print(len(actual2[19]))
 
-        if actual[0:10] != [int(x) for x in actual2[ph-1][0:10]]:
+        if actual[0:10] != [int(x) for x in actual2[ph - 1][0:10]]:
             print('SYNC ERROR')
+            print(idx)
+            print(files[idx])
+            print(offset)
+            print(actual[0:10])
+            print(actual2[ph - 1][0:10])
 
-        # print(names[idx])
-        sig = Metrics.dm_test(actual, pred, pred2[ph-1], h=ph, crit="MSE", power=2)
-        print(sig)
+        if Metrics.rmse(pred, actual) < Metrics.rmse(pred2[ph - 1], actual2[ph - 1]):
+            sigs.append('n/a')
+        else:
+            sig = Metrics.dm_test(actual, pred, pred2[ph - 1], h=ph, crit="MSE", power=2)
+            sigs.append(round(sig[1],5))
 
-        # return sig, names[idx]
+    return sigs, names
 
 def normal_bar_plot(model, save_as='none'):
     days = data_helper.get_thesis_test_days()
@@ -383,6 +412,7 @@ def normal_bar_plot(model, save_as='none'):
         labels = list(range(1, 21))
 
         r = np.arange(20)
+
         errors_sunny = avg_lol(errors_sunny)
         errors_pcloudy = avg_lol(errors_pcloudy)
         errors_cloudy = avg_lol(errors_cloudy)
@@ -428,4 +458,37 @@ def normal_bar_plot(model, save_as='none'):
         else:
             plt.show()
         plt.close()
+
+def plot_err_per_hour(model, prediction_horizon):
+    days = data_helper.get_thesis_test_days()
+    files, names = get_files_names(model)
+
+    hours = list(range(6,19))
+    split = []
+    times = []
+
+    trmse = []
+
+    for i in hours:
+        split.append((i, i+1))
+        times.append(str(i) + '-' + str(i+1))
+
+    files = ['persistence'] + files
+    names = ['Persistence'] + names
+
+    for file in files:
+        print(file)
+        tmp_rmse = []
+        for idx, s in enumerate(split):
+            if file == 'persistence':
+                actual, pred, _ = data_helper.get_persistence_dates(days, s[0], s[1], prediction_horizon)
+                rmse, mae, mape = Metrics.get_error(actual, pred)
+            else:
+                actual, pred, _ = get_all_TP_multi(file, s)
+                rmse, mae, mape = Metrics.get_error(actual[prediction_horizon-1], pred[prediction_horizon-1])
+
+            tmp_rmse.append(rmse)
+        trmse.append(tmp_rmse)
+
+    plot_error_per_horizons(trmse, times, names, 'Root mean squared error averaged per hour', 'time in hours', 'Root mean squared error', y_lim=150)
 

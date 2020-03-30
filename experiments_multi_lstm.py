@@ -16,9 +16,14 @@ min_vals = []
 min_loss = []
 
 def run_final_all_days():
+    # onsite
+    # data = DataFrameSequenceMulti(False, True, False, False)
+    # onsite & img
+    # data = DataFrameSequenceMulti(False, True, True, False)
+    # all data
     data = DataFrameSequenceMulti(False, True, True, True)
     data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], 5)
-    data.normalize_mega_df()
+    data.scale_mega(model='lstm')
 
     name_time = '_sqnc_' + str(5)
     name_data = 'data_' + 'all'
@@ -170,6 +175,7 @@ def optimize():
 
 # LSTM_test()
 # optimize()
-run_lstm_experiment()
+# run_lstm_experiment()
 # LSTM_test()
 # run_final_test_days()
+run_final_all_days()

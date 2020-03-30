@@ -99,8 +99,10 @@ def get_files_lstm_multi():
 
 
 def get_files_cnn():
-    folders = ['persistence', 'prem results cnn/farneback/CNN_predhor', 'prem results cnn/lukaskanade/CNN_predhor_LK']
-    return folders
+    fix_directory()
+    folders = ['persistence', 'results 26 march/cnn/fb/CNN_predhor_LK_2', 'results_18march/cnn/lukaskanade/CNN_predhor_LK']
+    names = ['Persistence', 'CNN-Farneback', 'CNN-LK']
+    return folders, names
 
 def get_files_rf_multi():
     folders = ls_dir('results_18march/multi/rf/')
@@ -125,9 +127,8 @@ def build_name(arr):
         else:
             tmp_name = tmp_name + ' M'
 
-        if 'sqnc_3' in str:  # seq length
-            tmp_name = tmp_name + ' 3'
-        elif 'sqnc_5' in str:
+
+        if 'sqnc_5' in str:
             tmp_name = tmp_name + ' 5'
         elif 'sqnc_10' in str:
             tmp_name = tmp_name + ' 10'
@@ -135,10 +136,14 @@ def build_name(arr):
             tmp_name = tmp_name + ' 20'
         elif 'sqnc_30' in str:
             tmp_name = tmp_name + ' 30'
+        elif 'sqnc_40' in str:
+            tmp_name = tmp_name + ' 40'
         elif 'sqnc_60' in str:
             tmp_name = tmp_name + ' 60'
         elif 'sqnc_120' in str:
             tmp_name = tmp_name + ' 120'
+        elif 'sqnc_3' in str:  # seq length
+            tmp_name = tmp_name + ' 3'
 
         if 'all data' in str:  # data type
             tmp_name = tmp_name + ' all data'
@@ -771,14 +776,22 @@ def get_persistence_dates(tups, start, end, pred_hor, offset=0):
 
     return actual, pred, times
 
-def get_thesis_test_days():  # test days personal research
+def get_thesis_test_days(in_sunny=True, in_cloudy=True, in_parcloudy=True):  # test days personal research
     sunny = [(9, 15), (10, 15), (11, 15), (12, 15)]
     pcloudy = [(10, 21), (11, 17), (12, 16)]
     cloudy = [(10, 22), (12, 3)]
     total = []
-    total.extend(sunny)
-    total.extend(pcloudy)
-    total.extend(cloudy)
+
+    if in_sunny:
+        total.extend(sunny)
+    if in_parcloudy:
+        total.extend(pcloudy)
+    if in_cloudy:
+        total.extend(cloudy)
+
+    if len(total) < 1:
+        print('Include atleast 1 weather circumstance')
+
     return total
 
 def get_all_days():  # copernicus test days

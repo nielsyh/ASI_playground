@@ -57,9 +57,9 @@ class Metrics:
         mae = Metrics.mae(y_observed, y_predicted)
         # print(mae)
         # print('MAPE')
-        # mape = Metrics.mean_absolute_percentage_error(y_observed, y_predicted)
+        mape = Metrics.mean_absolute_percentage_error(y_observed, y_predicted)
         # print(mape)
-        return rmse, mae#, mape
+        return rmse, mae, mape
 
     @staticmethod
     def print_error(y_observed, y_predicted):
@@ -162,9 +162,9 @@ class Metrics:
                 return True
 
             for actual, pred1, pred2 in zip(actual_lst, pred1_lst, pred2_lst):
-                is_actual_ok = compiled_regex(str(abs(actual)))
-                is_pred1_ok = compiled_regex(str(abs(pred1)))
-                is_pred2_ok = compiled_regex(str(abs(pred2)))
+                is_actual_ok = True#compiled_regex(str(abs(actual)))
+                is_pred1_ok = True#compiled_regex(str(abs(pred1)))
+                is_pred2_ok = True#compiled_regex(str(abs(pred2)))
                 if (not (is_actual_ok and is_pred1_ok and is_pred2_ok)):
                     msg = "An element in the actual_lst, pred1_lst or pred2_lst is not numeric."
                     rt = -1

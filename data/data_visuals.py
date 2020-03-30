@@ -124,7 +124,7 @@ def get_all_TP(file):
 
     return actual, predicted
 
-def get_all_TP_multi(file, split=False, md_split=False):
+def get_all_TP_multi(file, split=False, md_split=False, md_list_split=False):
 
     if split:
         print('SPLIT')
@@ -156,6 +156,10 @@ def get_all_TP_multi(file, split=False, md_split=False):
                 if md_split[0] != month:
                     continue
                 if md_split[1] != day:
+                    continue
+            if md_list_split:
+                current = (month,day)
+                if current not in md_list_split:
                     continue
 
             a = datetime.datetime(year=2019, month=int(month), day=int(day), hour=int(hour), minute=int(minute))
@@ -196,7 +200,7 @@ def file_to_values(file, prediction_horizon = 0, times_=False):
             else:
                 pred = float(l[6])
 
-            if int(true) == 0 or int(pred) == 0:
+            if int(true) == 0:
                 continue
             else:
                 predicted.append(pred)
@@ -590,10 +594,10 @@ def plot_err_hor(model):
     elif model == 'best':
         folders = data_helper.get_folders_best()
     elif model == 'cnn':
-        folders = data_helper.get_files_cnn()
+        folders, names = data_helper.get_files_cnn()
 
     # 'Persistence',
-    names = ['Persistence']
+
 
     extension = '.txt'
     predictions = list(range(1, 21))
@@ -601,8 +605,6 @@ def plot_err_hor(model):
     trmse, tmae, tmape = [], [], []
 
     for f in folders:
-        if f != 'persistence':
-            names.append(f[f.find('/') + 1:-1][0:(f[f.find('/') + 1:-1]).find('/')])
         rmse, mae, mape = [], [], []
         for i in predictions:
 
@@ -627,13 +629,13 @@ def plot_err_hor(model):
         tmape.append(mape)
 
     plot_error_per_horizons(trmse, predictions, names,
-                            'RMSE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in RMSE')
+                            'Average error flow models', 'Prediction Horizon in minutes', 'Root mean squared error',y_lim=500)
 
-    plot_error_per_horizons(tmae, predictions, names,
-                            'MAE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAE')
-
-    plot_error_per_horizons(tmape, predictions, names,
-                            'MAPE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAPE')
+    # plot_error_per_horizons(tmae, predictions, names,
+    #                         'MAE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAE')
+    #
+    # plot_error_per_horizons(tmape, predictions, names,
+    #                         'MAPE Error per prediction horizon', 'Prediction Horizon in minutes', 'Error in MAPE')
 
 def print_error_prem_day():
     t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
