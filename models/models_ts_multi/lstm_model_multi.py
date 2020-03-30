@@ -72,7 +72,8 @@ class LSTM_predictor():
 
         y_pred =  self.model.predict(self.data.test_x_df)
 
-        rmse, mae, mape = Metrics.get_error(self.data.test_y_df, y_pred)
+        # rmse, mae, mape = Metrics.get_error(self.data.test_y_df, y_pred)
+        rmse, mae = Metrics.get_error(self.data.test_y_df, y_pred)
 
         if self.pred_csi:
             # translate back to ghi
@@ -90,13 +91,13 @@ class LSTM_predictor():
                 #                                                      int(self.data.test_x_df[idx][-1][4]))     # minute
                 pred_ghi.append(ghi)
 
-            realrmse, mae, mape = Metrics.get_error(self.data.test_label_df, pred_ghi)
+            # realrmse, mae, mape = Metrics.get_error(self.data.test_label_df, pred_ghi)
             print('REAL RMSE')
-            print(realrmse)
-            return pred_ghi, rmse, mae, mape
+            # print(realrmse)
+            return pred_ghi, rmse, mae#, mape
 
 
-        return y_pred, rmse, mae, mape
+        return y_pred, rmse, mae#, mape
 
     def run_experiment(self):
         for exp in self.day_month_to_predict:
@@ -108,7 +109,8 @@ class LSTM_predictor():
             epochs = self.epochs
             self.train(epochs=100)
 
-            y_pred, rmse, mae, mape = self.predict()
+            # y_pred, rmse, mae, mape = self.predict()
+            y_pred, rmse, mae = self.predict()
             print('RMSE:')
             print(rmse)
 
