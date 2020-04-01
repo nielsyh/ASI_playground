@@ -206,13 +206,26 @@ def plot_err_hor_test(model, max_models=9, save=0):
         mae_persistence = []
         mape_persistence = []
 
-        for i in range(0, 20):
+        rmse_spersistence = []
+        mae_spersistence = []
+        mape_spersistence = []
 
+
+        for i in range(0, 20):
             actual, pred, _ = data_helper.get_persistence_dates(t, 7, 17, i + 1)
+            actuals, preds, _ = data_helper.get_smart_persistence_dates(t, 7, 17, i + 1)
+
             rmse, mae, mape = Metrics.get_error(actual, pred)
+            srmse, smae, smape = Metrics.get_error(actuals, preds)
+
             rmse_persistence.append(rmse)
             mae_persistence.append(mae)
             mape_persistence.append(mape)
+
+            rmse_spersistence.append(srmse)
+            mae_spersistence.append(smae)
+            mape_spersistence.append(smape)
+
 
         for file in files:  # get multi model data
             tmp_rmse = []
@@ -241,18 +254,18 @@ def plot_err_hor_test(model, max_models=9, save=0):
                 name_mape = 'final_plots_test/' + model + '_' + weather_names[idx] + '_prem_mape_' + str(id) + '.jpg'
                 save_as = [name_rmse, name_mae, name_mape]
 
-            data_visuals.plot_error_per_horizons([rmse_persistence] + trmse[i:i + max_models], predictions,
-                                    ['Persistence'] + names[i:i + max_models],
+            data_visuals.plot_error_per_horizons([rmse_persistence] + [rmse_spersistence] + trmse[i:i + max_models], predictions,
+                                    ['Persistence'] + ['Smart-persistence'] + names[i:i + max_models],
                                     'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Root mean squared error',
                                     save_as[0])
 
-            data_visuals.plot_error_per_horizons([mae_persistence] + tmae[i:i + max_models], predictions,
-                                    ['Persistence'] + names[i:i + max_models],
+            data_visuals.plot_error_per_horizons([mae_persistence]+ [mae_spersistence] + tmae[i:i + max_models], predictions,
+                                    ['Persistence'] + ['Smart-persistence']+ names[i:i + max_models],
                                     'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Mean average error',
                                     save_as[1])
 
-            data_visuals.plot_error_per_horizons([mape_persistence] + tmape[i:i + max_models], predictions,
-                                    ['Persistence'] + names[i:i + max_models],
+            data_visuals.plot_error_per_horizons([mape_persistence]+ [mape_spersistence] + tmape[i:i + max_models], predictions,
+                                    ['Persistence'] + ['Smart-persistence']+ names[i:i + max_models],
                                     'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Mean average percentage error',
                                     save_as[2])
             id = id + 1

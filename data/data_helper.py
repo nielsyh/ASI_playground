@@ -705,6 +705,9 @@ def plot_persistence_day(day, month, start, end, step):
     data.data_visuals.plot_2_models(tick_times, times, ghi_truth, ghi_pred, 'time', 'GHI in W/m^2',
                   'GHI at day: ' + str(day) + ' month: ' + str(month))
 
+
+
+
 def get_persistence_df(month, day, start, end, pred_hor):
     name = str(month) + str(day) + str(start) + str(end) + str(pred_hor)
 
@@ -897,4 +900,48 @@ def search_weather_circ_days():
 
     print('Cloudy days: ' + str(len(cloudy_days)))
     print(cloudy_days)
+
+
+def get_smart_persistence_dates(tups, start, end, pred_hor, offset=0):
+    actual = []
+    pred = []
+    times = []
+    for tup in tups:
+        # print(tup)
+        # print(offset)
+        observed, predicted = get_smart_persistence(tup[0], tup[1], start, end, pred_hor)
+
+        actual.extend(observed)
+        pred.extend(predicted)
+        # times.extend(tm[offset+pred_hor-1:780+pred_hor-1])
+
+    return actual, pred,0
+
+def get_smart_persistence(month, day, start, end, pred_hor):
+    # def get_smart_persistence_df(month, day, start, end, pred_hor):
+    name = 'smart/' + str(month) + str(day) + str(start) + str(end) + str(pred_hor)
+
+    additions = ['pred', 'truth', 'times']
+
+    if os.path.isfile('persistence/' + name + additions[0]):
+        # print('from cache')
+        ghi_pred, ghi_truth = load_list(name + additions[0]), load_list(name + additions[1])
+        return ghi_pred, ghi_truth, 0
+
+    df_copy = get_df_csv_day_RP(month, day, start, end, 1)
+    df_true = get_df_csv_day_RP(month, day, start, end+1, 1)
+    times = pvlib_playground.PvLibPlayground.get_times(2019, month, day, start, end+1)
+    df_dni = pvlib_playground.PvLibPlayground.get_clear_sky_irradiance(times)
+    csi_ls = pvlib_playground.PvLibPlayground.calc_clear_sky_ls(df_copy[:,8], df_dni[0:len(df_copy)])
+
+    res = []
+
+    for idx, val in enumerate(csi_ls):
+        res.append(val * df_dni[idx + pred_hor])
+
+
+    dump_list(name+additions[0], res)
+    dump_list(name + additions[1], df_true[pred_hor: len(res)+ pred_hor,8])
+
+    return df_true[pred_hor: len(res)+ pred_hor,8], res
 

@@ -16,3 +16,5 @@ search_grid/*
 cnn/*
 persistence/*
 *.h5
+final*
+results*

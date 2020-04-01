@@ -161,7 +161,6 @@ class PvLibPlayground:
         end = pd.Timestamp(year=2019, month=12, day=31)
         return pd.date_range(start=start, end=end, freq='W', tz='UTC', name=None)
 
-
     @staticmethod
     def get_clear_sky_irradiance(times):
         loc = PvLibPlayground.get_location_almeria()
