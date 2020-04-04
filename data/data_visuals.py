@@ -26,10 +26,11 @@ def plot_per_weather_circ(errors, horizons, names, title, xl, yl, save_as='none'
     plt.plot(horizons, errors[4], 'b', linestyle=':', label=names[4])
     plt.plot(horizons, errors[5], 'b', linestyle='--', label=names[5])
 
+
     plt.legend()
-    plt.title(title)
-    plt.xlabel(xl)
-    plt.ylabel(yl)
+    plt.title(title, fontsize=16)
+    plt.xlabel(xl, fontsize=16)
+    plt.ylabel(yl, fontsize=16)
 
     if save_as != 'none':
         data.data_helper.fix_directory()
@@ -49,14 +50,18 @@ def plot_error_per_horizons(errors, horizons, names, title, xl, yl, save_as='non
     plt.plot(horizons, errors[0], color='grey', linewidth=2, alpha=0.5)
     plt.plot(horizons, errors[0], 'r', linestyle='-', label=names[0], linewidth=4, alpha=0.5)
 
+    plt.plot(horizons, errors[1], color='grey', linewidth=2, alpha=0.5)
+    plt.plot(horizons, errors[1], 'b', linestyle='-', label=names[1], linewidth=4, alpha=0.5)
+
     for idx, i in enumerate(errors):
-        if idx>0:
+        if idx > 1:
             plt.plot(horizons, i, color=data_helper.getColor_racket(len(errors)-1, idx-1), linestyle='-', label=names[idx], linewidth=2)
 
     plt.legend()
-    plt.title(title)
-    plt.xlabel(xl)
-    plt.ylabel(yl)
+    fz = 20
+    plt.title(title, fontsize=fz)
+    plt.xlabel(xl, fontsize=fz)
+    plt.ylabel(yl, fontsize=fz)
 
     if save_as != 'none':
         data.data_helper.fix_directory()

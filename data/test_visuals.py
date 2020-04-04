@@ -4,7 +4,7 @@ from metrics import *
 from data import data_visuals, data_helper
 import matplotlib.pyplot as plt
 import matplotlib.style as style
-
+import data.ramp_score
 style.use('seaborn-poster') #sets the size of the charts
 style.use('ggplot')
 
@@ -150,9 +150,7 @@ def plot_days_sep_bar(model):
                 mape_persistence.append(mape)
 
         else:
-            tmp_rmse = []
-            tmp_mae = []
-            tmp_mape = []
+            tmp_rmse,tmp_mae, tmp_mape = [[] for x in range(3)]
             actual, pred, _ = data_visuals.get_all_TP_multi(file, md_split=t)
 
             for i in range(0, 20):
@@ -193,81 +191,95 @@ def plot_err_hor_test(model, max_models=9, save=0):
 
 
     for idx, t in enumerate(weather_circumstances):
-
-
-        # merge names
         trmse = []
         tmae = []
         tmape = []
+        tramp = []
         predictions = list(range(1, 21))
 
         # get persistence errors:
         rmse_persistence = []
         mae_persistence = []
         mape_persistence = []
+        ramp_persistence = []
 
         rmse_spersistence = []
         mae_spersistence = []
         mape_spersistence = []
+        ramp_spersistence = []
 
 
         for i in range(0, 20):
-            actual, pred, _ = data_helper.get_persistence_dates(t, 7, 17, i + 1)
-            actuals, preds, _ = data_helper.get_smart_persistence_dates(t, 7, 17, i + 1)
+            actual, pred, _ = data_helper.get_persistence_dates(t, 6, 19, i + 1)
+            actuals, preds, _ = data_helper.get_smart_persistence_dates(t, 6, 19, i + 1)
 
-            rmse, mae, mape = Metrics.get_error(actual, pred)
-            srmse, smae, smape = Metrics.get_error(actuals, preds)
+            actual, pred = data_helper.filter_0_list(actual,pred)
+            actuals, preds = data_helper.filter_0_list(actuals, preds)
+
+            rmse, mae, mape, ramp = Metrics.get_error(actual, pred)
+            srmse, smae, smape, sramp = Metrics.get_error(actuals, preds)
 
             rmse_persistence.append(rmse)
             mae_persistence.append(mae)
             mape_persistence.append(mape)
+            ramp_persistence.append(ramp)
 
             rmse_spersistence.append(srmse)
             mae_spersistence.append(smae)
             mape_spersistence.append(smape)
-
+            ramp_spersistence.append(sramp)
 
         for file in files:  # get multi model data
             tmp_rmse = []
             tmp_mae = []
             tmp_mape = []
+            tmp_ramp = []
             actual, pred, _ = data_visuals.get_all_TP_multi(file, md_list_split=t)
+            actual, pred = data_helper.filter_0_list(actual, pred)
 
             for i in range(0, 20):
 
-                rmse, mae, mape = Metrics.get_error(actual[i], pred[i])
+                rmse, mae, mape, ramp = Metrics.get_error(actual[i], pred[i])
                 tmp_rmse.append(rmse)
                 tmp_mae.append(mae)
                 tmp_mape.append(mape)
+                tmp_ramp.append(ramp)
 
             trmse.append(tmp_rmse)
             tmae.append(tmp_mae)
             tmape.append(tmp_mape)
+            tramp.append(tmp_ramp)
 
         id = 0
         for i in range(0, len(trmse), max_models):
             if save == 0:
-                save_as = ['none', 'none', 'none']
+                save_as = ['none', 'none', 'none', 'none']
             else:
                 name_rmse = 'final_plots_test/' + model + '_' + weather_names[idx] + '_prem_rmse_' + str(id) + '.jpg'
                 name_mae = 'final_plots_test/' + model + '_' + weather_names[idx] + '_prem_mae_' + str(id) + '.jpg'
                 name_mape = 'final_plots_test/' + model + '_' + weather_names[idx] + '_prem_mape_' + str(id) + '.jpg'
-                save_as = [name_rmse, name_mae, name_mape]
+                name_ramp = 'final_plots_test/' + model + '_' + weather_names[idx] + '_prem_ramp_' + str(id) + '.jpg'
+                save_as = [name_rmse, name_mae, name_mape, name_ramp]
 
-            data_visuals.plot_error_per_horizons([rmse_persistence] + [rmse_spersistence] + trmse[i:i + max_models], predictions,
-                                    ['Persistence'] + ['Smart-persistence'] + names[i:i + max_models],
-                                    'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Root mean squared error',
-                                    save_as[0])
+            # data_visuals.plot_error_per_horizons([rmse_persistence] + [rmse_spersistence] + trmse[i:i + max_models], predictions,
+            #                         ['Persistence'] + ['Smart-persistence'] + names[i:i + max_models],
+            #                         'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Root mean squared error',
+            #                         save_as[0])
+            #
+            # data_visuals.plot_error_per_horizons([mae_persistence]+ [mae_spersistence] + tmae[i:i + max_models], predictions,
+            #                         ['Persistence'] + ['Smart-persistence']+ names[i:i + max_models],
+            #                         'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Mean average error',
+            #                         save_as[1])
+            #
+            # data_visuals.plot_error_per_horizons([mape_persistence]+ [mape_spersistence] + tmape[i:i + max_models], predictions,
+            #                         ['Persistence'] + ['Smart-persistence']+ names[i:i + max_models],
+            #                         'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Mean average percentage error',
+            #                         save_as[2])
 
-            data_visuals.plot_error_per_horizons([mae_persistence]+ [mae_spersistence] + tmae[i:i + max_models], predictions,
+            data_visuals.plot_error_per_horizons([ramp_persistence] + [ramp_spersistence] + tramp[i:i + max_models], predictions,
                                     ['Persistence'] + ['Smart-persistence']+ names[i:i + max_models],
-                                    'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Mean average error',
-                                    save_as[1])
-
-            data_visuals.plot_error_per_horizons([mape_persistence]+ [mape_spersistence] + tmape[i:i + max_models], predictions,
-                                    ['Persistence'] + ['Smart-persistence']+ names[i:i + max_models],
-                                    'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Mean average percentage error',
-                                    save_as[2])
+                                    'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Ramp-score',
+                                    save_as[3])
             id = id + 1
 
 
@@ -505,3 +517,19 @@ def plot_err_per_hour(model, prediction_horizon):
 
     plot_error_per_horizons(trmse, times, names, 'Root mean squared error averaged per hour', 'time in hours', 'Root mean squared error', y_lim=150)
 
+def get_ramp_scores(model, sens=50):
+    days_cloudy = data_helper.get_thesis_test_days(in_cloudy=True, in_parcloudy=False, in_sunny=False)
+    days_pcloudy = data_helper.get_thesis_test_days(in_cloudy=False, in_parcloudy=True, in_sunny=False)
+    days_sunny = data_helper.get_thesis_test_days(in_cloudy=False, in_parcloudy=False, in_sunny=True)
+    weather_circumstances = [days_sunny]
+    weather_names = ['Sunny']
+
+    files, names = get_files_names(model)
+
+
+    for idx, t in enumerate(weather_circumstances):
+        for idx2, file in enumerate(files):  # get multi model data
+            actual, pred, _ = data_visuals.get_all_TP_multi(file, md_list_split=t)
+            actual, pred = data_helper.filter_0_list(actual[19], pred[19])
+            a = data.ramp_score.get_ramp_score(actual, pred, sens=sens, name=names[idx2] + ' ' + weather_names[idx])
+            print(a)

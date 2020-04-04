@@ -1,7 +1,8 @@
 from sklearn.metrics import *
-# from sklearn.utils import check_arrays
+from sklearn.utils import check_array
 from math import sqrt
 import numpy as np
+import data.ramp_score
 
 class Metrics:
 
@@ -43,10 +44,31 @@ class Metrics:
 
     @staticmethod
     def mape(y_observed, y_predicted):
-        y_observed, y_pred = np.array(y_observed), np.array(y_predicted)
-        return np.mean(np.abs((y_observed - y_predicted) / y_observed)) * 100
-        # return np.mean(np.abs((y_observed - y_predicted) / (y_observed +1) )) * 100
+        absolute_errors = []
 
+        for i in range(0, len(y_observed)):
+            if y_observed[i] == 0:
+                y_observed[i] = 1
+                y_predicted[i] = y_predicted[i] + 1
+            absolute_errors.append(np.abs((y_observed[i] - y_predicted[i]) / y_observed[i]))
+
+        return np.average(absolute_errors)*100
+
+
+        # # y_true, y_pred = check_array(y_observed), check_array(y_predicted)
+        # y_true, y_pred = y_observed, y_predicted
+        # y_true, y_pred = np.array(y_true), np.array(y_pred)
+        #
+        # for i in range(0, len(y_true)):
+        #     if y_true[i] == 0:
+        #         y_true[i] = 0.00001
+        #
+        # return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+
+
+    @staticmethod
+    def get_rmse(y_observed, y_predicted):
+        return Metrics.rmse(y_observed, y_predicted)
 
     @staticmethod
     def get_error(y_observed, y_predicted):
@@ -57,9 +79,11 @@ class Metrics:
         mae = Metrics.mae(y_observed, y_predicted)
         # print(mae)
         # print('MAPE')
-        mape = Metrics.mean_absolute_percentage_error(y_observed, y_predicted)
+        mape = Metrics.mape(y_observed, y_predicted)
         # print(mape)
-        return rmse, mae, mape
+        ramp_score = data.ramp_score.get_ramp_score(y_observed, y_predicted, plot=False)
+
+        return rmse, mae, mape, ramp_score
 
     @staticmethod
     def print_error(y_observed, y_predicted):

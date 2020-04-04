@@ -22,6 +22,18 @@ import pickle
 from os import listdir
 from os.path import isfile, join
 
+def filter_0_list(actual, pred):    # remove 0's
+    new_actual = []
+    new_pred = []
+
+    for idx, val in enumerate(actual):
+        if val != 0:
+            new_actual.append(val)
+            new_pred.append(pred[idx])
+
+    return new_actual, new_pred
+
+
 def getColor_binairy(N, idx):
     import matplotlib as mpl
     c = 'binary'
@@ -902,20 +914,20 @@ def search_weather_circ_days():
     print(cloudy_days)
 
 
-def get_smart_persistence_dates(tups, start, end, pred_hor, offset=0):
+def get_smart_persistence_dates(tups, start, end, pred_hor):
     actual = []
     pred = []
     times = []
     for tup in tups:
         # print(tup)
         # print(offset)
-        observed, predicted = get_smart_persistence(tup[0], tup[1], start, end, pred_hor)
+        observed, predicted, _ = get_smart_persistence(tup[0], tup[1], start, end, pred_hor)
 
         actual.extend(observed)
         pred.extend(predicted)
         # times.extend(tm[offset+pred_hor-1:780+pred_hor-1])
 
-    return actual, pred,0
+    return actual, pred, 0
 
 def get_smart_persistence(month, day, start, end, pred_hor):
     # def get_smart_persistence_df(month, day, start, end, pred_hor):
@@ -943,5 +955,5 @@ def get_smart_persistence(month, day, start, end, pred_hor):
     dump_list(name+additions[0], res)
     dump_list(name + additions[1], df_true[pred_hor: len(res)+ pred_hor,8])
 
-    return df_true[pred_hor: len(res)+ pred_hor,8], res
+    return df_true[pred_hor: len(res)+ pred_hor,8], res, 0
 

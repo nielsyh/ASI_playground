@@ -19,9 +19,10 @@ prediction_horizons = list(range(1, 21))
 
 
 def run_final_all_days():
-    data = DataFrameSequenceMulti(False, True, True, True)
+    # onsite
+    data = DataFrameSequenceMulti(False, True, False, False)
     data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], 5)
-    data.normalize_mega_df()
+    data.scale_mega(model='ann')
 
     name_time = '_sqnc_' + str(5)
     name_data = 'data_' + 'all'
@@ -87,7 +88,7 @@ def ann_test():
     ann.train(100)
 
     plot_history('s1',1, ann.history)
-    y_pred, rmse, mae, mape = ann.predict()
+    y_pred, rmse = ann.predict()
 
     Metrics.write_results_multi('ANN_TEST_MULTI', data.test_x_df.reshape(
         (data.test_x_df.shape[0],
@@ -137,5 +138,5 @@ def optimize():
 
 # optimize()
 # run_ann_experiments()
-run_final_test_days()
+run_final_all_days()
 # ann_test()
