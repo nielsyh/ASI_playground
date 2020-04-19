@@ -81,7 +81,7 @@ class Metrics:
         # print('MAPE')
         mape = Metrics.mape(y_observed, y_predicted)
         # print(mape)
-        ramp_score = data.ramp_score.get_ramp_score(y_observed, y_predicted, plot=False)
+        ramp_score = data.ramp_score.get_ramp_score(y_observed, y_predicted, plot=False, avg_mins=5)
 
         return rmse, mae, mape, ramp_score
 

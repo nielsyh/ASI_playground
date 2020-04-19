@@ -27,8 +27,13 @@ def round_s(flt, rnd):
 def avg_res(res):
     return list(map(sum, zip(*res)))
 
-def round_list(ls):
-    avgls = [n/20 for n in ls]
+def round_list(ls, div=True):
+
+    if div:
+        avgls = [n/20 for n in ls]
+    else:
+        avgls = ls
+
     l = []
     for i in avgls:
         l.append(round(i, 2))
@@ -43,11 +48,13 @@ def calc_ss(res):
 
 def format_results(res_list, pref='small'):
     if pref == 'small':
-        idx = res_list.index(min(res_list[2:]))
+        val = min(res_list[2:])
     else:
-        idx = res_list.index(max(res_list[2:]))
+        val = max(res_list[2:])
 
-    res_list[idx] = '\\textbf{' + str(res_list[idx]) + '}'
+    for i in range(0, len(res_list)):
+        if res_list[i] == val:
+            res_list[i] = '\\textbf{' + str(res_list[i]) + '}'
 
     return res_list
 
@@ -117,11 +124,17 @@ def print_sig_table(model):
     #     print end table
 
 
-def print_results_val(model, set='val'):
-    prediction_horizons = list(range(1,21))
+def print_results_val(model, set='val', default_hor=True):
+
+    if default_hor:
+        prediction_horizons = list(range(1,21))
+    else:
+        prediction_horizons = [20]
 
     if set == 'val':
-        t = [[(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]]
+        t = [(10, 5), (10, 6), (10, 7), (10, 8), (10, 20)]
+        weather_circumstances = [t]
+        weather_names = ['All weather']
         if model == 'ann':
             files, names = data.data_helper.get_files_ann_multi()
             folders, names_ = data.data_helper.get_folders_ann()
@@ -131,15 +144,15 @@ def print_results_val(model, set='val'):
         elif model == 'lstm':
             files, names = data.data_helper.get_files_lstm_multi()
             folders, names_ = data.data_helper.get_folders_lstm()
+
     else:
         # t = data.data_helper.get_thesis_test_days(include_cloudy=False)
         files, names = data.test_visuals.get_files_names(model)
-
-    days_cloudy = data_helper.get_thesis_test_days(in_cloudy=True, in_parcloudy=False, in_sunny=False)
-    days_pcloudy = data_helper.get_thesis_test_days(in_cloudy=False, in_parcloudy=True, in_sunny=False)
-    days_sunny = data_helper.get_thesis_test_days(in_cloudy=False, in_parcloudy=False, in_sunny=True)
-    weather_circumstances = [days_sunny, days_pcloudy]
-    weather_names = ['sunny', 'partially cloudy']
+        days_cloudy = data_helper.get_thesis_test_days(in_cloudy=True, in_parcloudy=False, in_sunny=False)
+        days_pcloudy = data_helper.get_thesis_test_days(in_cloudy=False, in_parcloudy=True, in_sunny=False)
+        days_sunny = data_helper.get_thesis_test_days(in_cloudy=False, in_parcloudy=False, in_sunny=True)
+        weather_circumstances = [days_sunny, days_pcloudy, days_cloudy]
+        weather_names = ['sunny', 'partially cloudy', 'cloudy']
 
     for weather_idx, t in enumerate(weather_circumstances):
 
@@ -194,6 +207,7 @@ def print_results_val(model, set='val'):
 
             for idx, file in enumerate(files):
                 predicted, actual, _ = data.data_visuals.get_all_TP_multi(file, md_list_split=t)
+                actual, predicted = data_helper.filter_0_list_LS(actual, predicted)
                 trmse, tmae, tmape, tramp = metrics.Metrics.get_error(actual[i-1], predicted[i-1])
                 modelname = names[idx]
 
@@ -207,8 +221,8 @@ def print_results_val(model, set='val'):
                 ss_mape.append(round(1 - (tmape / mape[0]), 2))
                 ss_ramp.append(round(1 - (tramp / ramp[0]), 2))
 
-            if i == 20:
-                print_table(model_names, rmse, mae, mape, ramp, ss_rmse, ss_mae, ss_mape, ss_ramp, 'Performance evaluation test set, for weather circumstance' + weather_names[weather_idx] + ', with prediction horizon: ' + str(i), 'prem.' + str(i))
+            # if i == 20:
+            #     print_table(model_names, rmse, mae, mape, ramp, ss_rmse, ss_mae, ss_mape, ss_ramp, 'Performance evaluation test set, for weather circumstance' + weather_names[weather_idx] + ', with prediction horizon: ' + str(i), 'prem.' + str(i))
 
             armse.append(rmse)
             amae.append(mae)
@@ -220,7 +234,22 @@ def print_results_val(model, set='val'):
             ass_ramp.append(ss_ramp)
             all_model_names = model_names
 
-        print_table(all_model_names, round_list(avg_res(armse)), round_list(avg_res(amae)),
-                     round_list(avg_res(amape)), round_list(avg_res(aramp)), calc_ss(avg_res(armse)), calc_ss(avg_res(amae)),
-                     calc_ss(avg_res(amape)), calc_ss(avg_res(aramp)), str(model).upper() + '. Average performance on test-set, with weather circumstance ' + weather_names[weather_idx] + '.', str(model).upper() + '.test.avg.' + str(weather_names[weather_idx]))
+        if default_hor:
+            title = str(model).upper() + '. Average performance on test-set, with weather circumstance ' + weather_names[weather_idx] + '.'
+            label =  str(model).upper() + '.test.avg.' + str(weather_names[weather_idx])
+
+            print_table(all_model_names, round_list(avg_res(armse)), round_list(avg_res(amae)),
+                        round_list(avg_res(amape)), round_list(avg_res(aramp)), calc_ss(avg_res(armse)),
+                        calc_ss(avg_res(amae)),
+                        calc_ss(avg_res(amape)), calc_ss(avg_res(aramp)), title, label)
+        else:
+            title = str(model).upper() + '. Average performance on test-set with prediction horizon 20, with weather circumstance ' + weather_names[weather_idx] + '.'
+            label =  str(model).upper() + '.test.avg.20' + str(weather_names[weather_idx])
+
+            print_table(all_model_names, round_list(avg_res(armse), div=False), round_list(avg_res(amae), div=False),
+                        round_list(avg_res(amape), div=False), round_list(avg_res(aramp), div=False), calc_ss(avg_res(armse)),
+                        calc_ss(avg_res(amae)),
+                        calc_ss(avg_res(amape)), calc_ss(avg_res(aramp)), title, label)
+
+
 

@@ -90,17 +90,41 @@ def run_lstm_experiment():
 def LSTM_test():
     data = DataFrameSequenceMulti(False, True, True, True)
 
-    data.build_ts_df(6, 19, [8,9], 5, clear_sky_label=True)
-    lstm = lstm_model_multi.LSTM_predictor(data, 100, 'LSTM_TEST', pred_csi=True)
+    data.build_ts_df(6, 19, [10,11,12], 5)
+    lstm = lstm_model_multi.LSTM_predictor(data, 100, 'LSTM_TEST')
 
-    data.split_data_set_EXPRMTL(9, 15, 3)
+    data.split_data_set_EXPRMTL(12, 30, 20)
     data.scale_mega(model='lstm')
     data.flatten_data_set_to_3d()
 
     lstm.get_model()
     lstm.train(100)
-    y_pred, rmse, mae, mape = lstm.predict()
-    plot_history('s1', 1, lstm.history)
+    y_pred, rmse = lstm.predict()
+    # plot_history('s1', 1, lstm.history)
+
+    import matplotlib.pyplot as plt
+    from matplotlib.lines import lineStyles
+    plt.plot(lstm.history.history['loss'])
+    plt.plot(lstm.history.history['val_loss'], linestyle=':')
+    ymin = min(lstm.history.history['val_loss'])
+    xpos = lstm.history.history['val_loss'].index(ymin)
+    xmin = lstm.history.history['val_loss'][xpos]
+    plt.annotate('Minimum validation loss', size=20, xy=(xpos, ymin), xytext=(xpos, ymin + 30000),
+                 arrowprops=dict(facecolor='black', shrink=0.05, width=5, headwidth=20),
+                 horizontalalignment='center', verticalalignment='top',
+                 )
+    plt.ylim(0, 100000)
+    plt.title('LSTM M 5 all data', size=20)
+    plt.ylabel('Mean squared error', size=20)
+    plt.xlabel('Epochs', size=20)
+    plt.legend(['train', 'validation'], loc='upper left')
+    plt.show()
+
+    Metrics.write_results_multi('ANN_TEST_MULTI', data.test_x_df.reshape(
+        (data.test_x_df.shape[0],
+         data.sequence_len_minutes,
+         data.number_of_features)),
+                                data.test_y_df, y_pred)
 
     Metrics.write_results_multi('LSTM_TEST_MULTI', data.test_x_df.reshape(
         (data.test_x_df.shape[0],
@@ -173,9 +197,6 @@ def optimize():
     print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
 
 
-# LSTM_test()
-# optimize()
-# run_lstm_experiment()
-# LSTM_test()
+LSTM_test()
 # run_final_test_days()
-run_final_all_days()
+# run_final_all_days()

@@ -22,6 +22,17 @@ import pickle
 from os import listdir
 from os.path import isfile, join
 
+def filter_0_list_LS(actual, pred):
+    res_act, res_pred = [], []
+
+    for i in range(0, len(actual)):
+        new_actual, new_pred = filter_0_list(actual[i], pred[i])
+        res_act.append(new_actual)
+        res_pred.append(new_pred)
+
+    return res_act, res_pred
+
+
 def filter_0_list(actual, pred):    # remove 0's
     new_actual = []
     new_pred = []
@@ -197,6 +208,24 @@ def ls_dir(dir):
     fix_directory()
     return [dir + '/' + f for f in listdir(dir) if isfile(join(dir, f))]
 
+def get_files_best_test():
+    f, n = get_files_lstm_test()
+    f = [f[1], f[3]]
+    n = [n[1], n[3]]
+
+    fann, nann = get_files_ann_test()
+    fann, nann = [fann[4]], [nann[4]]
+
+    frf, nrf = get_files_rf_test()
+    frf, nrf = [frf[5]], [nrf[5]]
+
+    f.extend(fann)
+    f.extend(frf)
+
+    n.extend(nann)
+    n.extend(nrf)
+
+    return f, n
 
 def get_files_lstm_test():
     files = ls_dir('Results test set/LSTM')

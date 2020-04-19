@@ -1,7 +1,6 @@
-from data.data_helper import getColor_binairy
 from data.data_visuals import plot_error_per_horizons, get_all_TP_multi
 from metrics import *
-from data import data_visuals, data_helper
+import data.data_helper
 import matplotlib.pyplot as plt
 import matplotlib.style as style
 import data.ramp_score
@@ -26,18 +25,20 @@ def proces_lists_stack(lst):
 
 def get_files_names(model):
     if model == 'ann':
-        files, names = data_helper.get_files_ann_test()
+        files, names = data.data_helper.get_files_ann_test()
     elif model == 'rf':
-        files, names = data_helper.get_files_rf_test()
+        files, names = data.data_helper.get_files_rf_test()
     elif model == 'lstm':
-        files, names = data_helper.get_files_lstm_test()
+        files, names = data.data_helper.get_files_lstm_test()
+    elif model == 'best':
+        files, names = data.data_helper.get_files_best_test()
     elif model == 'p':
         return ['p'], ['Persistence']
 
     return files, names
 
 def plot_bar(model, save_as=0):
-    days = data_helper.get_thesis_test_days()
+    days = data.data_helper.get_thesis_test_days()
     files, names = get_files_names(model)
 
     sunny = [(9, 15), (10, 15), (11, 15), (12, 15)]
@@ -60,7 +61,7 @@ def plot_bar(model, save_as=0):
                 rmse_persistence, mae_persistence, mape_persistence = [[] for x in range(3)]
                 # get persistence
                 for i in range(0, 20):
-                    actual, pred, _ = data_helper.get_persistence_df(t[0], t[1], 7, 17, i + 1)
+                    actual, pred, _ = data.data_helper.get_persistence_df(t[0], t[1], 7, 17, i + 1)
                     rmse, mae, mape = Metrics.get_error(actual, pred)
                     rmse_persistence.append(rmse)
                     mae_persistence.append(mae)
@@ -76,7 +77,7 @@ def plot_bar(model, save_as=0):
                 tmp_rmse = []
                 tmp_mae = []
                 tmp_mape = []
-                actual, pred, _ = data_visuals.get_all_TP_multi(file, md_split=t)
+                actual, pred, _ = data.data_visuals.get_all_TP_multi(file, md_split=t)
 
                 for i in range(0, 20):
                     rmse, mae, mape = Metrics.get_error(actual[i], pred[i])
@@ -102,9 +103,9 @@ def plot_bar(model, save_as=0):
         # process for bar
         proces_lists_stack(errors)
 
-        plt.bar(r, [item[0] for item in errors], color=data_helper.getColor_binairy(25, 3), edgecolor='white', width=1, label='1')
+        plt.bar(r, [item[0] for item in errors], color=data.data_helper.getColor_binairy(25, 3), edgecolor='white', width=1, label='1')
         for i in range(1, 20):
-            plt.bar(r, [item[i] for item in errors], bottom=[item[i - 1] for item in errors], color=data_helper.getColor_binairy(25, i+3),
+            plt.bar(r, [item[i] for item in errors], bottom=[item[i - 1] for item in errors], color=data.data_helper.getColor_binairy(25, i+3),
                     edgecolor='white', width=1, label=str(i + 1))
 
         # Custom X axis
@@ -118,7 +119,7 @@ def plot_bar(model, save_as=0):
         plt.title('Average error per weather circumstance for '+ str(names[idx]))
 
         if save_as != 0:
-            data_helper.fix_directory()
+            data.data_helper.fix_directory()
             dir = 'Results test set/'
             name = names[idx]
             plt.savefig(dir + name)
@@ -128,7 +129,7 @@ def plot_bar(model, save_as=0):
         plt.close()
 
 def plot_days_sep_bar(model):
-    days = data_helper.get_thesis_test_days()
+    days = data.data_helper.get_thesis_test_days()
     files, names = get_files_names(model)
     file = files[0]
     name = names[0]
@@ -143,7 +144,7 @@ def plot_days_sep_bar(model):
             rmse_persistence, mae_persistence, mape_persistence = [[] for x in range(3)]
             # get persistence
             for i in range(0, 20):
-                actual, pred, _ = data_helper.get_persistence_df(t[0], t[1], 7, 17, i + 1)
+                actual, pred, _ = data.data_helper.get_persistence_df(t[0], t[1], 7, 17, i + 1)
                 rmse, mae, mape = Metrics.get_error(actual, pred)
                 rmse_persistence.append(rmse)
                 mae_persistence.append(mae)
@@ -151,7 +152,7 @@ def plot_days_sep_bar(model):
 
         else:
             tmp_rmse,tmp_mae, tmp_mape = [[] for x in range(3)]
-            actual, pred, _ = data_visuals.get_all_TP_multi(file, md_split=t)
+            actual, pred, _ = data.data_visuals.get_all_TP_multi(file, md_split=t)
 
             for i in range(0, 20):
                 rmse, mae, mape = Metrics.get_error(actual[i], pred[i])
@@ -161,9 +162,9 @@ def plot_days_sep_bar(model):
 
             # process for bar
             tmp_rmse = proces_lists_stack(tmp_rmse)
-            plt.bar(r, [item[0] for item in tmp_rmse], color=getColor_binairy(30, 5), edgecolor='white', width=1, label='PH 1')
+            plt.bar(r, [item[0] for item in tmp_rmse], color=data.data_helper.getColor_binairy(30, 5), edgecolor='white', width=1, label='PH 1')
             for i in range(1, 20):
-                plt.bar(r, [item[i] for item in tmp_rmse], bottom=[item[i - 1] for item in tmp_rmse], color=getColor_binairy(30, i+5),
+                plt.bar(r, [item[i] for item in tmp_rmse], bottom=[item[i - 1] for item in tmp_rmse], color=data.data_helper.getColor_binairy(30, i+5),
                         edgecolor='white', width=1, label='PH ' + str(i + 1))
 
             labels = ['model']
@@ -181,9 +182,9 @@ def plot_days_sep_bar(model):
 
 
 def plot_err_hor_test(model, max_models=9, save=0):
-    days_cloudy = data_helper.get_thesis_test_days(in_cloudy=True, in_parcloudy=False, in_sunny=False)
-    days_pcloudy = data_helper.get_thesis_test_days(in_cloudy=False, in_parcloudy=True, in_sunny=False)
-    days_sunny = data_helper.get_thesis_test_days(in_cloudy=False, in_parcloudy=False, in_sunny=True)
+    days_cloudy = data.data_helper.get_thesis_test_days(in_cloudy=True, in_parcloudy=False, in_sunny=False)
+    days_pcloudy = data.data_helper.get_thesis_test_days(in_cloudy=False, in_parcloudy=True, in_sunny=False)
+    days_sunny = data.data_helper.get_thesis_test_days(in_cloudy=False, in_parcloudy=False, in_sunny=True)
     weather_circumstances = [days_sunny, days_pcloudy, days_cloudy]
     weather_names = ['sunny', 'partially cloudy', 'cloudy']
 
@@ -210,11 +211,12 @@ def plot_err_hor_test(model, max_models=9, save=0):
 
 
         for i in range(0, 20):
-            actual, pred, _ = data_helper.get_persistence_dates(t, 6, 19, i + 1)
-            actuals, preds, _ = data_helper.get_smart_persistence_dates(t, 6, 19, i + 1)
 
-            actual, pred = data_helper.filter_0_list(actual,pred)
-            actuals, preds = data_helper.filter_0_list(actuals, preds)
+            actual, pred, _ = data.data_helper.get_persistence_dates(t, 6, 19, i + 1)
+            actuals, preds, _ = data.data_helper.get_smart_persistence_dates(t, 6, 19, i + 1)
+
+            actual, pred = data.data_helper.filter_0_list(actual,pred)
+            actuals, preds = data.data_helper.filter_0_list(actuals, preds)
 
             rmse, mae, mape, ramp = Metrics.get_error(actual, pred)
             srmse, smae, smape, sramp = Metrics.get_error(actuals, preds)
@@ -234,8 +236,8 @@ def plot_err_hor_test(model, max_models=9, save=0):
             tmp_mae = []
             tmp_mape = []
             tmp_ramp = []
-            actual, pred, _ = data_visuals.get_all_TP_multi(file, md_list_split=t)
-            actual, pred = data_helper.filter_0_list(actual, pred)
+            actual, pred, _ = data.data_visuals.get_all_TP_multi(file, md_list_split=t)
+            actual, pred = data.data_helper.filter_0_list_LS(actual, pred)
 
             for i in range(0, 20):
 
@@ -261,22 +263,22 @@ def plot_err_hor_test(model, max_models=9, save=0):
                 name_ramp = 'final_plots_test/' + model + '_' + weather_names[idx] + '_prem_ramp_' + str(id) + '.jpg'
                 save_as = [name_rmse, name_mae, name_mape, name_ramp]
 
-            # data_visuals.plot_error_per_horizons([rmse_persistence] + [rmse_spersistence] + trmse[i:i + max_models], predictions,
+            # data.data_visuals.plot_error_per_horizons([rmse_persistence] + [rmse_spersistence] + trmse[i:i + max_models], predictions,
             #                         ['Persistence'] + ['Smart-persistence'] + names[i:i + max_models],
             #                         'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Root mean squared error',
             #                         save_as[0])
-            #
-            # data_visuals.plot_error_per_horizons([mae_persistence]+ [mae_spersistence] + tmae[i:i + max_models], predictions,
-            #                         ['Persistence'] + ['Smart-persistence']+ names[i:i + max_models],
-            #                         'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Mean average error',
-            #                         save_as[1])
-            #
-            # data_visuals.plot_error_per_horizons([mape_persistence]+ [mape_spersistence] + tmape[i:i + max_models], predictions,
+
+            data.data_visuals.plot_error_per_horizons([mae_persistence]+ [mae_spersistence] + tmae[i:i + max_models], predictions,
+                                    ['Persistence'] + ['Smart-persistence']+ names[i:i + max_models],
+                                    'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Mean average error',
+                                    save_as[1])
+
+            # data.data_visuals.plot_error_per_horizons([mape_persistence]+ [mape_spersistence] + tmape[i:i + max_models], predictions,
             #                         ['Persistence'] + ['Smart-persistence']+ names[i:i + max_models],
             #                         'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Mean average percentage error',
             #                         save_as[2])
 
-            data_visuals.plot_error_per_horizons([ramp_persistence] + [ramp_spersistence] + tramp[i:i + max_models], predictions,
+            data.data_visuals.plot_error_per_horizons([ramp_persistence] + [ramp_spersistence] + tramp[i:i + max_models], predictions,
                                     ['Persistence'] + ['Smart-persistence']+ names[i:i + max_models],
                                     'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Ramp-score',
                                     save_as[3])
@@ -284,7 +286,7 @@ def plot_err_hor_test(model, max_models=9, save=0):
 
 
 def plot_day_multi(model, ph):
-    t = data_helper.get_thesis_test_days()
+    t = data.data_helper.get_thesis_test_days(in_cloudy=False, in_parcloudy=False, in_sunny=True)
     files, names = get_files_names(model)
 
     for idx, file in enumerate(files):
@@ -296,11 +298,19 @@ def plot_day_multi(model, ph):
             offset = 20
 
 
-        actual, pred, times = data_helper.get_persistence_dates(t, 6, 19, ph, offset=offset)
-        actual2, pred2, times2 = data_visuals.get_all_TP_multi(file)
-        plt.plot(actual, linestyle='-', label='Actual')
-        plt.plot(pred, linestyle=':', label='Persistence')
+        # actual, pred, times = data_helper.get_persistence_dates(t, 6, 19, ph, offset=offset)
+        actual2, pred2, times2 = data.data_visuals.get_all_TP_multi(file, md_list_split=t)
+        # plt.plot(actual, linestyle='-', label='Actual')
+        actual2[ph - 1], pred2[ph-1] = data.data_helper.filter_0_list(actual2[ph - 1], pred2[ph-1])
+        plt.plot(actual2[ph-1], linestyle=':', label='Observed')
         plt.plot(pred2[ph-1], linestyle=':', label=names[idx])
+        fz = 20
+        title = 'Result ' + names[idx] + ', prediction horizon ' + str(ph) + ', sunny days test set.'
+        plt.title(title, fontsize=fz)
+        xl = 'Time in minutes'
+        yl = 'GHI in kWh/m^2'
+        plt.xlabel(xl, fontsize=fz)
+        plt.ylabel(yl, fontsize=fz)
         plt.legend()
         plt.show()
         plt.close()
@@ -309,7 +319,7 @@ def get_statistical_sig(model, ph, days=False):
     if days:
         t = days
     else:
-        t = data_helper.get_thesis_test_days()
+        t = data.data_helper.get_thesis_test_days()
 
     files, names = get_files_names(model)
     sigs = []
@@ -333,8 +343,8 @@ def get_statistical_sig(model, ph, days=False):
         elif '3' in names[idx]:
             offset = 3
 
-        actual, pred, _ = data_helper.get_persistence_dates(t, 6, 19, ph, offset=offset)
-        actual2, pred2, _ = data_visuals.get_all_TP_multi(file, md_list_split=t)
+        actual, pred, _ = data.data_helper.get_persistence_dates(t, 6, 19, ph, offset=offset)
+        actual2, pred2, _ = data.data_visuals.get_all_TP_multi(file, md_list_split=t)
 
         # remove 0
         remove_list = []
@@ -359,9 +369,7 @@ def get_statistical_sig(model, ph, days=False):
         pred = [float(i) if i > 0 else 0 for i in pred[first:last]]
         pred2[ph - 1] = [float(i) if i > 0 else 0 for i in pred2[ph - 1][first:last]]
 
-        # print(actual[first:last])
-        # print(pred[first:last])
-        # print(pred2[ph - 1][first:last])
+
 
         if len(actual) != len(actual2[ph - 1]):
             print('LEN ERROR')
@@ -385,7 +393,7 @@ def get_statistical_sig(model, ph, days=False):
     return sigs, names
 
 def normal_bar_plot(model, save_as='none'):
-    days = data_helper.get_thesis_test_days()
+    days = data.data_helper.get_thesis_test_days()
     files, names = get_files_names(model)
 
     sunny = [(9, 15), (10, 15), (11, 15), (12, 15)]
@@ -403,7 +411,7 @@ def normal_bar_plot(model, save_as='none'):
             rmse_persistence, mae_persistence, mape_persistence = [[] for x in range(3)]
             # get persistence
             for i in range(0, 20):
-                actual, pred, _ = data_helper.get_persistence_df(t[0], t[1], 7, 17, i + 1)
+                actual, pred, _ = data.data_helper.get_persistence_df(t[0], t[1], 7, 17, i + 1)
                 rmse, mae, mape = Metrics.get_error(actual, pred)
                 rmse_persistence.append(rmse)
                 mae_persistence.append(mae)
@@ -420,7 +428,7 @@ def normal_bar_plot(model, save_as='none'):
             tmp_rmse = []
             tmp_mae = []
             tmp_mape = []
-            actual, pred, _ = data_visuals.get_all_TP_multi(file, md_split=t)
+            actual, pred, _ = data.data_visuals.get_all_TP_multi(file, md_split=t)
 
             for i in range(0, 20):
                 rmse, mae, mape = Metrics.get_error(actual[i], pred[i])
@@ -485,7 +493,7 @@ def normal_bar_plot(model, save_as='none'):
         plt.close()
 
 def plot_err_per_hour(model, prediction_horizon):
-    days = data_helper.get_thesis_test_days()
+    days = data.data_helper.get_thesis_test_days()
     files, names = get_files_names(model)
 
     hours = list(range(6,19))
@@ -506,7 +514,7 @@ def plot_err_per_hour(model, prediction_horizon):
         tmp_rmse = []
         for idx, s in enumerate(split):
             if file == 'persistence':
-                actual, pred, _ = data_helper.get_persistence_dates(days, s[0], s[1], prediction_horizon)
+                actual, pred, _ = data.data_helper.get_persistence_dates(days, s[0], s[1], prediction_horizon)
                 rmse, mae, mape = Metrics.get_error(actual, pred)
             else:
                 actual, pred, _ = get_all_TP_multi(file, s)
@@ -517,10 +525,10 @@ def plot_err_per_hour(model, prediction_horizon):
 
     plot_error_per_horizons(trmse, times, names, 'Root mean squared error averaged per hour', 'time in hours', 'Root mean squared error', y_lim=150)
 
-def get_ramp_scores(model, sens=50):
-    days_cloudy = data_helper.get_thesis_test_days(in_cloudy=True, in_parcloudy=False, in_sunny=False)
-    days_pcloudy = data_helper.get_thesis_test_days(in_cloudy=False, in_parcloudy=True, in_sunny=False)
-    days_sunny = data_helper.get_thesis_test_days(in_cloudy=False, in_parcloudy=False, in_sunny=True)
+def get_ramp_scores(model, sens=50, avg_mins=5):
+    days_cloudy = data.data_helper.get_thesis_test_days(in_cloudy=True, in_parcloudy=False, in_sunny=False)
+    days_pcloudy = data.data_helper.get_thesis_test_days(in_cloudy=False, in_parcloudy=True, in_sunny=False)
+    days_sunny = data.data_helper.get_thesis_test_days(in_cloudy=False, in_parcloudy=False, in_sunny=True)
     weather_circumstances = [days_sunny]
     weather_names = ['Sunny']
 
@@ -529,7 +537,141 @@ def get_ramp_scores(model, sens=50):
 
     for idx, t in enumerate(weather_circumstances):
         for idx2, file in enumerate(files):  # get multi model data
-            actual, pred, _ = data_visuals.get_all_TP_multi(file, md_list_split=t)
-            actual, pred = data_helper.filter_0_list(actual[19], pred[19])
-            a = data.ramp_score.get_ramp_score(actual, pred, sens=sens, name=names[idx2] + ' ' + weather_names[idx])
+            actual, pred, _ = data.data_visuals.get_all_TP_multi(file, md_list_split=t)
+            actual, pred = data.data_helper.filter_0_list(actual[19], pred[19])
+            a = data.ramp_score.get_ramp_score(actual, pred, sens=sens, name=names[idx2] + ' ' + weather_names[idx], avg_mins=avg_mins)
             print(a)
+
+def round_list(ls, div=True):
+    if div:
+        avgls = [n/20 for n in ls]
+    else:
+        avgls = ls
+    l = []
+    for i in avgls:
+        l.append(round(i, 2))
+    return l
+def avg_res(res):
+    return list(map(sum, zip(*res)))
+
+def plot_radar(model):
+
+    files, names = get_files_names(model)
+    # files = [files[0]]
+    days_cloudy = data.data_helper.get_thesis_test_days(in_cloudy=True, in_parcloudy=False, in_sunny=False)
+    days_pcloudy = data.data_helper.get_thesis_test_days(in_cloudy=False, in_parcloudy=True, in_sunny=False)
+    days_sunny = data.data_helper.get_thesis_test_days(in_cloudy=False, in_parcloudy=False, in_sunny=True)
+    weather_circumstances = [days_sunny, days_pcloudy, days_cloudy]
+    weather_names = ['sunny', 'partially cloudy', 'cloudy']
+
+    for weather_idx, t in enumerate(weather_circumstances):
+
+        armse, amae, amape, aramp, all_model_names = [[] for x in range(5)]
+        # prediction_horizons = list(range(1, 21))
+        prediction_horizons = [20]
+
+        for i in prediction_horizons:
+            model_names, rmse, mae, mape, ramp = [[] for x in range(5)]
+
+            # Persistence results
+            actual, pred, _ = data.data_helper.get_persistence_dates(t, 6, 19, i)
+            sactual, spred, _ = data.data_helper.get_smart_persistence_dates(t, 6, 19, i)
+
+            actual, pred = data.data_helper.filter_0_list(actual,pred)
+            sactual, spred = data.data_helper.filter_0_list(sactual, spred)
+
+            #persistence
+            trmse, tmae, tmape, tramp = Metrics.get_error(actual, pred)
+            model_names.append("Persistence")
+            rmse.append(round(trmse, 2))
+            mae.append(round(tmae, 2))
+            mape.append(round(tmape, 2))
+            ramp.append(round(tramp, 2))
+
+            #smart-persistence
+            trmse, tmae, tmape, tramp = Metrics.get_error(sactual, spred)
+            model_names.append("Smart-persistence")
+            rmse.append(round(trmse, 2))
+            mae.append(round(tmae, 2))
+            mape.append(round(tmape, 2))
+            ramp.append(round(tramp, 2))
+
+            for idx, file in enumerate(files):
+                predicted, actual, _ = data.data_visuals.get_all_TP_multi(file, md_list_split=t)
+                actual, predicted = data.data_helper.filter_0_list_LS(actual, predicted)
+                trmse, tmae, tmape, tramp = Metrics.get_error(actual[i-1], predicted[i-1])
+                modelname = names[idx]
+
+                model_names.append(modelname)
+                rmse.append(round(trmse, 2))
+                mae.append(round(tmae, 2))
+                mape.append(round(tmape, 2))
+                ramp.append(round(tramp, 2))
+
+            armse.append(rmse)
+            amae.append(mae)
+            amape.append(mape)
+            aramp.append(ramp)
+            all_model_names = model_names
+
+        if len(prediction_horizons) > 1:
+            RMSE = round_list(avg_res(armse))
+            MAE = round_list(avg_res(amae))
+            MAPE = round_list(avg_res(amape))
+            RAMP = round_list(avg_res(aramp))
+        else:
+            RMSE = round_list(avg_res(armse), div=False)
+            MAE = round_list(avg_res(amae), div=False)
+            MAPE = round_list(avg_res(amape), div=False)
+            RAMP = round_list(avg_res(aramp), div=False)
+
+
+        # Libraries
+        import matplotlib.pyplot as plt
+        import pandas as pd
+        from math import pi
+        categories = ['RMSE', 'MAE', 'MAPE', 'RAMP']
+
+        # number of variable
+        N = len(categories)
+        # What will be the angle of each axis in the plot? (we divide the plot / number of variable)
+        angles = [n / float(N) * 2 * pi for n in range(N)]
+        angles += angles[:1]
+
+        # Initialise the spider plot
+        ax = plt.subplot(111, polar=True)
+        # ax = plt.subplot()
+        # Draw one axe per variable + add labels labels yet
+        plt.xticks(angles[:-1], categories, color='grey', size=16)
+
+        # Draw ylabels
+        ax.set_rlabel_position(0)
+        if len(prediction_horizons) > 1:
+            plt.yticks([50, 75], ["50", '75'], color="grey", size=16)
+            plt.ylim(0, 90)
+        else:
+            plt.yticks([50, 75, 100], ["50", '75', '100'], color="grey", size=16)
+            plt.ylim(0, 120)
+
+        for i in range(0, len(RMSE)):
+            # Plot data
+            values = np.array([RMSE[i], MAE[i], MAPE[i], RAMP[i], RMSE[i]])
+            ax.plot(angles, values, linewidth=1, linestyle='solid', label=model_names[i])
+            # Fill area
+            ax.fill(angles, values, alpha=0.1)
+
+        if len(prediction_horizons) > 1:
+            plt.title('Average performance on ' + str(weather_names[weather_idx]) + ' circumstances.', size=20)
+        else:
+            plt.title('Average performance on prediction horizon 20 with ' + str(weather_names[weather_idx]) + ' circumstances.', size=20)
+        plt.legend()
+        plt.show()
+
+
+
+
+
+
+
+
+

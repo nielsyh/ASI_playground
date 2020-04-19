@@ -14,7 +14,8 @@ def int_to_str(i):
         return '0' + s
 
 def get_full_image_by_date_time(month, day, hour, minute, seconds):
-    seconds_list = ['0', '15', '30', '45']
+    # seconds_list = ['0', '15', '30', '45']
+    seconds_list = [seconds]
 
     base_url = 'asi_16124/'
     tmp_url = '2019' + int_to_str(month) + int_to_str(day)
@@ -70,12 +71,8 @@ def get_features_by_day(month, day, start, end):
 
     return intensity, number_of_cloud_pixels, harris_corner_detector,edge_detector
 
-def get_image_by_date_time(year, month, day, hour, minute, seconds):
-    if (year == 19):
-        year = '2019'
-    elif (year == 20):
-        year = '2020'
-
+def get_image_by_date_time(month, day, hour, minute, seconds):
+    year = '2019'
     base_url = 'asi_16124/'
     tmp_url = year + int_to_str(month) + int_to_str(day)
     base_url = base_url + tmp_url + '/'  # folder
@@ -84,7 +81,7 @@ def get_image_by_date_time(year, month, day, hour, minute, seconds):
     for s in seconds_list:
         img_url = tmp_url + int_to_str(hour) + int_to_str(minute) + int_to_str(s) + '_11.jpg'
         total_url = base_url+ img_url
-        # print(total_url)
+        print(total_url)
         if os.path.isfile(total_url):
             image = cv2.imread(total_url)
             if (image is None):
@@ -92,6 +89,7 @@ def get_image_by_date_time(year, month, day, hour, minute, seconds):
             else:
                 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                 return pre_process_img(image, 400)
+                # return image
 
     print('CANT FIND IMAGE: ')
     print(month, day, hour, minute)
@@ -171,54 +169,79 @@ def edge_detector(img):
     # print(edge_count)
 
 
-def number_of_cloud_pixels(img, threshold = 0.8):
+def number_of_cloud_pixels_RBR(img, th = 0.8):
+    copy = np.copy(img)
     height, width, channels = img.shape
     amount_of_cloud_pixels = 0
 
     for h in range(0, height):
         for w in range(0, width):
-            r = img[h,w,0]
-            b = img[h,w,1]
+            r = copy[h,w,0]
+            b = copy[h,w,1]
+            g = copy[h,w,2]
             np.seterr(divide='ignore', invalid='ignore')
             rbr = r/b
-            if rbr > 0.67 and rbr < 1:
+            if rbr > th and rbr < 1:
                 amount_of_cloud_pixels += 1
-                img[h, w, 0] = 124
-                img[h, w, 1] = 252
-                img[h, w, 2] = 0
-    # plt.imshow(img)
-    # plt.show()
+                copy[h, w, 0] = 124
+                copy[h, w, 1] = 252
+                copy[h, w, 2] = 0
+    show_img(copy)
     return amount_of_cloud_pixels
 
+
+def number_of_cloud_pixels_BRBG(img, th = 2):
+    copy = np.copy(img)
+    height, width, channels = img.shape
+    amount_of_cloud_pixels = 0
+    for h in range(0, height):
+        for w in range(0, width):
+            r = copy[h,w,0]
+            b = copy[h,w,1]
+            g = copy[h,w,2]
+            np.seterr(divide='ignore', invalid='ignore')
+            brbg = (b/r) + (b/g)
+            # print(brbg)
+            if brbg < th:
+                amount_of_cloud_pixels += 1
+                copy[h, w, 0] = 124
+                copy[h, w, 1] = 252
+                copy[h, w, 2] = 0
+
+    show_img(copy)
+    return amount_of_cloud_pixels
+
+
+def number_of_cloud_pixels_NRBR(img, th = 0.8):
+    copy = np.copy(img)
+    height, width, channels = img.shape
+    amount_of_cloud_pixels = 0
+
+    for h in range(0, height):
+        for w in range(0, width):
+            r = copy[h,w,0]
+            b = copy[h,w,1]
+            g = copy[h,w,2]
+            np.seterr(divide='ignore', invalid='ignore')
+            nrbr = (r-b) / (r+b)
+            if nrbr > th and nrbr < 1:
+                amount_of_cloud_pixels += 1
+                copy[h, w, 0] = 124
+                copy[h, w, 1] = 252
+                copy[h, w, 2] = 0
+    show_img(copy)
+    return amount_of_cloud_pixels
+
+
+
 def show_img(img):
+    plt.axis('off')
     plt.imshow(img)
     plt.show()
 
 
-# #
-# a = Features()
-# img = get_image_by_date_time(19,9,1,12,0,0)
-# number_of_cloud_pixels(img)
-
-
-# url = 'asi_16124/20190813/20190813153030_11.jpg'
-# # # url = 'test.PNG'
-# img = cv2.imread(url)
-# img = pre_process_img(img, 400)
-#
-# cv2.imshow('res', img)
-#
-# if cv2.waitKey(0) & 0xff == 27:
-#     cv2.destroyAllWindows()
-#
-# number_of_cloud_pixels(img)
-#
-# cv2.imshow('res', img)
-#
-# if cv2.waitKey(0) & 0xff == 27:
-#     cv2.destroyAllWindows()
-#
-# # a.number_of_cloud_pixels(img)
-# # a.edge_detector(img)
-# # # a.harris_corner_detector(img)
-# # # print(intensity(img))
+img = get_image_by_date_time(8,21,12,0,0)
+show_img(img)
+number_of_cloud_pixels_RBR(img)
+number_of_cloud_pixels_BRBG(img)
+number_of_cloud_pixels_NRBR(img)

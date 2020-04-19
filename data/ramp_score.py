@@ -1,5 +1,4 @@
 import numpy as np
-from data import data_helper
 import matplotlib.pyplot as plt
 import math
 
@@ -34,7 +33,7 @@ class swingingDoor:
             'is_snap' : bool,
         }
 
-    def compress(self, time_series, KWH_SENS): # returns SW compression of time-series
+    def compress(self, time_series, KWH_SENS, avg_mins): # returns SW compression of time-series
         ARCHIVE = []
         counter = 0
         archive_count = 0
@@ -119,18 +118,19 @@ class swingingDoor:
         res.append(tmp_arch['value'])
         times.append(tmp_arch['trade_date'])
 
-        return self.average_per_hour(res, times)  #average by the hour
+        return self.average_per_hour(res, times, avg_mins)  #average by the hour
+        # return res, times
 
-    def average_per_hour(self, series, times):
+    def average_per_hour(self, series, times, minutes):
         res_times = []
         res_series = []
 
         end = times[-1]
-        end = math.ceil(end / 60) * 60
+        end = math.ceil(end / minutes) * minutes
 
-        for i in range(0, end, 60):
+        for i in range(0, end, minutes):
             min  = i
-            max = i + 60
+            max = i + minutes
             tmp_observations = []
 
             last_idx = 0
@@ -139,36 +139,41 @@ class swingingDoor:
                     last_idx = idx
                     tmp_observations.append(series[idx])
 
-            res_times.extend([x for x in range(i,i+60)])
+            res_times.extend([x for x in range(i,i+minutes)])
 
             if len(tmp_observations) < 1:
-                tmp_observations = [res_series[-1], series[last_idx+1]]
+                tmp_observations = [res_series[-1]]
+                # tmp_observations = [res_series[-1], series[last_idx+1]]
+                # print(tmp_observations)
 
             avg = np.average(tmp_observations)
 
-            res_series.extend([avg for x in range(0,60)])
+            res_series.extend([avg for x in range(0,minutes)])
+
 
         return res_series, res_times
 
 
 
-def calc_ramp_score(reference_x, reference_y, competing_x, competing_y):  #     rs = 1/n Integral |SD ts - SD ref|
+def calc_ramp_score(reference_x, reference_y, competing_x, competing_y, avg_mins):  #     rs = 1/n Integral |SD ts - SD ref|
     t_min = reference_x[0]
     t_max = reference_x[-1]
 
     RS = []
-    for i in range(t_min, t_max,60):
-        RS.append(abs(np.trapz(y=competing_y[i:i+60], x=competing_x[i:i+60]) - np.trapz(y=reference_y[i:i+60], x=reference_x[i:i+60])))
+    for i in range(t_min, t_max,avg_mins):
+        RS.append(abs(np.trapz(y=competing_y[i:i+avg_mins], x=competing_x[i:i+avg_mins]) - np.trapz(y=reference_y[i:i+avg_mins], x=reference_x[i:i+avg_mins])))
     return (1/(t_max - t_min)) * sum(RS)
 
 
-def get_ramp_score(ref_ls, model_ls, sens = 80, name='Compete', plot=True):
+
+
+def get_ramp_score(ref_ls, model_ls, avg_mins=5, sens = 80, name='Compete', plot=True):
     kwh_sens = sens
     kwh_sens = kwh_sens /100
 
     SD = swingingDoor()
-    y_reference, x_reference = SD.compress(ref_ls,kwh_sens)
-    y_compete, x_compete = SD.compress(model_ls,kwh_sens)
+    y_reference, x_reference = SD.compress(ref_ls,kwh_sens, avg_mins)
+    y_compete, x_compete = SD.compress(model_ls,kwh_sens, avg_mins)
 
     if plot:
         plt.plot(ref_ls, linestyle='-', color='gray', label='Actual')
@@ -184,6 +189,13 @@ def get_ramp_score(ref_ls, model_ls, sens = 80, name='Compete', plot=True):
         plt.show()
         plt.close()
 
-    rs = calc_ramp_score(x_reference, y_reference, x_compete, y_compete)
+    rs = calc_ramp_score(x_reference, y_reference, x_compete, y_compete, avg_mins)
     # print(rs)
     return rs
+
+# from data.data_helper import get_thesis_test_days, get_persistence_dates
+#
+# # t = get_thesis_test_days()
+# t = get_thesis_test_days(in_cloudy=False, in_parcloudy=False, in_sunny=True)
+# actual, pred, _ = get_persistence_dates(t, 6, 19, 20)
+# get_ramp_score(actual, pred, avg_mins=10, sens=80)

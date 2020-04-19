@@ -62,6 +62,7 @@ class ANN_Multi():
     def train(self,epochs=50, batch_size=128):
         self.history = self.model.fit(self.data.train_x_df, self.data.train_y_df, epochs=epochs, batch_size=batch_size,
                                       validation_data=(self.data.val_x_df, self.data.val_y_df),
+                                      # validation_data=(self.data.val_x_df, self.data.val_y_df),
                                       callbacks=[TestCallback(self.data.test_x_df, self.data.test_y_df),
                                                  EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True),
                                                  ModelCheckpoint(filepath= str(self.name) + '.h5', monitor='val_loss',
