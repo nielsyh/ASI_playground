@@ -49,7 +49,7 @@ class DataFrameSequenceMulti:
         if gradients:
             print('Gradient enabled')
             self.onsite_features = 3*2
-            self.img_features = 4*2
+            self.img_features = 7*2
             self.gradients = True
 
         # first onsite
@@ -224,7 +224,9 @@ class DataFrameSequenceMulti:
                             if v == self.img_idx:
                                 ts[0:minutes, v:v+7] = pxl_features[0:7, i:i + minutes].transpose()
                                 if self.gradients:
-                                    ts[0:minutes, v+7:v+14] = np.gradient(pxl_features[0:7, i:i + minutes].transpose())[0]
+                                    grad = np.gradient(pxl_features[0:7, i:i + minutes].transpose())[0]
+                                    print(grad.shape)
+                                    ts[0:minutes, (v+7):(v+14)] = grad
 
                         if cams == 2:
                             for v in range(variables):

@@ -75,7 +75,7 @@ def run_lstm_experiment(set='test'):
                     data.build_ts_df(start, end, [7,8,9,10,11,12], s, cams=c, clear_sky_label=False)
                     data.save_df()
                 else:
-                    data.build_ts_df(start, end, [7, 8, 9, 10], s, cams=c, clear_sky_label=False)
+                    data.build_ts_df(10, 11, [7], s, cams=c, clear_sky_label=False)
                 data.scale_mega('lstm')
                 name_time = '_sqnc_' + str(s)
                 name_data = 'data_' + permutations_names[pidx]
