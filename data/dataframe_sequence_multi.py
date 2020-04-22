@@ -143,7 +143,7 @@ class DataFrameSequenceMulti:
                 # todo add sunrise/sundown for start end hour? half hour?
                 day_data = get_df_csv_day_RP(m, d, start, end+1, 1).astype(int)
                 if self.img_data:
-                    img_data = get_features_by_day_rebuild(m, d, start, end + 1)
+                    pxl_features = get_features_by_day_rebuild(m, d, start, end + 1)
 
                 if cams == 2:
                     day_data2 = get_df_csv_day_RP(m, d, start, end+1, 1, cam=2).astype(int)
@@ -222,9 +222,9 @@ class DataFrameSequenceMulti:
                         # if img
                         if self.img_data:
                             if v == self.img_idx:
-                                ts[0:minutes, v:v+7] = img_data[i:i + minutes, 0:7]
+                                ts[0:minutes, v:v+7] = pxl_features[0:7, i:i + minutes].transpose()
                                 if self.gradients:
-                                    ts[0:minutes, v+7:v+14] = np.gradient(img_data[i:i + minutes, 0:7])[0]
+                                    ts[0:minutes, v+7:v+14] = np.gradient(pxl_features[0:7, i:i + minutes].transpose())[0]
 
                         if cams == 2:
                             for v in range(variables):
@@ -512,10 +512,10 @@ class DataFrameSequenceMulti:
 
         print('loaded')
 
-
-data = DataFrameSequenceMulti(False, True, True, False)
-data.build_ts_df(6, 19, [7, 8, 9, 10, 11, 12], 5, cams=1)
-data.save_df()
+#
+# data = DataFrameSequenceMulti(False, True, True, False)
+# data.build_ts_df(6, 19, [7, 8, 9, 10, 11, 12], 5, cams=1)
+# data.save_df()
 
 
 #

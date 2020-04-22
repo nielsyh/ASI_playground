@@ -133,7 +133,7 @@ def get_features_by_day_rebuild(month, day, start, end):
                 p5.append(0)
                 p6.append(0)
                 p7.append(0)
-    return p1, p2, p3, p4, p5, p6, p7
+    return np.array([p1, p2, p3, p4, p5, p6, p7])
 
 
 def get_features_by_day(month, day, start, end):
@@ -148,7 +148,7 @@ def get_features_by_day(month, day, start, end):
     for h in tqdm(hours, total=len(hours), unit='Hours progress'):
         for m in minutes:
             try:
-                img = get_image_by_date_time(19, month, day, h, m, 0)
+                img = get_image_by_date_time(month, day, h, m)
                 tmp = extract_features(img)
                 intensity.append(tmp[0])
                 number_of_cloud_pixels.append(tmp[1])
@@ -182,7 +182,6 @@ def get_image_by_date_time(month, day, hour, minute):
             else:
                 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                 return pre_process_img(image, 400)
-                # return image
 
     print('CANT FIND IMAGE: ')
     print(month, day, hour, minute)
