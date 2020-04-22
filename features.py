@@ -113,7 +113,7 @@ def get_features_by_day_rebuild(month, day, start, end):
     for h in tqdm(hours, total=len(hours), unit='Hours progress'):
         for m in minutes:
             try:
-                img = get_image_by_date_time(month, day, h, m)
+                img = get_image_by_date_time(8, 21, 12, 0)
                 tmp = cloud_pixel_feature(img)
                 p1.append(tmp[0])
                 p2.append(tmp[1])
