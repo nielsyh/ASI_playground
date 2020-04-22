@@ -5,6 +5,7 @@ from scipy import ndimage
 import os.path
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+import math
 
 def int_to_str(i):
     s = str(i)
@@ -72,7 +73,7 @@ def cloud_pixel_feature(img, plot=False):
         copy = cv2.circle(copy, loc, 120, (0, 0, 255), 0)
         copy = cv2.circle(copy, loc, 140, (0, 0, 255), 0)
         show_img(copy)
-    return [p1, p2, p3, p4, p5, p6, p7]
+    return p1, p2, p3, p4, p5, p6, p7
 
 def get_full_image_by_date_time(month, day, hour, minute, seconds):
     # seconds_list = ['0', '15', '30', '45']
@@ -103,6 +104,37 @@ def get_full_image_by_date_time(month, day, hour, minute, seconds):
         if hour >= 19:
             return 0
 
+def get_features_by_day_rebuild(month, day, start, end):
+    p1,p2,p3,p4,p5,p6,p7 = ([] for i in range(7))
+
+    hours = list(range(start, end))
+    minutes = list(range(0,60))
+
+    for h in tqdm(hours, total=len(hours), unit='Hours progress'):
+        for m in minutes:
+            try:
+                img = get_image_by_date_time(month, day, h, m)
+                tmp = cloud_pixel_feature(img)
+                p1.append(tmp[0])
+                p2.append(tmp[1])
+                p3.append(tmp[2])
+                p4.append(tmp[3])
+                p5.append(tmp[4])
+                p6.append(tmp[5])
+                p7.append(tmp[6])
+
+            except:
+                print('CANT FIND IMG')
+                print(month, day, h, m)
+                p1.append(0)
+                p2.append(0)
+                p3.append(0)
+                p4.append(0)
+                p5.append(0)
+                p6.append(0)
+                p7.append(0)
+    return p1, p2, p3, p4, p5, p6, p7
+
 
 def get_features_by_day(month, day, start, end):
     intensity = []
@@ -130,9 +162,9 @@ def get_features_by_day(month, day, start, end):
                 harris_corner_detector.append(0)
                 edge_detector.append(0)
 
-    return intensity, number_of_cloud_pixels, harris_corner_detector,edge_detector
+    return intensity, number_of_cloud_pixels, harris_corner_detector, edge_detector
 
-def get_image_by_date_time(month, day, hour, minute, seconds):
+def get_image_by_date_time(month, day, hour, minute):
     year = '2019'
     base_url = 'asi_16124/'
     tmp_url = year + int_to_str(month) + int_to_str(day)
@@ -155,14 +187,6 @@ def get_image_by_date_time(month, day, hour, minute, seconds):
     print('CANT FIND IMAGE: ')
     print(month, day, hour, minute)
     return None
-
-def get_cloud_pixels_img():
-    p1, p2, p3, p4, p5 = 0,0,0,0,0 # distance 20, 40, 60 ,80, 100
-    pass
-
-
-
-
 
 
 def extract_features(img):  # get df from image
@@ -312,7 +336,7 @@ def number_of_cloud_pixels_NRBR(img, th = 0.8):
     show_img(copy)
     return amount_of_cloud_pixels
 
-import math
+
 def get_distance(x1, x2, y1, y2):
     return math.sqrt(math.pow((x2-x1), 2) + math.pow((y2-y1),2))
 

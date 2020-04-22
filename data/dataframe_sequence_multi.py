@@ -6,7 +6,7 @@ import data.data_helper
 import calendar
 from tqdm import tqdm
 from sklearn.preprocessing import normalize
-from features import get_features_by_day
+from features import get_features_by_day, get_features_by_day_rebuild
 
 class DataFrameSequenceMulti:
 
@@ -34,7 +34,7 @@ class DataFrameSequenceMulti:
     number_of_features = 6
     onsite_features  = 3
     meteor_features = 9
-    img_features = 4
+    img_features = 7
     sequence_len_minutes = 60
     gradients = False
     cams = 1
@@ -51,7 +51,6 @@ class DataFrameSequenceMulti:
             self.onsite_features = 3*2
             self.img_features = 4*2
             self.gradients = True
-
 
         # first onsite
         if onsite_data:
@@ -143,14 +142,17 @@ class DataFrameSequenceMulti:
             for d in tqdm(days, total=len(days), unit='Days progress'):
                 # todo add sunrise/sundown for start end hour? half hour?
                 day_data = get_df_csv_day_RP(m, d, start, end+1, 1).astype(int)
+                if self.img_data:
+                    img_data = get_features_by_day_rebuild(m, d, start, end + 1)
+
                 if cams == 2:
                     day_data2 = get_df_csv_day_RP(m, d, start, end+1, 1, cam=2).astype(int)
 
-                if self.img_data:
-                    # intensity, cloudpixels, corners, edges = get_features_by_day(m, d, start, end+1)
-                    f = self.get_feature_data(m ,d, start, end+1)
-                    if cams == 2:
-                        f2 = self.get_feature_data(m ,d, start, end+1)
+                # if self.img_data:
+                #     # intensity, cloudpixels, corners, edges = get_features_by_day(m, d, start, end+1)
+                #     f = self.get_feature_data(m ,d, start, end+1)
+                #     if cams == 2:
+                #         f2 = self.get_feature_data(m ,d, start, end+1)
 
 
                 if self.meteor_data:  # get metoer data for 1st location
@@ -220,10 +222,9 @@ class DataFrameSequenceMulti:
                         # if img
                         if self.img_data:
                             if v == self.img_idx:
-                                ts[0:minutes, v:v+4] = f[i:i + minutes, 18:22]
+                                ts[0:minutes, v:v+7] = img_data[i:i + minutes, 0:7]
                                 if self.gradients:
-                                    ts[0:minutes, v+4:v+8] = np.gradient(f[i:i + minutes, 18:22])[0]
-
+                                    ts[0:minutes, v+7:v+14] = np.gradient(img_data[i:i + minutes, 0:7])[0]
 
                         if cams == 2:
                             for v in range(variables):
@@ -263,12 +264,12 @@ class DataFrameSequenceMulti:
                                             x = 17
                                         ts2[0:minutes, v] = [item[v - x] for item in ephemeris2[i:i + minutes]]
 
-                                # if img
-                                if self.img_data:
-                                    if v == self.img_idx:
-                                        ts2[0:minutes, v:v + 4] = f2[i:i + minutes, 18:22]
-                                        if self.gradients:
-                                            ts2[0:minutes, v + 4:v + 8] = np.gradient(f2[i:i + minutes, 18:22])[0]
+                                # # if img
+                                # if self.img_data:
+                                #     if v == self.img_idx:
+                                #         ts2[0:minutes, v:v + 4] = f2[i:i + minutes, 18:22]
+                                #         if self.gradients:
+                                #             ts2[0:minutes, v + 4:v + 8] = np.gradient(f2[i:i + minutes, 18:22])[0]
 
 
                     self.mega_df_x_1[day_index, i] = ts
