@@ -78,9 +78,9 @@ def run_ann_experiments():
 
 def ann_test():
     data = DataFrameSequenceMulti(False, True, False, False)
-    data.build_ts_df(6, 19, [10,11,12], 10, cams=1)
+    data.build_ts_df(6, 12, [8], 10, cams=1)
     # data.normalize_mega_EXPRTML(norm=True)
-    data.split_data_set_EXPRMTL(12, 30, 30)
+    data.split_data_set_EXPRMTL(8, 26, 3)
     data.scale_mega(model='ann')
     ann = ann_model_multi.ANN_Multi(data, 100, 'ANN_BETA_SEQUENCE_MUTLI_TEST')
     data.flatten_data_set()
@@ -88,30 +88,30 @@ def ann_test():
     ann.train(100)
 
     y_pred, rmse = ann.predict()
-
-    import matplotlib.pyplot as plt
-    from matplotlib.lines import lineStyles
-    plt.plot(ann.history.history['loss'])
-    plt.plot(ann.history.history['val_loss'], linestyle=':')
-    ymin = min(ann.history.history['val_loss'])
-    xpos = ann.history.history['val_loss'].index(ymin)
-    xmin = ann.history.history['val_loss'][xpos]
-    plt.annotate('Minimum validation loss', size=20, xy=(xpos, ymin), xytext=(xpos, ymin + 3000),
-                 arrowprops=dict(facecolor='black', shrink=0.05, width=5, headwidth=20),
-                 horizontalalignment='center', verticalalignment='top',
-                 )
-    # plt.ylim(0, 100000)
-    plt.title('ANN M 10 onsite', size=20)
-    plt.ylabel('Mean squared error', size=20)
-    plt.xlabel('Epochs', size=20)
-    plt.legend(['train', 'validation'], loc='upper left')
-    plt.show()
-
-    Metrics.write_results_multi('ANN_TEST_MULTI', data.test_x_df.reshape(
-        (data.test_x_df.shape[0],
-         data.sequence_len_minutes,
-         data.number_of_features)),
-                                data.test_y_df, y_pred)
+    #
+    # import matplotlib.pyplot as plt
+    # from matplotlib.lines import lineStyles
+    # plt.plot(ann.history.history['loss'])
+    # plt.plot(ann.history.history['val_loss'], linestyle=':')
+    # ymin = min(ann.history.history['val_loss'])
+    # xpos = ann.history.history['val_loss'].index(ymin)
+    # xmin = ann.history.history['val_loss'][xpos]
+    # plt.annotate('Minimum validation loss', size=20, xy=(xpos, ymin), xytext=(xpos, ymin + 3000),
+    #              arrowprops=dict(facecolor='black', shrink=0.05, width=5, headwidth=20),
+    #              horizontalalignment='center', verticalalignment='top',
+    #              )
+    # # plt.ylim(0, 100000)
+    # plt.title('ANN M 10 onsite', size=20)
+    # plt.ylabel('Mean squared error', size=20)
+    # plt.xlabel('Epochs', size=20)
+    # plt.legend(['train', 'validation'], loc='upper left')
+    # plt.show()
+    #
+    # Metrics.write_results_multi('ANN_TEST_MULTI', data.test_x_df.reshape(
+    #     (data.test_x_df.shape[0],
+    #      data.sequence_len_minutes,
+    #      data.number_of_features)),
+    #                             data.test_y_df, y_pred)
 
     print(rmse)
 
