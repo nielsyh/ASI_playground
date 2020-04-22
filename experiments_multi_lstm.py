@@ -65,7 +65,7 @@ def run_lstm_experiment(set='test'):
     sqs = [5]
     cams = [1]
     permutations = [(True, True, False)]
-    permutations_names = ['all data pixel loc']
+    permutations_names = ['pxl_onsite']
 
     for pidx, p in enumerate(permutations):
         for s in sqs:
