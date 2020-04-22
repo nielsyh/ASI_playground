@@ -120,12 +120,6 @@ def LSTM_test():
     plt.legend(['train', 'validation'], loc='upper left')
     plt.show()
 
-    Metrics.write_results_multi('ANN_TEST_MULTI', data.test_x_df.reshape(
-        (data.test_x_df.shape[0],
-         data.sequence_len_minutes,
-         data.number_of_features)),
-                                data.test_y_df, y_pred)
-
     Metrics.write_results_multi('LSTM_TEST_MULTI', data.test_x_df.reshape(
         (data.test_x_df.shape[0],
          data.sequence_len_minutes,

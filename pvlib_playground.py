@@ -5,6 +5,10 @@ import pvlib
 from pvlib.location import Location
 import math
 import numpy as np
+import features
+import cv2
+
+
 class PvLibPlayground:
 
     cam = 1
@@ -188,10 +192,7 @@ class PvLibPlayground:
         #elevation : actual elevation (not accounting for refraction) of the sun in decimal degrees, 0 = on horizon. The complement of the zenith angle.
         #apparent_zenith : apparent sun zenith accounting for atmospheric refraction.
         #solar_time : Solar time in decimal hours (solar noon is 12.00).
-        data = pvlib.solarposition.ephemeris(times, PvLibPlayground.get_latitude(), PvLibPlayground.get_longitude())[['apparent_elevation',
-                                                                                                                      'elevation',
-                                                                                                                      'apparent_zenith',
-                                                                                                                      'solar_time']].values.tolist()
+        data = pvlib.solarposition.ephemeris(times, PvLibPlayground.get_latitude(), PvLibPlayground.get_longitude())[['apparent_elevation',                                                                                                          'solar_time']].values.tolist()
         return data
 
     @staticmethod
@@ -203,17 +204,31 @@ class PvLibPlayground:
         ephemeris = PvLibPlayground.get_ephemeris_data(times)
         return csi, azimuth, zenith, sun_earth_dist, ephemeris
 
+    @staticmethod
+    def get_sun_cor_by_img(img, plot=False):
+        # img = features.get_image_by_date_time(8, 21, 17, 0, 0)
+        orig = img.copy()
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(gray)
 
-# p = PvLibPlayground()
-# times1 = PvLibPlayground.get_times(2019, 10,1, 7, 19)
-# times2 = PvLibPlayground.get_times(2019, 10,1, 7, 19,offset=3)
-#
-# print(PvLibPlayground.get_ephemeris_data(times1))
-# print(PvLibPlayground.get_ephemeris_data(times2))
-# t = PvLibPlayground.get_ephemeris_data(times)
-# with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
-#     print(t)
-#
-# print(PvLibPlayground.get_azimuth(10, 15, t))
-# PvLibPlayground.get_azimuth(10,15, PvLibPlayground.get_pd_time(10, 15, 12, 00))
-# p.get_clear_sky_irradiance(10,1)
+        if plot:
+            img = cv2.circle(orig, maxLoc, 10, (0, 0, 255), -1)
+            features.show_img(img)
+
+        return maxLoc
+
+    @staticmethod
+    def get_distance(x1, x2, y1, y2):
+        return math.sqrt(math.pow((x2-x1), 2) + math.pow((y2-y1),2))
+
+
+img = features.get_image_by_date_time(8, 21, 11, 0, 0)
+orig = img.copy()
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(gray)
+img = cv2.circle(img, maxLoc, 20, (0, 0, 255), 0)
+img = cv2.circle(img, maxLoc, 40, (0, 0, 255), 0)
+img = cv2.circle(img, maxLoc, 60, (0, 0, 255), 0)
+img = cv2.circle(img, maxLoc, 80, (0, 0, 255), 0)
+img = cv2.circle(img, maxLoc, 100, (0, 0, 255), 0)
+features.show_img(img)

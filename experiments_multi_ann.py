@@ -78,18 +78,16 @@ def run_ann_experiments():
 
 def ann_test():
     data = DataFrameSequenceMulti(False, True, False, False)
-    data.build_ts_df(6, 19, [7,8,9,10,11,12], 10, cams=1)
+    data.build_ts_df(6, 19, [10,11,12], 10, cams=1)
     # data.normalize_mega_EXPRTML(norm=True)
-    data.split_data_set_EXPRMTL(12, 15, 10)
+    data.split_data_set_EXPRMTL(12, 30, 30)
     data.scale_mega(model='ann')
     ann = ann_model_multi.ANN_Multi(data, 100, 'ANN_BETA_SEQUENCE_MUTLI_TEST')
     data.flatten_data_set()
     ann.get_model()
     ann.train(100)
 
-    plot_history('s1',1, ann.history)
     y_pred, rmse = ann.predict()
-
 
     import matplotlib.pyplot as plt
     from matplotlib.lines import lineStyles
@@ -98,14 +96,14 @@ def ann_test():
     ymin = min(ann.history.history['val_loss'])
     xpos = ann.history.history['val_loss'].index(ymin)
     xmin = ann.history.history['val_loss'][xpos]
-    plt.annotate('Minimum validation loss', size=20,  xy=(xpos, ymin), xytext=(xpos , ymin + 10000),
+    plt.annotate('Minimum validation loss', size=20, xy=(xpos, ymin), xytext=(xpos, ymin + 3000),
                  arrowprops=dict(facecolor='black', shrink=0.05, width=5, headwidth=20),
                  horizontalalignment='center', verticalalignment='top',
                  )
-
-    plt.title('ANN M 10 all data 15 September 2019',size=20)
-    plt.ylabel('Mean squared error',size=20)
-    plt.xlabel('Epochs',size=20)
+    # plt.ylim(0, 100000)
+    plt.title('ANN M 10 onsite', size=20)
+    plt.ylabel('Mean squared error', size=20)
+    plt.xlabel('Epochs', size=20)
     plt.legend(['train', 'validation'], loc='upper left')
     plt.show()
 

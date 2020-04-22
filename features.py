@@ -13,6 +13,67 @@ def int_to_str(i):
     else:
         return '0' + s
 
+def cloud_pixel_feature(img, plot=False):
+    p1, p2, p3, p4, p5, p6, p7 = 0, 0, 0, 0, 0, 0, 0 # distance 20, 40, 60 ,80, 100 etc
+    loc = get_sun_cor_by_img(img)
+    th = 0.8
+    copy = np.copy(img)
+    height, width, channels = img.shape
+    for h in range(0, height):
+        for w in range(0, width):
+            r = copy[h, w, 0]
+            b = copy[h, w, 1]
+            g = copy[h, w, 2]
+            np.seterr(divide='ignore', invalid='ignore')
+            rbr = r / b
+            if rbr > th and rbr < 1:
+                d = get_distance(loc[0], w, loc[1], h)
+                if d < 20:
+                    p1 += 1
+                    copy[h, w, 0] = 124
+                    copy[h, w, 1] = 252
+                    copy[h, w, 2] = 0
+                elif d < 40:
+                    p2 += 1
+                    copy[h, w, 0] = 0
+                    copy[h, w, 1] = 252
+                    copy[h, w, 2] = 254
+                elif d < 60:
+                    p3 += 1
+                    copy[h, w, 0] = 0
+                    copy[h, w, 1] = 0
+                    copy[h, w, 2] = 254
+                elif d < 80:
+                    p4 += 1
+                    copy[h, w, 0] = 50
+                    copy[h, w, 1] = 100
+                    copy[h, w, 2] = 0
+                elif d < 100:
+                    p5 += 1
+                    copy[h, w, 0] = 0
+                    copy[h, w, 1] = 254
+                    copy[h, w, 2] = 0
+                elif d < 120:
+                    p6 += 1
+                    copy[h, w, 0] = 156
+                    copy[h, w, 1] = 254
+                    copy[h, w, 2] = 0
+                elif d < 140:
+                    p7 += 1
+                    copy[h, w, 0] = 156
+                    copy[h, w, 1] = 44
+                    copy[h, w, 2] = 89
+    if plot:
+        copy = cv2.circle(copy, loc, 20, (0, 0, 255), 0)
+        copy = cv2.circle(copy, loc, 40, (0, 0, 255), 0)
+        copy = cv2.circle(copy, loc, 60, (0, 0, 255), 0)
+        copy = cv2.circle(copy, loc, 80, (0, 0, 255), 0)
+        copy = cv2.circle(copy, loc, 100, (0, 0, 255), 0)
+        copy = cv2.circle(copy, loc, 120, (0, 0, 255), 0)
+        copy = cv2.circle(copy, loc, 140, (0, 0, 255), 0)
+        show_img(copy)
+    return [p1, p2, p3, p4, p5, p6, p7]
+
 def get_full_image_by_date_time(month, day, hour, minute, seconds):
     # seconds_list = ['0', '15', '30', '45']
     seconds_list = [seconds]
@@ -95,10 +156,19 @@ def get_image_by_date_time(month, day, hour, minute, seconds):
     print(month, day, hour, minute)
     return None
 
+def get_cloud_pixels_img():
+    p1, p2, p3, p4, p5 = 0,0,0,0,0 # distance 20, 40, 60 ,80, 100
+    pass
+
+
+
+
+
+
 def extract_features(img):  # get df from image
     features = np.zeros(4)
     features[0] = intensity(img)
-    features[1] = number_of_cloud_pixels(img)
+    features[1] = number_of_cloud_pixels_RBR(img)
     features[2] = harris_corner_detector(img)
     features[3] = edge_detector(img)
 
@@ -162,7 +232,6 @@ def harris_corner_detector(img):
     # print(corner_count)
 
 
-
 def edge_detector(img):
     edges = cv2.Canny(img, img.shape[0], img.shape[1])
     return np.count_nonzero(edges)
@@ -190,6 +259,8 @@ def number_of_cloud_pixels_RBR(img, th = 0.8):
     return amount_of_cloud_pixels
 
 
+
+
 def number_of_cloud_pixels_BRBG(img, th = 2):
     copy = np.copy(img)
     height, width, channels = img.shape
@@ -211,6 +282,15 @@ def number_of_cloud_pixels_BRBG(img, th = 2):
     show_img(copy)
     return amount_of_cloud_pixels
 
+def get_sun_cor_by_img(img, plot=False):
+    # img = features.get_image_by_date_time(8, 21, 17, 0, 0)
+    orig = img.copy()
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(gray)
+    if plot:
+        img = cv2.circle(orig, maxLoc, 10, (0, 0, 255), -1)
+        show_img(img)
+    return maxLoc
 
 def number_of_cloud_pixels_NRBR(img, th = 0.8):
     copy = np.copy(img)
@@ -232,6 +312,9 @@ def number_of_cloud_pixels_NRBR(img, th = 0.8):
     show_img(copy)
     return amount_of_cloud_pixels
 
+import math
+def get_distance(x1, x2, y1, y2):
+    return math.sqrt(math.pow((x2-x1), 2) + math.pow((y2-y1),2))
 
 
 def show_img(img):
@@ -240,8 +323,7 @@ def show_img(img):
     plt.show()
 
 
-img = get_image_by_date_time(8,21,12,0,0)
-show_img(img)
-number_of_cloud_pixels_RBR(img)
-number_of_cloud_pixels_BRBG(img)
-number_of_cloud_pixels_NRBR(img)
+
+
+
+
