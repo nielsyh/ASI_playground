@@ -513,6 +513,11 @@ class DataFrameSequenceMulti:
         print('loaded')
 
 
+data = DataFrameSequenceMulti(False, True, True, False)
+data.build_ts_df(6, 19, [7, 8, 9, 10, 11, 12], 5, cams=1)
+data.save_df()
+
+
 #
 # data = DataFrameSequence(False, 20)
 # data.build_ts_df(10,13,[9,10],45,2)
