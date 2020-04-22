@@ -71,8 +71,8 @@ def run_lstm_experiment():
         for s in sqs:
             for c in cams:
                 data = DataFrameSequenceMulti(False, p[0], p[1], p[2])
-                data.build_ts_df(start, end, [7,8,9,10], s, cams=c, clear_sky_label=False)
-                # data.save_df()
+                data.build_ts_df(start, end, [7,8,9,10,11,12], s, cams=c, clear_sky_label=False)
+                data.save_df()
                 data.scale_mega('lstm')
                 name_time = '_sqnc_' + str(s)
                 name_data = 'data_' + permutations_names[pidx]
@@ -80,8 +80,8 @@ def run_lstm_experiment():
                 name_cam = '_cams_' + str(c)
 
                 lstm = lstm_model_multi.LSTM_predictor(data, 100,
-                                                'LSTM_MULTI PREM PXL' + name_epoch + name_time + name_data + name_cam, pred_csi=False)
-                lstm.set_days(data.get_prem_days())
+                                                'LSTM_MULTI TEST PXL' + name_epoch + name_time + name_data + name_cam, pred_csi=False)
+                lstm.set_days(data.get_thesis_test_days())
                 lstm.run_experiment()
 
 
