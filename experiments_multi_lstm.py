@@ -64,7 +64,7 @@ def run_final_test_days():
 def run_lstm_experiment(set='test'):
     sqs = [5]
     cams = [1]
-    permutations = [(True, False, False)]
+    permutations = [(True, True, False)]
     permutations_names = ['pxl_onsite']
 
     for pidx, p in enumerate(permutations):
@@ -132,7 +132,6 @@ def LSTM_test():
 
     print(rmse)
 
-
 def optimize():
     # data.build_ts_df(6, 19, [8, 9, 10,11,12], 10, cams=1, clear_sky_label=False)
     # data.normalize_mega_df()
@@ -193,7 +192,6 @@ def optimize():
     print('train loss: ' + str(min(min_loss)))
     print('epoch: ')
     print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
-
 
 run_lstm_experiment(set='val')
 # run_final_test_days()
