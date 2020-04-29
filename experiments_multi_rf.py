@@ -11,7 +11,7 @@ sequence_lenth = 20
 def run_final_all_days():
     data = DataFrameSequenceMulti(False, True, True, True)
     data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], sequence_lenth)
-    data.normalize_mega_df()
+    data.scale_mega(model='rf')
     name_time = '_sqnc_' + str(sequence_lenth)
     name_data = 'data_' + 'all'
     rf = rf_model_multi.RF_predictor(data, 'RF SEQUENCE multi all data' + name_time + name_data)
@@ -95,7 +95,7 @@ def rd_search_grid():
     print("grid.best_params_ {}".format(grid.best_params_))
 
 
-run_final_test_days()
+run_final_all_days()
 # rf_experiment()
 # rf_test()
 # run_final_test_days()

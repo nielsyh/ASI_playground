@@ -72,8 +72,9 @@ def run_lstm_experiment(set='test'):
             for c in cams:
                 data = DataFrameSequenceMulti(False, p[0], p[1], p[2])
                 if set == 'test':
+                    # data.load_prev_mega_df()
                     data.build_ts_df(start, end, [7,8,9,10,11,12], s, cams=c, clear_sky_label=False)
-                    data.save_df()
+                    # data.save_df()
                 else:
                     data.build_ts_df(start, end, [7,8,9,10], s, cams=c, clear_sky_label=False)
                 data.scale_mega('lstm')
@@ -86,7 +87,7 @@ def run_lstm_experiment(set='test'):
                                                     'LSTM_TEST_PXL' + name_epoch + name_time + name_data + name_cam)
                     lstm.set_days(data.get_thesis_test_days())
                 else:
-                    lstm = lstm_model_multi.LSTM_predictor(data, 100, 'LSTM_PREM_PXL' + name_epoch + name_time + name_data + name_cam)
+                    lstm = lstm_model_multi.LSTM_predictor(data, 100, 'LSTM_PREM2_PXL' + name_epoch + name_time + name_data + name_cam)
                     lstm.set_days(data.get_prem_days())
 
                 lstm.run_experiment()
@@ -94,10 +95,10 @@ def run_lstm_experiment(set='test'):
 
 def LSTM_test():
     data = DataFrameSequenceMulti(False, True, True, False)
-    data.build_ts_df(6, 19, [7,8,9,10], 5)
+    # data.build_ts_df(6, 19, [7,8,9,10], 5)
+    data.load_prev_mega_df()
     lstm = lstm_model_multi.LSTM_predictor(data, 100, 'LSTM_TEST')
-
-    data.split_data_set_EXPRMTL(12, 30, 20)
+    data.split_data_set_EXPRMTL(9, 15, 3)
     data.scale_mega(model='lstm')
     data.flatten_data_set_to_3d()
 
@@ -106,29 +107,29 @@ def LSTM_test():
     y_pred, rmse = lstm.predict()
     # plot_history('s1', 1, lstm.history)
 
-    import matplotlib.pyplot as plt
-    from matplotlib.lines import lineStyles
-    plt.plot(lstm.history.history['loss'])
-    plt.plot(lstm.history.history['val_loss'], linestyle=':')
-    ymin = min(lstm.history.history['val_loss'])
-    xpos = lstm.history.history['val_loss'].index(ymin)
-    xmin = lstm.history.history['val_loss'][xpos]
-    plt.annotate('Minimum validation loss', size=20, xy=(xpos, ymin), xytext=(xpos, ymin + 30000),
-                 arrowprops=dict(facecolor='black', shrink=0.05, width=5, headwidth=20),
-                 horizontalalignment='center', verticalalignment='top',
-                 )
-    plt.ylim(0, 100000)
-    plt.title('LSTM M 5 all data', size=20)
-    plt.ylabel('Mean squared error', size=20)
-    plt.xlabel('Epochs', size=20)
-    plt.legend(['train', 'validation'], loc='upper left')
-    plt.show()
-
-    Metrics.write_results_multi('LSTM_TEST_MULTI', data.test_x_df.reshape(
-        (data.test_x_df.shape[0],
-         data.sequence_len_minutes,
-         data.number_of_features)),
-                                data.test_y_df, y_pred)
+    # import matplotlib.pyplot as plt
+    # from matplotlib.lines import lineStyles
+    # plt.plot(lstm.history.history['loss'])
+    # plt.plot(lstm.history.history['val_loss'], linestyle=':')
+    # ymin = min(lstm.history.history['val_loss'])
+    # xpos = lstm.history.history['val_loss'].index(ymin)
+    # xmin = lstm.history.history['val_loss'][xpos]
+    # plt.annotate('Minimum validation loss', size=20, xy=(xpos, ymin), xytext=(xpos, ymin + 30000),
+    #              arrowprops=dict(facecolor='black', shrink=0.05, width=5, headwidth=20),
+    #              horizontalalignment='center', verticalalignment='top',
+    #              )
+    # plt.ylim(0, 100000)
+    # plt.title('LSTM M 5 all data', size=20)
+    # plt.ylabel('Mean squared error', size=20)
+    # plt.xlabel('Epochs', size=20)
+    # plt.legend(['train', 'validation'], loc='upper left')
+    # plt.show()
+    #
+    # Metrics.write_results_multi('LSTM_TEST_MULTI', data.test_x_df.reshape(
+    #     (data.test_x_df.shape[0],
+    #      data.sequence_len_minutes,
+    #      data.number_of_features)),
+    #                             data.test_y_df, y_pred)
 
     print(rmse)
 
@@ -193,6 +194,7 @@ def optimize():
     print('epoch: ')
     print(res[best_loss].history['loss'].index(min(res[best_loss].history['loss'])))
 
-run_lstm_experiment(set='val')
+run_lstm_experiment(set='test')
 # run_final_test_days()
 # run_final_all_days()
+# LSTM_test()

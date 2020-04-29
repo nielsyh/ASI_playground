@@ -39,11 +39,12 @@ def LSTM_experiment(prediction_horizon, minutes_sequence, data, data_name):
 
 def LSTM_test():
     # debug, pred_horizon, onsite_data, img_data, meteor_data
-    data = DataFrameSequence(False, 20, True, True, True)
+    data = DataFrameSequence(False, 20, True, True, False)
     # start, end, months, lenth_tm
-    data.build_ts_df(12, 15, [8,9], 5)
+    data.load_prev_mega_df()
+
     lstm = lstm_model.LSTM_predictor(data, 50, 50, 'LSTM_TEST')
-    data.normalize_mega_df()
+    data.s
     data.split_data_set(9, 15)
     data.flatten_data_set_to_3d()
     lstm.get_model()

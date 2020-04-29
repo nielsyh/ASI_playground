@@ -170,6 +170,8 @@ def build_name(arr):
 
         if 'all data' in str:  # data type
             tmp_name = tmp_name + ' all data'
+        elif 'PXL' in str:
+            tmp_name = tmp_name + ' PXL'
         elif 'onsite' in str:
             tmp_name = tmp_name + ' onsite'
         elif 'img only' in str:

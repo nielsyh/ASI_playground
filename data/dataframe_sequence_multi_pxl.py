@@ -62,7 +62,7 @@ class DataFrameSequenceMulti:
         if img_data:
             self.img_idx = self.number_of_features
             self.number_of_features = self.number_of_features + self.img_features
-            self.load_features_rebuild()
+            self.load_features()
             print('DF with images')
 
         if img_data and self.cams == 2:

@@ -7,6 +7,15 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 import math
 
+
+def getColor_racket(N, idx):
+    import matplotlib as mpl
+    c = 'jet'
+    cmap = mpl.cm.get_cmap(c)
+    norm = mpl.colors.Normalize(vmin=0.0, vmax=N - 1)
+    return cmap(norm(idx))
+
+
 def int_to_str(i):
     s = str(i)
     if(len(s)) == 2:
@@ -29,49 +38,51 @@ def cloud_pixel_feature(img, plot=False):
             rbr = r / b
             if rbr > th and rbr < 1:
                 d = get_distance(loc[0], w, loc[1], h)
+
                 if d < 20:
                     p1 += 1
-                    copy[h, w, 0] = 124
-                    copy[h, w, 1] = 252
-                    copy[h, w, 2] = 0
+                    copy[h, w, 0] = 214
+                    copy[h, w, 1] = 70
+                    copy[h, w, 2] = 17
                 elif d < 40:
                     p2 += 1
-                    copy[h, w, 0] = 0
-                    copy[h, w, 1] = 252
-                    copy[h, w, 2] = 254
+                    copy[h, w, 0] = 214
+                    copy[h, w, 1] = 175
+                    copy[h, w, 2] = 17
                 elif d < 60:
                     p3 += 1
-                    copy[h, w, 0] = 0
-                    copy[h, w, 1] = 0
-                    copy[h, w, 2] = 254
+                    copy[h, w, 0] = 161
+                    copy[h, w, 1] = 214
+                    copy[h, w, 2] = 17
                 elif d < 80:
                     p4 += 1
-                    copy[h, w, 0] = 50
-                    copy[h, w, 1] = 100
-                    copy[h, w, 2] = 0
+                    copy[h, w, 0] = 17
+                    copy[h, w, 1] = 214
+                    copy[h, w, 2] = 89
                 elif d < 100:
                     p5 += 1
-                    copy[h, w, 0] = 0
-                    copy[h, w, 1] = 254
-                    copy[h, w, 2] = 0
+                    copy[h, w, 0] = 125
+                    copy[h, w, 1] = 17
+                    copy[h, w, 2] = 214
                 elif d < 120:
                     p6 += 1
-                    copy[h, w, 0] = 156
-                    copy[h, w, 1] = 254
-                    copy[h, w, 2] = 0
+                    copy[h, w, 0] = 98
+                    copy[h, w, 1] = 140
+                    copy[h, w, 2] = 99
                 elif d < 140:
                     p7 += 1
-                    copy[h, w, 0] = 156
-                    copy[h, w, 1] = 44
-                    copy[h, w, 2] = 89
+                    copy[h, w, 0] = 95
+                    copy[h, w, 1] = 105
+                    copy[h, w, 2] = 70
     if plot:
-        copy = cv2.circle(copy, loc, 20, (0, 0, 255), 0)
-        copy = cv2.circle(copy, loc, 40, (0, 0, 255), 0)
-        copy = cv2.circle(copy, loc, 60, (0, 0, 255), 0)
-        copy = cv2.circle(copy, loc, 80, (0, 0, 255), 0)
-        copy = cv2.circle(copy, loc, 100, (0, 0, 255), 0)
-        copy = cv2.circle(copy, loc, 120, (0, 0, 255), 0)
-        copy = cv2.circle(copy, loc, 140, (0, 0, 255), 0)
+        clr = (255,255,255)
+        copy = cv2.circle(copy, loc, 20, clr, 0)
+        copy = cv2.circle(copy, loc, 40, clr, 0)
+        copy = cv2.circle(copy, loc, 60, clr, 0)
+        copy = cv2.circle(copy, loc, 80, clr, 0)
+        copy = cv2.circle(copy, loc, 100, clr, 0)
+        copy = cv2.circle(copy, loc, 120, clr, 0)
+        copy = cv2.circle(copy, loc, 140, clr, 0)
         show_img(copy)
     return p1, p2, p3, p4, p5, p6, p7
 
@@ -344,9 +355,11 @@ def show_img(img):
     plt.axis('off')
     plt.imshow(img)
     plt.show()
-
-
-
-
+#
+# img = get_image_by_date_time(8,21,11,0)
+# cloud_pixel_feature(img, plot=True)
+#
+#
+#
 
 

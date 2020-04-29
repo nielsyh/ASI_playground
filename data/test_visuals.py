@@ -263,20 +263,20 @@ def plot_err_hor_test(model, max_models=9, save=0):
                 name_ramp = 'final_plots_test/' + model + '_' + weather_names[idx] + '_prem_ramp_' + str(id) + '.jpg'
                 save_as = [name_rmse, name_mae, name_mape, name_ramp]
 
-            # data.data_visuals.plot_error_per_horizons([rmse_persistence] + [rmse_spersistence] + trmse[i:i + max_models], predictions,
-            #                         ['Persistence'] + ['Smart-persistence'] + names[i:i + max_models],
-            #                         'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Root mean squared error',
-            #                         save_as[0])
+            data.data_visuals.plot_error_per_horizons([rmse_persistence] + [rmse_spersistence] + trmse[i:i + max_models], predictions,
+                                    ['Persistence'] + ['Smart-persistence'] + names[i:i + max_models],
+                                    'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Root mean squared error',
+                                    save_as[0])
 
             data.data_visuals.plot_error_per_horizons([mae_persistence]+ [mae_spersistence] + tmae[i:i + max_models], predictions,
                                     ['Persistence'] + ['Smart-persistence']+ names[i:i + max_models],
                                     'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Mean average error',
                                     save_as[1])
 
-            # data.data_visuals.plot_error_per_horizons([mape_persistence]+ [mape_spersistence] + tmape[i:i + max_models], predictions,
-            #                         ['Persistence'] + ['Smart-persistence']+ names[i:i + max_models],
-            #                         'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Mean average percentage error',
-            #                         save_as[2])
+            data.data_visuals.plot_error_per_horizons([mape_persistence]+ [mape_spersistence] + tmape[i:i + max_models], predictions,
+                                    ['Persistence'] + ['Smart-persistence']+ names[i:i + max_models],
+                                    'Average error ' + weather_names[idx], 'Prediction horizon in minutes', 'Mean average percentage error',
+                                    save_as[2])
 
             data.data_visuals.plot_error_per_horizons([ramp_persistence] + [ramp_spersistence] + tramp[i:i + max_models], predictions,
                                     ['Persistence'] + ['Smart-persistence']+ names[i:i + max_models],
@@ -487,7 +487,6 @@ def normal_bar_plot(model, save_as='none'):
         save_name = model + '_bar_plot_' + str(idx) + '.jpg'
         if save_as != 'none':
             plt.savefig('final bar plots/' + save_name)
-
         else:
             plt.show()
         plt.close()
