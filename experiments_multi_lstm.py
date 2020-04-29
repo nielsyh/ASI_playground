@@ -8,7 +8,7 @@ from data.data_helper import plot_history
 
 epochs = 100
 start = 6
-end = 19
+end = 18
 
 res = []
 sets = []
