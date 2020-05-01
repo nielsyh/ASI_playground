@@ -6,7 +6,7 @@ import data.data_helper
 import calendar
 from tqdm import tqdm
 from sklearn.preprocessing import normalize
-from features import get_features_by_day, get_features_by_day_rebuild
+from features import get_features_by_day
 
 class DataFrameSequenceMulti:
 
@@ -34,7 +34,7 @@ class DataFrameSequenceMulti:
     number_of_features = 6
     onsite_features  = 3
     meteor_features = 9
-    img_features = 7
+    img_features = 4
     sequence_len_minutes = 60
     gradients = False
     cams = 1
@@ -49,8 +49,9 @@ class DataFrameSequenceMulti:
         if gradients:
             print('Gradient enabled')
             self.onsite_features = 3*2
-            self.img_features = 7*2
+            self.img_features = 4*2
             self.gradients = True
+
 
         # first onsite
         if onsite_data:
@@ -62,41 +63,13 @@ class DataFrameSequenceMulti:
         if img_data:
             self.img_idx = self.number_of_features
             self.number_of_features = self.number_of_features + self.img_features
-            self.load_features_rebuild()
+            self.load_features()
             print('DF with images')
 
         if img_data and self.cams == 2:
             raise ValueError('Cams 2 and images not possible')
 
         print('Total size: ' + str(self.number_of_features))
-
-    def load_features_rebuild(self):
-        data.data_helper.fix_directory()
-        self.features = np.load('mega_dfx.npy')
-
-    def get_pxl_features(self, month, day, start, end):
-        start_time_idx = (start - 6)*60
-        end_time_idx = (end - 6)*60
-        previous_days = 0
-
-        month_list = list(range(7,month+1))
-        for i in month_list:
-            if i == 7:
-                continue
-            if i == 8:
-                previous_days += 5
-            else:
-                previous_days += calendar.monthrange(2019, i-1)[1]
-        if month == 7:
-            day_idx = day - 26
-        else:
-            day_idx = previous_days + day
-
-        tmp = []
-        for i in self.features[day_idx, start_time_idx:end_time_idx]:
-            tmp.append(i[0])
-
-        return np.array(tmp)
 
     def load_features(self):
         data.data_helper.fix_directory()
@@ -170,18 +143,15 @@ class DataFrameSequenceMulti:
             for d in tqdm(days, total=len(days), unit='Days progress'):
                 # todo add sunrise/sundown for start end hour? half hour?
                 day_data = get_df_csv_day_RP(m, d, start, end+1, 1).astype(int)
-                if self.img_data:
-                    pxl_features = self.get_pxl_features(m, d, start, end+1)
-                        # get_features_by_day_rebuild(m, d, start, end + 1)
-
                 if cams == 2:
                     day_data2 = get_df_csv_day_RP(m, d, start, end+1, 1, cam=2).astype(int)
 
-                # if self.img_data:
+                if self.img_data:
                     # intensity, cloudpixels, corners, edges = get_features_by_day(m, d, start, end+1)
-                    # f = self.get_pxl_features(m ,d, start, end+1)
-                #     if cams == 2:
-                #         f2 = self.get_feature_data(m ,d, start, end+1)
+                    f = self.get_feature_data(m ,d, start, end+1)
+                    if cams == 2:
+                        f2 = self.get_feature_data(m ,d, start, end+1)
+
 
                 if self.meteor_data:  # get metoer data for 1st location
                     PvLibPlayground.set_cam(1)
@@ -247,20 +217,13 @@ class DataFrameSequenceMulti:
                                     x = 17
                                 ts[0:minutes, v] = [item[v - x] for item in ephemeris[i:i+minutes]]
 
-                        # # if img
-                        # if self.img_data:
-                        #     if v == self.img_idx:
-                        #         ts[0:minutes, v:v+7] = pxl_features[0:7, i:i + minutes].transpose()
-                        #         if self.gradients:
-                        #             grad = np.gradient(pxl_features[0:7, i:i + minutes].transpose())[0]
-                        #             print(grad.shape)
-                        #             ts[0:minutes, (v+7):(v+14)] = grad
-                        # # if img
+                        # if img
                         if self.img_data:
                             if v == self.img_idx:
-                                ts[0:minutes, v:v + 7] = pxl_features[i:i + minutes, 12:19]
+                                ts[0:minutes, v:v+4] = f[i:i + minutes, 18:22]
                                 if self.gradients:
-                                    ts[0:minutes, (v+7):(v+14)] = np.gradient(pxl_features[i:i + minutes, 12:19])[0]
+                                    ts[0:minutes, v+4:v+8] = np.gradient(f[i:i + minutes, 18:22])[0]
+
 
                         if cams == 2:
                             for v in range(variables):
@@ -300,12 +263,12 @@ class DataFrameSequenceMulti:
                                             x = 17
                                         ts2[0:minutes, v] = [item[v - x] for item in ephemeris2[i:i + minutes]]
 
-                                # # if img
-                                # if self.img_data:
-                                #     if v == self.img_idx:
-                                #         ts2[0:minutes, v:v + 4] = f2[i:i + minutes, 18:22]
-                                #         if self.gradients:
-                                #             ts2[0:minutes, v + 4:v + 8] = np.gradient(f2[i:i + minutes, 18:22])[0]
+                                # if img
+                                if self.img_data:
+                                    if v == self.img_idx:
+                                        ts2[0:minutes, v:v + 4] = f2[i:i + minutes, 18:22]
+                                        if self.gradients:
+                                            ts2[0:minutes, v + 4:v + 8] = np.gradient(f2[i:i + minutes, 18:22])[0]
 
 
                     self.mega_df_x_1[day_index, i] = ts
@@ -434,13 +397,12 @@ class DataFrameSequenceMulti:
         if model == 'lstm':
             print('scale for lstm')
             # if self.onsite_data:
-            #     ctn.extend([6, 7, 8])
-            # # if self.meteor_data:
-            # #     ctn.extend([self.meteor_idx, self.meteor_idx + 1, self.meteor_idx + 5, self.meteor_idx + 9])
-            # if self.img_data:
-            #     ctn.extend([self.img_idx, self.img_idx +1 , self.img_idx+ 2, self.img_idx + 3, self.img_idx + 4, self.img_idx + 5, self.img_idx + 6])
-            #     ctn.extend([self.img_idx+7, self.img_idx + 8, self.img_idx + 9, self.img_idx + 10, self.img_idx + 11,self.img_idx + 12, self.img_idx + 13])
-            #
+            #     ctn.extend([8])
+            # if self.meteor_data:
+            #     ctn.extend([self.meteor_idx, self.meteor_idx + 1, self.meteor_idx + 5, self.meteor_idx + 9])
+            if self.img_data:
+                ctn.extend([self.img_idx, self.img_idx +1 , self.img_idx+ 2, self.img_idx + 3])
+
 
         if model == 'rf':
             print('scale for rf')
@@ -537,11 +499,9 @@ class DataFrameSequenceMulti:
 
     def load_prev_mega_df(self):  # todo get data from df
         self.start = 6
-        self.end = 19
+        self.end = 20
         self.step = 1
         self.months = [7,8,9,10,11,12]
-        self.sequence_len_minutes = 5
-
         # self.queries_per_day = int(((self.end - self.start) * 60 / self.step))  # amount of data in one day
         self.mega_df_x_1 = np.load('mega_dfx.npy')
         self.mega_df_y_1 = np.load('mega_dfy.npy')
@@ -551,5 +511,25 @@ class DataFrameSequenceMulti:
 
         print('loaded')
 
+
 #
-# data = DataFrameSequenceMulti(False, True, True, False)
+# data = DataFrameSequence(False, 20)
+# data.build_ts_df(10,13,[9,10],45,2)
+# data.split_data_set(9,27)
+
+# data = DataFrameSequence(False, 20)
+# data.build_ts_df(9,18,[7,8,9,10],1)
+# # data.save_df()
+# data.split_data_set(8,25)
+# data.flatten_data_set_to_3d()
+# data
+
+
+
+# # data.normalize_data_sets()
+# # data.load_prev_mega_df()
+# ann = ann_model.ANN(data, 50, 50)
+# ann.run_experiment()
+# # lstm = lstm_model.LSTM_predictor(data, 400,100)
+# # lstm.get_model()
+# # lstm.run_experiment()

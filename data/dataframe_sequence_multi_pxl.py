@@ -62,7 +62,7 @@ class DataFrameSequenceMulti:
         if img_data:
             self.img_idx = self.number_of_features
             self.number_of_features = self.number_of_features + self.img_features
-            self.load_features()
+            self.load_features_rebuild()
             print('DF with images')
 
         if img_data and self.cams == 2:
@@ -91,7 +91,12 @@ class DataFrameSequenceMulti:
             day_idx = day - 26
         else:
             day_idx = previous_days + day
-        return self.features[day_idx, start_time_idx:end_time_idx]
+
+        tmp = []
+        for i in self.features[day_idx, start_time_idx:end_time_idx]:
+            tmp.append(i[0])
+
+        return np.array(tmp)
 
     def load_features(self):
         data.data_helper.fix_directory()
@@ -548,28 +553,3 @@ class DataFrameSequenceMulti:
 
 #
 # data = DataFrameSequenceMulti(False, True, True, False)
-# data.build_ts_df(6, 19, [7, 8, 9, 10, 11, 12], 5, cams=1)
-# data.save_df()
-
-
-#
-# data = DataFrameSequence(False, 20)
-# data.build_ts_df(10,13,[9,10],45,2)
-# data.split_data_set(9,27)
-
-# data = DataFrameSequence(False, 20)
-# data.build_ts_df(9,18,[7,8,9,10],1)
-# # data.save_df()
-# data.split_data_set(8,25)
-# data.flatten_data_set_to_3d()
-# data
-
-
-
-# # data.normalize_data_sets()
-# # data.load_prev_mega_df()
-# ann = ann_model.ANN(data, 50, 50)
-# ann.run_experiment()
-# # lstm = lstm_model.LSTM_predictor(data, 400,100)
-# # lstm.get_model()
-# # lstm.run_experiment()

@@ -6,17 +6,28 @@ from metrics import Metrics
 
 start = 6
 end = 19
-sequence_lenth = 20
+
 
 def run_final_all_days():
-    data = DataFrameSequenceMulti(False, True, True, True)
-    data.build_ts_df(start, end, [7, 8, 9, 10, 11, 12], sequence_lenth)
-    data.scale_mega(model='rf')
-    name_time = '_sqnc_' + str(sequence_lenth)
-    name_data = 'data_' + 'all'
-    rf = rf_model_multi.RF_predictor(data, 'RF SEQUENCE multi all data' + name_time + name_data)
-    rf.set_days(data.get_all_test_days())
-    rf.run_experiment()
+    permutations = [(True, True, True),(True, False, False)]
+    permutations_names = ['all data','onsite_only']
+    sqs = [5,60]
+    cams = [1]
+    for c in cams:
+        for pidx, p in enumerate(permutations):
+            for s in sqs:
+                data = DataFrameSequenceMulti(False, p[0], p[1], p[2])
+                data.build_ts_df(start,end,[7,8,9,10,11,12],s, cams=c)
+                data.scale_mega(model='rf')
+
+                name_time = '_sqnc_' + str(s)
+                name_data = '_data_' + permutations_names[pidx]
+                name_cam = '_cams_' + str(c)
+
+                rf = rf_model_multi.RF_predictor(data, 'RF_MULTI_ALL' + name_cam + name_time + name_data)
+                rf.set_days(data.get_all_test_days())
+                rf.run_experiment()
+                print('Finish rf')
 
 def run_final_test_days():
     permutations = [(True, True, True),(True, False, False), (False, True, False)]
@@ -59,8 +70,7 @@ def rf_experiment():
 
 def rf_test():
     data = DataFrameSequenceMulti(False, True, True, True)
-    # a = data.get_prem_days()
-    data.build_ts_df(7, 10, [7], 5)
+    data.build_ts_df(8, 10, [8], 10)
     data.normalize_mega_df()
     rf = rf_model_multi.RF_predictor(data, 'RF SEQUENCE multi PREM_ NO METOER')
     # rf.set_days(a)
@@ -95,7 +105,7 @@ def rd_search_grid():
     print("grid.best_params_ {}".format(grid.best_params_))
 
 
+# rf_test()
 run_final_all_days()
 # rf_experiment()
-# rf_test()
 # run_final_test_days()

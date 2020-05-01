@@ -192,7 +192,11 @@ class PvLibPlayground:
         #elevation : actual elevation (not accounting for refraction) of the sun in decimal degrees, 0 = on horizon. The complement of the zenith angle.
         #apparent_zenith : apparent sun zenith accounting for atmospheric refraction.
         #solar_time : Solar time in decimal hours (solar noon is 12.00).
-        data = pvlib.solarposition.ephemeris(times, PvLibPlayground.get_latitude(), PvLibPlayground.get_longitude())[['apparent_elevation',                                                                                                          'solar_time']].values.tolist()
+        data = pvlib.solarposition.ephemeris(times, PvLibPlayground.get_latitude(), PvLibPlayground.get_longitude())[
+            ['apparent_elevation',
+             'elevation',
+             'apparent_zenith',
+             'solar_time']].values.tolist()
         return data
 
     @staticmethod
